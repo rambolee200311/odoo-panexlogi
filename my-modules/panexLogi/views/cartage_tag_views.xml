@@ -1,0 +1,21 @@
+<odoo>
+    <data>
+        <record id="cartage_tag_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.cartage.tag.tree.view</field>
+            <field name="model">panexlogi.cartage.tag</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="cartage_tag_action" model="ir.actions.act_window">
+            <field name="name">Cartage Tag</field>
+            <field name="res_model">panexlogi.cartage.tag</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+    </data>
+</odoo>

@@ -1,0 +1,220 @@
+<odoo>
+    <data noupdate="1">
+        <record id="seq_cartage" model="ir.sequence">
+            <field name="name">cartage offer 序列号</field>
+            <field name="code">seq.cartage</field>
+            <field name="prefix">CA%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_cartage_offer" model="ir.sequence">
+            <field name="name">cartage offer 序列号</field>
+            <field name="code">seq.cartage.offer</field>
+            <field name="prefix">COF%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_cartage_trail" model="ir.sequence">
+            <field name="name">cartage trail 序列号</field>
+            <field name="code">seq.cartage.trail</field>
+            <field name="prefix">COT%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill" model="ir.sequence">
+            <field name="name">Waybill 序列号</field>
+            <field name="code">seq.waybill</field>
+            <field name="prefix">WB%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_arrivnotice" model="ir.sequence">
+            <field name="name">Waybill arrivnotice 序列号</field>
+            <field name="code">seq.waybill.arrivnotice</field>
+            <field name="prefix">AN%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_commeinvoice" model="ir.sequence">
+            <field name="name">Waybill commeinvoice 序列号</field>
+            <field name="code">seq.waybill.commeinvoice</field>
+            <field name="prefix">CI%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_packlinglist" model="ir.sequence">
+            <field name="name">Waybill Packlist 序列号</field>
+            <field name="code">seq.waybill.packlinglist</field>
+            <field name="prefix">PL%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_shipinvoice" model="ir.sequence">
+            <field name="name">Waybill shipinvoice 序列号</field>
+            <field name="code">seq.waybill.shipinvoice</field>
+            <field name="prefix">SI%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_clearinvoice" model="ir.sequence">
+            <field name="name">Waybill clearinvoice 序列号</field>
+            <field name="code">seq.waybill.clearinvoice</field>
+            <field name="prefix">CLI%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_custduty" model="ir.sequence">
+            <field name="name">Waybill custduty 序列号</field>
+            <field name="code">seq.waybill.custduty</field>
+            <field name="prefix">CD%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_cargorelease" model="ir.sequence">
+            <field name="name">Waybill cargorelease 序列号</field>
+            <field name="code">seq.waybill.cargorelease</field>
+            <field name="prefix">CR%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_cargoreleaseline" model="ir.sequence">
+            <field name="name">Waybill cargoreleaseline 序列号</field>
+            <field name="code">seq.waybill.cargoreleaseline</field>
+            <field name="prefix">CRL%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+         <record id="seq_waybill_paymentapplication" model="ir.sequence">
+            <field name="name">Waybill payment application 序列号</field>
+            <field name="code">seq.finance.paymentapplication</field>
+            <field name="prefix">PA%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_paymentapplicationline" model="ir.sequence">
+            <field name="name">Waybill payment application line 序列号</field>
+            <field name="code">seq.finance.paymentapplicationline</field>
+            <field name="prefix">PAL%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_settlebill" model="ir.sequence">
+            <field name="name">Settle Bill 序列号</field>
+            <field name="code">seq.finance.settlebill</field>
+            <field name="prefix">SEB%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+         <record id="seq_demotodo" model="ir.sequence">
+            <field name="name">Demo Todo 序列号</field>
+            <field name="code">seq.demotodo</field>
+            <field name="prefix">DTO%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_inboundorder" model="ir.sequence">
+            <field name="name">Inbound Order 序列号</field>
+            <field name="code">seq.inbound.order</field>
+            <field name="prefix">INO%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_inboundorder_products" model="ir.sequence">
+            <field name="name">Inbound Order Products 序列号</field>
+            <field name="code">seq.inbound.order.products</field>
+            <field name="prefix">INOP%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+         <record id="seq_waybill_inboundoperate" model="ir.sequence">
+            <field name="name">Inbound Opeate Products 序列号</field>
+            <field name="code">seq.inbound.operate</field>
+            <field name="prefix">INP%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_inboundoperate_products" model="ir.sequence">
+            <field name="name">Inbound operate Products 序列号</field>
+            <field name="code">seq.inbound.operate.products</field>
+            <field name="prefix">INPP%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_outboundorder" model="ir.sequence">
+            <field name="name">Outbound Order 序列号</field>
+            <field name="code">seq.outbound.order</field>
+            <field name="prefix">OUO%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_outboundorder_products" model="ir.sequence">
+            <field name="name">outbound Order Products 序列号</field>
+            <field name="code">seq.outbound.order.products</field>
+            <field name="prefix">OUOP%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_outboundoperate" model="ir.sequence">
+            <field name="name">outbound Opeate Products 序列号</field>
+            <field name="code">seq.outbound.operate</field>
+            <field name="prefix">OUP%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_waybill_outboundoperate_products" model="ir.sequence">
+            <field name="name">outbound operate Products 序列号</field>
+            <field name="code">seq.outbound.operate.products</field>
+            <field name="prefix">OUPP%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+    </data>
+</odoo>

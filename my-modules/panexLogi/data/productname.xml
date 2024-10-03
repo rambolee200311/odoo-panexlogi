@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="1">
+        <record id="productname_001" model="panexlogi.project.productname" forcecreate="1">
+            <field name="name">Customs Clearance</field>
+        </record>
+        <record id="productname_002" model="panexlogi.project.productname" forcecreate="1">
+            <field name="name">Import Handling</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,93 @@
+<odoo>
+<!--    packing list search-->
+    <record id="panexlogi_waybill_packlist_search" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.packlist.search</field>
+        <field name="model">panexlogi.waybill.packlist</field>
+        <field name="arch" type="xml">
+             <search string="Packing_List_Search">
+                <field name="billno"/>
+                <field name="product_id"/>
+                <field name="batch"/>
+                <field name="interpono"/>
+                <field name="powerperpc"/>
+                <field name="pcs"/>
+                <field name="pallets"/>
+                <field name="totalvo"/>
+                <field name="shipping"/>
+                <field name="waybillno"/>
+                <field name="cntrno"/>
+                <field name="sealno"/>
+                <field name="etdport"/>
+                <field name="eta"/>
+                <field name="meap"/>
+                <field name="gwp"/>
+                <field name="gw"/>
+                <field name="mea"/>
+             </search>
+        </field>
+    </record>
+<!--    packing list tree-->
+    <record id="panexlogi_waybill_packlist_tree" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.packlist.tree</field>
+        <field name="model">panexlogi.waybill.packlist</field>
+        <field name="arch" type="xml">
+             <tree string="Packing_List_Tree">
+                    <field name="billno"/>
+                    <field name="product_id"/>
+                    <field name="batch"/>
+                    <field name="interpono"/>
+                    <field name="powerperpc"/>
+                    <field name="pcs"/>
+                    <field name="pallets"/>
+                    <field name="totalvo"/>
+                    <field name="shipping"/>
+                    <field name="waybillno"/>
+                    <field name="cntrno"/>
+                    <field name="sealno"/>
+                    <field name="etdport"/>
+                    <field name="eta"/>
+                    <field name="meap"/>
+                    <field name="gwp"/>
+                    <field name="gw"/>
+                    <field name="mea"/>
+              </tree>
+        </field>
+    </record>
+
+<!--    packing list from-->
+    <record id="panexlogi_waybill_packlist_form" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.packlist.form</field>
+        <field name="model">panexlogi.waybill.packlist</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="billno"/>
+                    <field name="product_id"/>
+                    <field name="batch"/>
+                    <field name="interpono"/>
+                    <field name="powerperpc"/>
+                    <field name="pcs"/>
+                    <field name="pallets"/>
+                    <field name="totalvo"/>
+                    <field name="shipping"/>
+                    <field name="waybillno"/>
+                    <field name="cntrno"/>
+                    <field name="sealno"/>
+                    <field name="etdport"/>
+                    <field name="eta"/>
+                    <field name="meap"/>
+                    <field name="gwp"/>
+                    <field name="gw"/>
+                    <field name="mea"/>
+                </group>
+            </form>
+        </field>
+    </record>
+ <!-- action -->
+    <record id="waybill_packlist_action" model="ir.actions.act_window">
+        <field name="name">Packing List</field>
+        <field name="res_model">panexlogi.waybill.packlist</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+<!--cartage kanban-->
+        <record id="cartage_offer_view_kanban" model="ir.ui.view">
+            <field name="name">cartage.kanban.offer</field>
+            <field name="model">panexlogi.cartage.offer</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="billno"/>
+                    <field name="cartagebillno"/>
+                    <field name="truckco"/>
+                    <field name="costprice"/>
+                    <field name="status"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div clasds="oe_kanban_detail">
+                                    <ul>
+                                        <li>
+                                            <field name="billno"/>
+                                        </li>
+                                        <li>
+                                            <span >Order Code:</span>
+                                            <field name="cartagebillno"/>
+                                        </li>
+                                        <li>
+                                            <span >Truck Co:</span>
+                                            <field name="truckco"/>
+                                        </li>
+                                        <li>
+                                            <field name="costprice"/>
+                                        </li>
+                                        <li>
+                                            <field name="status"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+<!--        offer tree view-->
+        <record id="cartage_offer_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.cartage.offer.tree.view</field>
+            <field name="model">panexlogi.cartage.offer</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="status=='accepted'"
+                    decoration-danger="status=='refused'"
+                    decoration-info="status=='new'">
+                    <field name="billno"/>
+                    <field name="costprice"/>
+                    <field name="truckco"/>
+                    <field name="ddate"/>
+                    <field name="adate"/>
+                    <field name="remark"/>
+<!--                    <button name="action_offer_accept" type="object" icon="fa-check" string="Accept"/>-->
+<!--                        attrs="{'invisible': ['|', ('status', '=', 'accepted'), ('status', '=', 'refused')]}" -->
+<!--                    <button name="action_offer_refuse" type="object" icon="fa-times" string="Reject"/>-->
+<!--                        attrs="{'invisible': ['|', ('status', '=', 'accepted'), ('status', '=', 'refused')]}" -->
+                    <field name="status"/>
+                </tree>
+            </field>
+        </record>
+<!--        cartage offer form-->
+        <record id="cartage_offer_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.cartage.offer.form.view</field>
+            <field name="model">panexlogi.cartage.offer</field>
+            <field name="arch" type="xml">
+                <form>
+                     <header>
+                         <button name="action_offer_accept"
+                                type="object"
+                                string="Accept"
+                                invisible="status == 'accepted'"
+                                class="btn-primary"/>
+                         <button name="action_offer_refuse"
+                                type="object"
+                                string="Refuse"
+                                invisible="status == 'refused'"
+                                class="btn-danger"/>
+                        <button name="action_offer_renew"
+                                type="object"
+                                string="Renew"
+                                invisible="status == 'new'"
+                                class="btn-danger"/>
+                        <field name="status" invisible="True"/>
+<!--                         <field-->
+<!--                                name="status"-->
+<!--                                widget="statusbar"-->
+<!--                                statusbar_visible="new,accepted,refused"/>-->
+                         <widget name="web_ribbon" title="ACCEPT" bg_color="bg-success"
+                            invisible="status=='new' or status=='refused'"/>
+                    </header>
+                    <sheet>
+                         <div class="oe_title">
+                            <h1>
+                                Cartage Offer
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <group col="2">
+                            <group string="Order Info">
+                                <field name="cartagebillno"/>
+                                <field name="refno"/>
+                                <field name="sender"/>
+                                <field name="sender_tel"/>
+                                <field name="sender_address"/>
+                                <field name="consignee"/>
+                                <field name="consignee_tel"/>
+                                <field name="consignee_address"/>
+                            </group>
+                            <group string="offer">
+                                <field name="costprice"/>
+                                <field name="truckco"/>
+                                <field name="driverinfo"/>
+                                <field name="ddate"/>
+                                <field name="adate"/>
+                                <field name="remark"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+        <record id="cartage_offer_action" model="ir.actions.act_window">
+            <field name="name">Offers</field>
+            <field name="res_model">panexlogi.cartage.offer</field>
+            <field name="view_mode">kanban,tree</field>
+        </record>
+
+        <!--物流部的view和action-->
+        <record id="cartage_offer_tree_view1" model="ir.ui.view">
+            <field name="name">panexlogi.cartage.offer.tree.view1</field>
+            <field name="model">panexlogi.cartage.offer</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="status=='accepted'"
+                    decoration-danger="status=='refused'"
+                decoration-info="status=='new'">
+                    <field name="billno"/>
+                    <field name="cartagebillno"/>
+                    <field name="costprice"/>
+                    <field name="truckco"/>
+                    <field name="ddate"/>
+                    <field name="adate"/>
+                    <field name="remark"/>
+                    <field name="status"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="cartage_offer_form_view1" model='ir.ui.view'>
+            <field name="name">panexlogi.cartage.offer.form.view1</field>
+            <field name="model">panexlogi.cartage.offer</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                         <button name="action_offer_accept"
+                                type="object"
+                                string="Accept"
+                                invisible="status == 'accepted'"
+                                class="btn-primary"/>
+                         <button name="action_offer_refuse"
+                                type="object"
+                                string="Refuse"
+                                invisible="status == 'refused'"
+                                class="btn-warning"/>
+                        <button name="action_offer_renew"
+                                type="object"
+                                string="Renew"
+                                invisible="status == 'new'"
+                                class="btn-danger"/>
+                        <field name="status" invisible="True"/>
+<!--                         <field-->
+<!--                                name="status"-->
+<!--                                widget="statusbar"-->
+<!--                                statusbar_visible="new,accepted,refused"/>-->
+                         <widget name="web_ribbon" title="ACCEPT" bg_color="bg-success"
+                            invisible="status=='new' or status=='refused'"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Cartage Offer
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <group col="2">
+                            <group string="Order Info">
+                                <field name="cartagebillno" readonly="status!='new'"/>
+                                <field name="refno" readonly="status!='new'"/>
+                                <field name="sender"/>
+                                <field name="sender_tel"/>
+                                <field name="sender_address"/>
+                                <field name="consignee"/>
+                                <field name="consignee_tel"/>
+                                <field name="consignee_address"/>
+                            </group>
+                            <group string="offer">
+                                <field name="costprice" readonly="status!='new'"/>
+                                <field name="truckco" readonly="status!='new'"/>
+                                <field name="driverinfo" readonly="status!='new'"/>
+                                <field name="ddate" readonly="status!='new'"/>
+                                <field name="adate" readonly="status!='new'"/>
+                                <field name="remark"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="cartage_offer_action1" model="ir.actions.act_window">
+            <field name="name">Offers</field>
+            <field name="res_model">panexlogi.cartage.offer</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_ids" eval="[(5,0,0),
+                                      (0,0,{'view_mode': 'tree','view_id': ref('cartage_offer_tree_view1')}),
+                                      (0,0,{'view_mode': 'form','view_id': ref('cartage_offer_form_view1')}),
+                                      (0,0,{'view_mode':'kanban','view_id':ref('cartage_offer_view_kanban')})]"/>
+        </record>
+    </data>
+</odoo>

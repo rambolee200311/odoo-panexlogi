@@ -1,0 +1,35 @@
+<odoo>
+<!--    packing list tree-->
+    <record id="panexlogi_waybill_cargoreleaseline_tree" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.cargoreleaseline.tree</field>
+        <field name="model">panexlogi.waybill.cargoreleaseline</field>
+        <field name="arch" type="xml">
+             <tree string="CargoRelease_Line_List_Tree" editable="bottom">
+                <field name="cntrno"/>
+                <field name="pincode"/>
+                <field name="returndepot"/>
+                <field name="releaseexpire"/>
+                <field name="releasedepot"/>
+                <field name="remark"/>
+              </tree>
+        </field>
+    </record>
+
+<!--    packing list from-->
+    <record id="panexlogi_waybill_cargoreleaseline_form" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.cargoreleaseline.form</field>
+        <field name="model">panexlogi.waybill.cargoreleaseline</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="cntrno"/>
+                    <field name="pincode"/>
+                    <field name="returndepot"/>
+                    <field name="releaseexpire"/>
+                    <field name="releasedepot"/>
+                    <field name="remark"/>
+                </group>
+            </form>
+        </field>
+    </record>
+</odoo>

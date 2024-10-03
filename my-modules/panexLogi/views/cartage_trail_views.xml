@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+<!--cartage kanban-->
+        <record id="cartage_trail_view_kanban" model="ir.ui.view">
+            <field name="name">cartage.kanban.trail</field>
+            <field name="model">panexlogi.cartage.trail</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="billno"/>
+                    <field name="cartagebillno"/>
+                    <field name="truckco"/>
+                    <field name="adate"/>
+                    <field name="ddate"/>
+                    <field name="status"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div clasds="oe_kanban_detail">
+                                    <ul>
+                                        <li>
+                                            <field name="billno"/>
+                                        </li>
+                                        <li>
+                                            <span >Order Code:</span>
+                                            <field name="cartagebillno"/>
+                                        </li>
+                                        <li>
+                                            <span >Truck Co:</span>
+                                            <field name="truckco"/>
+                                        </li>
+                                        <li>
+                                            <span >Date of Departure(出发日期):</span>
+                                            <field name="ddate"/>
+                                        </li>
+                                        <li>
+                                            <span >Date of Arrival(到达日期):</span>
+                                            <field name="adate"/>
+                                        </li>
+                                        <li>
+                                            <span >status:</span>
+                                            <field name="status"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+<!--        cartage trail tree view-->
+        <record id="cartage_trail_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.cartage.trail.tree.view</field>
+            <field name="model">panexlogi.cartage.trail</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="status=='accepted'"
+                    decoration-danger="status=='refused'" editable="bottom">
+                    <field name="billno"/>
+                    <field name="cmrfile" filename="cmrfilename"/>
+                    <field name="cmrfilename" invisible="True"/>
+                    <field name="driver"/>
+                    <field name="truckco"/>
+                    <field name="ddate"/>
+                    <field name="adate"/>
+                    <field name="remark"/>
+                    <field name="status"/>
+                </tree>
+            </field>
+        </record>
+<!--        cartage trail form view-->
+        <record id="cartage_trail_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.cartage.trail.form.view</field>
+            <field name="model">panexlogi.cartage.trail</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="billno"/>
+                            <field name="driver"/>
+                            <field name="truckco"/>
+                            <field name="ddate"/>
+                            <field name="adate"/>
+                            <field name="remark"/>
+                            <field name="status"/>
+                            <field name="cmrfile" filename="cmrfilename"/>
+                            <field name="cmrfilename" invisible="True"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="cartage_trail_action" model="ir.actions.act_window">
+            <field name="name">trails</field>
+            <field name="res_model">panexlogi.cartage.trail</field>
+            <field name="view_mode">kanban,tree</field>
+        </record>
+
+        <!--物流部的view和action-->
+        <record id="cartage_trail_tree_view1" model="ir.ui.view">
+            <field name="name">panexlogi.cartage.trail.tree.view1</field>
+            <field name="model">panexlogi.cartage.trail</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="status=='accepted'"
+                    decoration-danger="status=='refused'">
+                    <field name="billno"/>
+                    <field name="cartagebillno"/>
+                    <field name="driver"/>
+                    <field name="truckco"/>
+                    <field name="ddate"/>
+                    <field name="adate"/>
+                    <field name="remark"/>
+                    <button name="action_trail_sent" type="object" icon="fa-check" string="Sent"/>
+<!--                        attrs="{'invisible': ['|',('status', '=', 'sent'),('status', '=', 'received')]}" -->
+                    <button name="action_trail_received" type="object" icon="fa-check" string="Received"/>
+<!--                        attrs="{'invisible': [('status', '=', 'received')]}" -->
+                    <field name="status"/>
+                    <field name="cmrfile" filename="cmrfilename"/>
+                    <field name="cmrfilename" invisible="True"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="cartage_trail_form_view1" model='ir.ui.view'>
+            <field name="name">panexlogi.cartage.trail.form.view1</field>
+            <field name="model">panexlogi.cartage.trail</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Cartage Trail
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <group col="2">
+                             <group string="Order Info">
+                                <field name="cartagebillno"/>
+                                <field name="refno"/>
+                                <field name="sender"/>
+                                <field name="sender_tel"/>
+                                <field name="sender_address"/>
+                                <field name="consignee"/>
+                                <field name="consignee_tel"/>
+                                <field name="consignee_address"/>
+                            </group>
+                            <group string="Trail">
+                                <field name="driver"/>
+                                <field name="truckco"/>
+                                <field name="ddate"/>
+                                <field name="adate"/>
+                                <field name="remark"/>
+                            </group>
+                        </group>
+                        <group string="CMR File">
+                            <field name="cmrfile" filename="cmrfilename"/>
+                            <field name="cmrfilename" invisible="True"/>
+                        </group>
+<!--                        <group string="Status">
+                           <field name="status"/>
+                       </group>-->
+                    </sheet>
+                     <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="cartage_trail_action1" model="ir.actions.act_window">
+            <field name="name">trails</field>
+            <field name="res_model">panexlogi.cartage.trail</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5,0,0),
+                                      (0,0,{'view_mode': 'tree','view_id': ref('cartage_trail_tree_view1')}),
+                                      (0,0,{'view_mode': 'form','view_id': ref('cartage_trail_form_view1')}),
+                                      (0,0,{'view_mode':'kanban','view_id':ref('cartage_trail_view_kanban')})]"/>
+        </record>
+    </data>
+</odoo>

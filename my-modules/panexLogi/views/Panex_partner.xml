@@ -1,0 +1,21 @@
+<odoo>
+  <!--<data>-->
+      <record model="ir.ui.view" id="shipping_line_list">
+          <field name="name">partner_option</field>
+          <field name="model">res.partner</field>
+          <field name="inherit_id" ref="base.view_partner_form"/>
+          <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Panex_Options">
+                    <group>
+                        <field name="shipline"/>
+                        <field name="project"/>
+                        <field name="receiver"/>
+                        <field name="truck"/>
+                        <field name="agency"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+      </record>
+</odoo>

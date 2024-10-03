@@ -1,0 +1,175 @@
+<odoo>
+<!--cartage kanban-->
+    <record id="cartage_view_kanban" model="ir.ui.view">
+        <field name="name">cartage.kanban</field>
+        <field name="model">panexlogi.cartage</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="billno"/>
+                <field name="refno"/>
+                <field name="sender"/>
+                <field name="consignee"/>
+                <field name="truckco"/>
+                <field name="inouttype"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div clasds="oe_kanban_detail">
+                                <ul>
+                                    <li>
+                                        <field name="billno"/>
+                                    </li>
+                                    <li>
+                                        <span >REF No:</span>
+                                        <field name="refno"/>
+                                    </li>
+                                    <li>
+                                        <span >Sender Name:</span>
+                                        <field name="sender"/>
+                                    </li>
+                                    <li>
+                                        <span >Consignee Name:</span>
+                                        <field name="consignee"/>
+                                    </li>
+                                    <li>
+                                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    </li>
+                                    <li>
+                                        <field name="state"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+<!--cartage search-->
+    <record id="cartage_view_search" model="ir.ui.view">
+        <field name="name">cartage.search.view</field>
+        <field name="model">panexlogi.cartage</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="inouttype"/>
+                <field name="billno"/>
+                <field name="refno"/>
+                <field name="date"/>
+                <field name="sender"/>
+                <field name="consignee"/>
+                <field name="truckco"/>
+                <field name="tag_ids"/>
+                <field name="state"/>
+                <filter
+                    name="state"
+                    context="{
+                        'group_by' : 'state'
+                    }"
+                />
+            </search>
+        </field>
+    </record>
+
+<!--cartage tree-->
+     <record id="cartage_view_tree" model="ir.ui.view">
+        <field name="name">cartage.tree</field>
+        <field name="model">panexlogi.cartage</field>
+        <field name="arch" type="xml">
+            <tree string="Seacartage_Tree">
+                <field name="billno"/>
+                <field name="inouttype"/>
+                <field name="refno"/>
+                <field name="date"/>
+                <field name="sender"/>
+                <field name="consignee"/>
+                <field name="truckco"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                <field name="state"/>
+            </tree>
+        </field>
+     </record>
+<!--cartage form-->
+     <record id="cartage_view_form" model="ir.ui.view">
+        <field name="name">cartage.form</field>
+        <field name="model">panexlogi.cartage</field>
+        <field name="arch" type="xml">
+            <form>
+                 <header>
+                     <button
+                            name="action_cancel_order"
+                            type="object"
+                            string="Cancel"/>
+<!--                            attrs="{'invisible': ['|', ('state', '=', 'sent'), ('state', '=', 'cancel')]}" -->
+
+                     <button
+                             name="action_renew_order"
+                             type="object"
+                             string="Renew"/>
+                        <field
+                            name="state"
+                            widget="statusbar"
+                            statusbar_visible="new,offer_accepted,sent,received" />
+                 </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            Cartage Order
+                        </h1>
+                        <h2>
+                            <field name="billno"/>
+                        </h2>
+                    </div>
+                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                    <group string="General" col="2">
+                        <group>
+                            <field name="date"/>
+                            <field name="inouttype"/>
+                            <field name="refno"/>
+<!--                            <field name="cargoReleaseLine"/>-->
+                            <field name="cntrno"/>
+                            <field name="waybillno"/>
+                            <field name="project"/>
+                        </group>
+                        <group>
+                            <field name="costprice"/>
+                            <field name="truckco"/>
+                            <field name="driverinfo"/>
+                            <field name="remark"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group string="Sender">
+                            <field name="sender"/>
+                            <field name="sender_tel"/>
+                            <field name="sender_address"/>
+                        </group>
+                        <group string="Consignee">
+                            <field name="consignee"/>
+                            <field name="consignee_tel"/>
+                            <field name="consignee_address"/>
+                        </group>
+                     </group>
+                    <notebook>
+                        <page string="Offers">
+                            <field name="cartageoffer_ids"/>
+                        </page>
+                        <page string="Trails">
+                            <field name="cartagetrail_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+     </record>
+<!--    cartage action-->
+    <record id="cartage_order_action" model="ir.actions.act_window">
+        <field name="name">Cartage Order</field>
+        <field name="res_model">panexlogi.cartage</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_panexlogi_demotodo_pivot" model="ir.ui.view">
+         <field name="name">panexlogi.demotodo.report.pivot</field>
+         <field name="model">panexlogi.demotodo.report</field>
+         <field name="arch" type="xml">
+             <pivot string="Demo ToDo Analysis" sample="1">
+                 <field name="project" type="col"/>
+                 <field name="date" interval="month" type="row"/>
+                 <field name="eurtotal" type="measure"/>
+             </pivot>
+         </field>
+    </record>
+    <record id="view_panexlogi_demotodo_date_graph" model="ir.ui.view">
+         <field name="name">panexlogi.demotodo.report.date.graph</field>
+         <field name="model">panexlogi.demotodo.report</field>
+         <field name="arch" type="xml">
+             <graph string="Demo ToDo Analysis" type="line" sample="1">
+                 <field name="date" interval="day"/>
+                 <field name="project"/>
+                 <field name="totalpieces" type="measure"/>
+                 <field name="eurtotal" type="measure"/>
+             </graph>
+         </field>
+    </record>
+    <record id="view_panexlogi_demotodo_graph_pie" model="ir.ui.view">
+         <field name="name">panexlogi.demotodo.report.pie</field>
+         <field name="model">panexlogi.demotodo.report</field>
+         <field name="mode">primary</field>
+         <field name="inherit_id" ref="view_panexlogi_demotodo_date_graph"/>
+         <field name="arch" type="xml">
+            <graph position="attributes">
+                <attribute name="type">pie</attribute>
+            </graph>
+         </field>
+    </record>
+    <record id="view_panexlogi_demotodo_tree" model="ir.ui.view">
+        <field name="name">panexlogi.demotodo.report.tree</field>
+        <field name="model">panexlogi.demotodo.report</field>
+        <field name="arch" type="xml">
+            <tree string="Demo ToDO Analysis">
+                <field name="date" widget="date"/>
+                <field name="billno" optional="show"/>
+                <field name="project" optional="hide"/>
+                <field name="product_id" string="Product" optional="show"/>
+                <field name="totalpieces" optional="hide" sum="Sum of Pieces"/>
+                <field name="eurtotal" optional="show" sum="Sum of Total"/>
+                <field name="state" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_panexlogi_demotodo_search" model="ir.ui.view">
+        <field name="name">panexlogi.demotodo.report.search</field>
+        <field name="model">panexlogi.demotodo.report</field>
+        <field name="arch" type="xml">
+            <search string="Demo ToDo Analysis">
+                <field name="project"/>
+                <field name="date"/>
+                <field name="product_id"/>
+                <field name="state"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_panexlogi_demotodo_report_all" model="ir.actions.act_window">
+        <field name="name">Demo ToDo Analysis</field>
+        <field name="res_model">panexlogi.demotodo.report</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="view_id"></field>  <!-- force empty -->
+        <field name="search_view_id" ref="view_panexlogi_demotodo_search"/>
+        <field name="domain">[('state', '!=', 'cancel')]</field>
+        <field name="context">{}</field>
+<!--        <field name="help">This report performs analysis on your quotations and sales orders. Analysis check your sales revenues and sort it by different group criteria (salesman, partner, product, etc.) Use this report to perform analysis on sales not having invoiced yet. If you want to analyse your turnover, you should use the Invoice Analysis report in the Accounting application.</field>-->
+    </record>
+
+
+
+
+
+</odoo>

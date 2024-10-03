@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+         <!-- Search View -->
+        <record id="view_demo_stock_picking_search" model="ir.ui.view">
+            <field name="name">demo.stock.picking.search</field>
+            <field name="model">panexlogi.demostockpicking</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="barcode"/>
+                    <field name="prouduct_id"/>
+                    <field name="qty"/>
+                </search>
+            </field>
+        </record>
+        <!-- Tree View -->
+        <record id="view_demo_stock_picking_tree" model="ir.ui.view">
+            <field name="name">demo.stock.picking.tree</field>
+            <field name="model">panexlogi.demostockpicking</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="billno"/>
+                    <field name="barcode"/>
+                    <field name="prouduct_id"/>
+                    <field name="qty"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_demo_stock_picking_form" model="ir.ui.view">
+            <field name="name">demo.stock.picking.form</field>
+            <field name="model">panexlogi.demostockpicking</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="billno"/>
+                            <!--<field name=" _barcode_scanned" widget="samplecollection_barcode_handler"/>-->
+                            <field name="barcode"/>
+                            <field name="prouduct_id"/>
+                            <field name="qty"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                     </div>
+                </form>
+            </field>
+        </record>
+
+         <!-- Action Menu -->
+        <record id="action_demo_stock_picking_menu" model="ir.actions.act_window">
+            <field name="name">Demo stock_picking Menu</field>
+            <field name="res_model">panexlogi.demostockpicking</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to view Demo stock_picking records.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

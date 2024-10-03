@@ -1,0 +1,90 @@
+<odoo>
+    <record id="action_panexlogi_demotodo_report_print" model="ir.actions.report">
+        <field name="name">Demo ToDo Print</field>
+        <field name="model">panexlogi.demotodo</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">panexLogi.demotodo_printmodel2</field><!--(主模块的文件名)模块名称+ (Qweb模板)看板视图id   -->
+        <field name="report_file">panexLogi.demotodo_printmodel2</field><!--(主模块的文件名)模块名称+ (Qweb模板)看板视图id   -->
+        <field name="print_report_name">(object.billno)</field>
+        <field name="binding_model_id"
+               ref="model_panexlogi_demotodo"/><!--(主模块的文件名)模块名称+ csv里的模型id (model_id)   用于指定打印模板位置放置于那个模块里，如果不写，不显示 -->
+        <field name="binding_type">report</field><!--  固定写法  -->
+        <!--<field name="paperformat_id" ref="base.paperformat_euro"/>-->
+    </record>
+    <template id="demotodo_printmodel">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+                    <table style="width:100%;">
+                        <t t-foreach="doc.packlists" t-as="move">
+                            <tr>
+                                <td colspan="10" class="nowrap cell-center"
+                                    style="text-align: center; border: 1px solid black; vertical-align: middle; height:20px; width: max-content;">
+                                    <span t-field="move.product_id"/>
+                                </td>
+                                <td colspan="6" class="nowrap cell-center"
+                                    style="text-align: center; border: 1px solid black; vertical-align: middle; height:20px; width: max-content;">
+                                    <span t-field="move.totalpieces"/>
+                                </td>
+                                <td class="nowrap cell-center" colspan="10"
+                                    style="text-align: center; border: 1px solid black; vertical-align: middle; height:20px; width: max-content;">
+                                     <span t-field="move.eurtotal"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                    <!--           换页             -->
+                    <div style="page-break-after: always;"></div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+    <template id="demotodo_printmodel1">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <div class="mt-4">
+                        <t t-call="web.external_layout">
+                            <h2>Purchase Order #<span t-field="o.billno"/></h2>
+                            <h2>Cancelled Purchase Order #<span t-field="o.project"/></h2>
+                        </t>
+                    </div>
+                </div>
+             </t>
+        </t>
+    </template>
+    <template id="demotodo_printmodel2" name="demotodo_printmodel2">
+        <t t-call="web.html_container">
+            <div class="article o_report_layout_clean">
+                <t t-raw="0"/>
+                <t t-foreach="docs" t-as="doc">
+                    <h1>
+                        <t t-esc="doc.billno"/>
+                    </h1>
+                    <div>
+                        <strong>备注:</strong>
+                        <p t-field="doc.date"/>
+                    </div>
+                    <t t-foreach="doc.packlists" t-as="line">
+                        <div class="page" style="page-break-before: always;">
+                            <table>
+                                <th>
+                                    <div><td><strong>Product</strong></td></div>
+                                    <div><td><strong>Qty</strong></td></div>
+                                </th>
+                                <tr>
+                                    <div><td><p t-field="line.product_id.name"/></td></div>
+                                    <div><td><p t-field="line.totalpieces"/></td></div>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+
+</odoo>

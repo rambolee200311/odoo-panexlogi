@@ -1,0 +1,79 @@
+<odoo>
+<!--        Settle Bill inbound Search tree -->
+        <record id="settle_bill_inbound_serch_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.inbound.search.view</field>
+            <field name="model">panexlogi.finance.settlebill.inbound</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="settlebill_billno"/>
+                    <field name="date"/>
+                    <field name="palletqty"/>
+                    <field name="unitprice"/>
+                    <field name="inboundcosts"/>
+                    <field name="blno"/>
+                    <field name="cntrno"/>
+                    <field name="truckprice"/>
+                    <field name="waittime"/>
+                    <field name="termianlsurcharge"/>
+                    <field name="amount"/>
+                    <field name="note"/>
+<!--                    <filter string="Today's Records" name="today_records" domain="[('date', '=', fields.date.today())]"/>-->
+                </search>
+            </field>
+        </record>
+<!--        Settle Bill inbound tree -->
+        <record id="settle_bill_inbound_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.inbound.tree.view</field>
+            <field name="model">panexlogi.finance.settlebill.inbound</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="settlebill_billno"/>
+                    <field name="date"/>
+                    <field name="palletqty" sum="Total of Pallet Amount"/>
+                    <field name="unitprice"/>
+                    <field name="inboundcosts" sum="Total of  Inbound Costs"/>
+                    <field name="blno"/>
+                    <field name="cntrno"/>
+                    <field name="truckprice" sum="Total of Trucking Price"/>
+                    <field name="waittime"/>
+                    <field name="termianlsurcharge" sum="Total of Terminal Surcharge"/>
+                    <field name="amount" sum="Total of Amount"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+
+<!--        Settle Bill inbound form -->
+        <record id="settle_bill_inbound_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.finance.settlebill.inbound.form.view</field>
+            <field name="model">panexlogi.finance.settlebill.inbound</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="settlebill_billno"/>
+                            <field name="date"/>
+                            <field name="palletqty"/>
+                            <field name="unitprice"/>
+                            <field name="inboundcosts"/>
+                            <field name="blno"/>
+                            <field name="cntrno"/>
+                            <field name="truckprice"/>
+                            <field name="waittime"/>
+                            <field name="termianlsurcharge"/>
+                            <field name="amount"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>                
+                </form>
+            </field>
+        </record>
+
+<!--        Settle Bill inbound action -->
+        <record id="settle_bill_inbound_action" model="ir.actions.act_window">
+            <field name="name">Inbound Operating</field>
+            <field name="res_model">panexlogi.finance.settlebill.inbound</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+</odoo>

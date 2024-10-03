@@ -1,0 +1,69 @@
+<odoo>
+<!--        Settle Bill handling Search tree -->
+        <record id="settle_bill_handling_serch_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.handling.search.view</field>
+            <field name="model">panexlogi.finance.settlebill.handling</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="settlebill_billno"/>
+                    <field name="shipco"/>
+                    <field name="receiveco"/>
+                    <field name="invoicedetail"/>
+                    <field name="invoiceno"/>
+                    <field name="blno"/>
+                    <field name="amount"/>
+                    <field name="othercost"/>
+                    <field name="note"/>
+                </search>
+            </field>
+        </record>
+<!--        Settle Bill handling tree -->
+        <record id="settle_bill_handling_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.handling.tree.view</field>
+            <field name="model">panexlogi.finance.settlebill.handling</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="settlebill_billno"/>
+                    <field name="shipco"/>
+                    <field name="receiveco"/>
+                    <field name="invoicedetail"/>
+                    <field name="invoiceno"/>
+                    <field name="blno"/>
+                    <field name="amount" sum="Total of amount"/>
+                    <field name="othercost"  sum="Total of othercost"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+
+<!--        Settle Bill handling form -->
+        <record id="settle_bill_handling_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.finance.settlebill.handling.form.view</field>
+            <field name="model">panexlogi.finance.settlebill.handling</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="settlebill_billno"/>
+                            <field name="shipco"/>
+                            <field name="receiveco"/>
+                            <field name="invoicedetail"/>
+                            <field name="invoiceno"/>
+                            <field name="blno"/>
+                            <field name="amount"/>
+                            <field name="othercost"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>                
+                </form>
+            </field>
+        </record>
+
+<!--        Settle Bill handling action -->
+        <record id="settle_bill_handling_action" model="ir.actions.act_window">
+            <field name="name">Customs handling</field>
+            <field name="res_model">panexlogi.finance.settlebill.handling</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+</odoo>

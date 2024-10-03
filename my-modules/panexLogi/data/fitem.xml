@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="1">
+        <record id="fitem_001" model="panexlogi.fitems" forcecreate="1">
+            <field name="code">001</field>
+            <field name="name">THC</field>
+            <field name="remark">terminal handling charge</field>
+            <field name="be_outcome">True</field>
+            <field name="be_income">True</field>
+        </record>
+        <record id="fitem_002" model="panexlogi.fitems" forcecreate="1">
+            <field name="code">002</field>
+            <field name="name">Demurrage</field>
+            <field name="remark"/>
+            <field name="be_outcome">True</field>
+            <field name="be_income">False</field>
+        </record>
+         <record id="fitem_003" model="panexlogi.fitems" forcecreate="1">
+            <field name="code">003</field>
+            <field name="name">Detention</field>
+            <field name="remark"/>
+            <field name="be_outcome">False</field>
+            <field name="be_income">True</field>
+        </record>
+    </data>
+</odoo>
+<!--
+    THC （terminal handling charge）
+    Demurrage
+    Detention
+    YOC
+    terminal other charges
+    customs clearance
+    trucking
+    Parcels delivery
+    warehouse storage
+    warehouse operation
+    warehouse maintenance
+    ZZP （warehouse worker)
+    warehosue rental
+    apartment rental
+    utilities bill
+    Ocean Freight
+    Customs import duties
+    import-VAT
+    Damege cost
+    Office rental
+-->

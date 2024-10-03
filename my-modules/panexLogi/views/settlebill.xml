@@ -1,0 +1,150 @@
+<odoo>
+    <!--        Settle Bill search -->
+        <record id="settle_bill_search_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.search.view</field>
+            <field name="model">panexlogi.finance.settlebill</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="project"/>
+                    <field name="date"/>
+                    <field name="customs_clearance_amount"/>
+                    <field name="import_handling_amount"/>
+                     <field name="inbound_amount"/>
+                    <field name="outbound_amount"/>
+                    <field name="trucking_amount"/>
+                    <field name="warehousing_amount"/>
+                    <field name="delivery_amount"/>
+                    <field name="total_amount"/>
+                    <field name="remark"/>
+                </search>
+            </field>
+        </record>
+<!--        Settle Bill tree -->
+        <record id="settle_bill_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.tree.view</field>
+            <field name="model">panexlogi.finance.settlebill</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="billno"/>
+                    <field name="project"/>
+                    <field name="date"/>
+                    <field name="customs_clearance_amount"/>
+                    <field name="import_handling_amount"/>
+                     <field name="inbound_amount"/>
+                    <field name="outbound_amount"/>
+                    <field name="trucking_amount"/>
+                    <field name="warehousing_amount"/>
+                    <field name="delivery_amount"/>
+                    <field name="total_amount"/>
+                    <field name="remark"/>
+                </tree>
+            </field>
+        </record>
+
+<!--        Settle Bill form -->
+        <record id="settle_bill_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.finance.settlebill.form.view</field>
+            <field name="model">panexlogi.finance.settlebill</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                         <button name="action_confirm_order"
+                                type="object"
+                                string="Confirm"
+                                invisible="state == 'confirm' or state == 'received' or state == 'cancel'"
+                                class="btn-danger"/>
+                         <button name="action_unconfirm_order"
+                                type="object"
+                                string="Unconfirm"
+                                invisible="state == 'new' or state == 'received' or state == 'cancel'"
+                                class="btn-primary"/>
+                         <button name="action_received_order"
+                                type="object"
+                                string="Received"
+                                invisible="state == 'new' or state == 'received' or state == 'cancel'"
+                                class="btn-danger"/>
+                         <button name="action_unreceived_order"
+                                type="object"
+                                string="Unreceived"
+                                invisible="state == 'new' or state == 'confirm' or state == 'cancel'"
+                                class="btn-primary"/>
+                         <button name="action_cancel_order"
+                                type="object"
+                                string="Cancel"
+                                invisible="state == 'confirm' or state == 'received' or state == 'cancel'"
+                                class="btn-warning"/>
+                         <button name="action_renew_order"
+                                type="object"
+                                string="Renew"
+                                invisible="state == 'confirm' or state == 'received' or state == 'new'"
+                                class="btn-success"/>
+                         <field
+                                name="state"
+                                widget="statusbar"
+                                statusbar_visible="new,confirm,received,cancel"/>
+                     </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Bill of Settlement
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <group col="3">
+                            <group string="General">
+                                <field name="project" readonly="state!='new'"/>
+                                <field name="date" readonly="state!='new'"/>
+                                <field name="total_amount" readonly="state!='new'"/>
+                                <field name="remark" readonly="state!='new'"/>
+                                <field name="pdffile" readonly="state!='new'"/>
+                                <field name="pdffilename" invisible="True"/>
+                            </group>
+                            <group string="IMPORT">
+                                <field name="customs_clearance_amount" readonly="state!='new'"/>
+                                <field name="import_handling_amount" readonly="state!='new'"/>
+                            </group>
+                            <group string="OPERATE">
+                                <field name="inbound_amount" readonly="state!='new'"/>
+                                <field name="outbound_amount" readonly="state!='new'"/>
+                                <field name="warehousing_amount" readonly="state!='new'"/>
+                                <field name="delivery_amount" readonly="state!='new'"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Customs Clearance">
+                                <field name="clearanceids" readonly="state!='new'"/>
+                            </page>
+                            <page string="Import Handling">
+                                <field name="handlingids" readonly="state!='new'"/>
+                            </page>
+                            <page string="Inbound Operating">
+                                <field name="inboundids" readonly="state!='new'"/>
+                            </page>
+                            <page string="Outbound Operating">
+                                <field name="outboundids" readonly="state!='new'"/>
+                            </page>
+                            <page string="Outbound Delivery">
+                                <field name="deliveryids" readonly="state!='new'"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+                </form>
+            </field>
+        </record>
+
+<!--        Settle Bill action -->
+        <record id="settle_bill_action" model="ir.actions.act_window">
+            <field name="name">Bill of Settlement</field>
+            <field name="res_model">panexlogi.finance.settlebill</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+</odoo>

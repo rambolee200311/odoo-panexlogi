@@ -1,0 +1,169 @@
+<odoo>
+<!-- Search for arrival notice -->
+    <record id="waybill_arrivnotice_view_search" model="ir.ui.view">
+        <field name="name">waybill.arrivnotice.search.view</field>
+        <field name="model">panexlogi.waybill.arrivnotice</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="billno"/>
+                <field name="waybill_billno"/>
+                <field name="date"/>
+<!--                <field name="project"/>-->
+                <field name="state"/>
+<!--                <field name="shipping"/>-->
+            </search>
+        </field>
+    </record>
+<!--waybill kanban-->
+    <record id="waybill_view_arrivnotice_kanban" model="ir.ui.view">
+        <field name="name">waybill.arrivnotice.kanban</field>
+        <field name="model">panexlogi.waybill.arrivnotice</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}">
+                            <div class="oe_dropdown_kanban">
+                                <div class="oe_dropdown_toggle">
+                                    <i class="fa fa-bars fa-lg"/>
+                                    <ul class="oe_dropdown_menu">
+                                        <li>
+                                            <a type="edit">Edit</a>
+                                        </li>
+                                        <li>
+                                            <ul class="oe_kanban_colorpicker" datafield="color" role="popup"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="oe_clear"></div>
+                            </div>
+                            <div t-attf-class="oe_kanban_content">
+                                BillNo:
+                                <field name="billno" decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'"/>
+                                <br/>
+                                B/L No:
+                                <field name="waybill_billno"/>
+                                <br/>
+                                Project:
+                                <field name="project"/>
+                                <br/>
+<!--                                Shipper:-->
+<!--                                <field name="shipping"/>-->
+<!--                                <br/>-->
+                                Start date:
+                                <field name="date"/>
+                                <br/>
+                                Block Days:
+                                <field name="blockdays"/>
+                                <br/>
+                                Block Date:
+                                <field name="block_date"/>
+                                <br/>
+                                State:
+                                <field name="state"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+
+            </kanban>
+        </field>
+    </record>
+<!--    arrival notice tree-->
+    <record id="panexlogi_waybill_arrivnotice_tree" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.arrivnotice.tree</field>
+        <field name="model">panexlogi.waybill.arrivnotice</field>
+        <field name="arch" type="xml">
+            <tree string="Arrival_Notice_Tree" decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'">
+                <field name="billno"/>
+                <field name="waybill_billno"/>
+                <field name="date"/>
+<!--                <field name="project"/>-->
+<!--                <field name="shipping"/>-->
+                <field name="blockdays"/>
+                <field name="block_date"/>
+                <field name="adate" />
+                <field name="pdffile"/>
+                <field name="pdffilename" invisible="True"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+<!--    arrival notice calendar-->
+    <record id="arrival_notice_view_calendar" model="ir.ui.view">
+        <field name="name">arrival.notice.calendar</field>
+        <field name="model">panexlogi.waybill.arrivnotice</field>
+        <field name="arch" type="xml">
+            <calendar string="Arrival Notice Calendar"
+                      date_start="date" date_stop="block_date"
+                      color="color" mode="month">
+                <field name="billno"/>
+                <field name="waybill_billno"/>
+            </calendar>
+        </field>
+    </record>
+<!--    arrival notice form-->
+    <record id="panexlogi_waybill_arrivnotice_form" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.arrivnotice.form</field>
+        <field name="model">panexlogi.waybill.arrivnotice</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                     <button name="action_confirm_order"
+                            type="object"
+                            string="Confirm"
+                            invisible="state == 'confirm' or state == 'cancel'"
+                            class="btn-danger"/>
+                     <button name="action_unconfirm_order"
+                            type="object"
+                            string="Unconfirm"
+                            invisible="state == 'new' or state == 'cancel'"
+                            class="btn-primary"/>
+                     <button name="action_cancel_order"
+                            type="object"
+                            string="Cancel"
+                            invisible="state == 'confirm' or state == 'cancel'"
+                            class="btn-warning"/>
+                     <field
+                            name="state"
+                            widget="statusbar"
+                            statusbar_visible="new,confirm"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            Arrival Notice
+                        </h1>
+                        <h2>
+                            <field name="billno"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <field name="waybill_billno" readonly="state!='new'"/>
+                        <field name="project"/>
+<!--                        <field name="shipping_name"/>-->
+                        <field name="date" readonly="state!='new'"/>
+                        <field name="blockdays" readonly="state!='new'"/>
+                        <field name="block_date" readonly="state!='new'"/>
+                        <field name="adate" />
+                        <field name="pdffile" filename="pdffilename"/>
+                        <field name="pdffilename" invisible="True"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+ <!-- action -->
+    <record id="waybill_arrivnotice_action" model="ir.actions.act_window">
+        <field name="name">Arrival Notice</field>
+        <field name="res_model">panexlogi.waybill.arrivnotice</field>
+        <field name="view_mode">kanban,calendar,tree,form</field>
+    </record>
+
+</odoo>

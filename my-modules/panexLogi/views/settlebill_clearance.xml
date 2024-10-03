@@ -1,0 +1,71 @@
+<odoo>
+
+<!--        Settle Bill Search tree -->
+        <record id="settle_bill_clearance_serch_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.clearance.search.view</field>
+            <field name="model">panexlogi.finance.settlebill.clearance</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="settlebill_billno"/>
+                    <field name="declaration"/>
+                    <field name="blno"/>
+                    <field name="vatintro"/>
+                    <field name="enitemno"/>
+                    <field name="exitemno"/>
+                    <field name="amount"/>
+                    <field name="note"/>
+                    <field name="Remark"/>
+                </search>
+            </field>
+        </record>
+
+<!--        Settle Bill Clearance tree -->
+        <record id="settle_bill_clearance_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.clearance.tree.view</field>
+            <field name="model">panexlogi.finance.settlebill.clearance</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="settlebill_billno"/>
+                    <field name="declaration"/>
+                    <field name="blno"/>
+                    <field name="vatintro" sum="Total of vatintro"/>
+                    <field name="enitemno"/>
+                    <field name="exitemno"/>
+                    <field name="amount" sum="Total of amount"/>
+                    <field name="note"/>
+                    <field name="Remark"/>
+                </tree>
+            </field>
+        </record>
+
+<!--        Settle Bill Clearance form -->
+        <record id="settle_bill_clearance_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.finance.settlebill.clearance.form.view</field>
+            <field name="model">panexlogi.finance.settlebill.clearance</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="settlebill_billno"/>
+                            <field name="declaration" />
+                            <field name="blno"/>
+                            <field name="vatintro"/>
+                            <field name="enitemno"/>
+                            <field name="exitemno"/>
+                            <field name="amount"/>
+                            <field name="note"/>
+                            <field name="Remark"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+<!--        Settle Bill Clearance action -->
+        <record id="settle_bill_clearance_action" model="ir.actions.act_window">
+            <field name="name">Customs Clearance</field>
+            <field name="res_model">panexlogi.finance.settlebill.clearance</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+</odoo>

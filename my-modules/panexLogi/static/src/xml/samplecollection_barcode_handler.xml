@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 引用JavaScript文件 -->
+<template id="assets_backend" name="panex assets" inherit_id="web.assets_backend">
+    <xpath expr="." position="inside">
+        <script type="text/javascript" src="/panexLogi/static/src/js/samplecollection_barcode_handler.js"></script>
+    </xpath>
+</template>

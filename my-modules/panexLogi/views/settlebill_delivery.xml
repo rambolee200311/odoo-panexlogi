@@ -1,0 +1,72 @@
+<odoo>
+<!--        Settle Bill delivery Search tree -->
+        <record id="settle_bill_delivery_serch_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.delivery.search.view</field>
+            <field name="model">panexlogi.finance.settlebill.delivery</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="settlebill_billno"/>
+                    <field name="cntrno"/>
+                    <field name="palletqty"/>
+                    <field name="orderno"/>
+                    <field name="truckprice"/>
+                    <field name="deliveryaddress"/>
+                    <field name="date"/>
+                    <field name="extracost"/>
+                    <field name="amount"/>
+                    <field name="note"/>
+                </search>
+            </field>
+        </record>
+<!--        Settle Bill delivery tree -->
+        <record id="settle_bill_delivery_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.delivery.tree.view</field>
+            <field name="model">panexlogi.finance.settlebill.delivery</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="settlebill_billno"/>
+                    <field name="cntrno"/>
+                    <field name="palletqty" sum="Total of palletqty"/>
+                    <field name="orderno"/>
+                    <field name="truckprice" sum="Total of truckprice"/>
+                    <field name="deliveryaddress"/>
+                    <field name="date"/>
+                    <field name="extracost" sum="Total of extracost"/>
+                    <field name="amount" sum="Total of amount"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+
+<!--        Settle Bill delivery form -->
+        <record id="settle_bill_delivery_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.finance.settlebill.delivery.form.view</field>
+            <field name="model">panexlogi.finance.settlebill.delivery</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="settlebill_billno"/>
+                            <field name="cntrno"/>
+                            <field name="palletqty"/>
+                            <field name="orderno"/>
+                            <field name="truckprice"/>
+                            <field name="deliveryaddress"/>
+                            <field name="date"/>
+                            <field name="extracost"/>
+                            <field name="amount"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>                
+                </form>
+            </field>
+        </record>
+
+<!--        Settle Bill delivery action -->
+        <record id="settle_bill_delivery_action" model="ir.actions.act_window">
+            <field name="name">Outbound Delivery</field>
+            <field name="res_model">panexlogi.finance.settlebill.delivery</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+</odoo>

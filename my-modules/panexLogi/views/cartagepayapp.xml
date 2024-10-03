@@ -1,0 +1,139 @@
+<odoo>
+    <!--        Cartage Payment Application tree-->
+        <record id="cartage_payment_application_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.paymentapplication.tree.view</field>
+            <field name="model">panexlogi.finance.paymentapplication</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="billno"/>
+                    <field name="type"/>
+<!--                    <field name="waybill_billno"/>-->
+                    <field name="payee"/>
+                    <field name="date"/>
+                    <field name="total_amount"/>
+                    <field name="remark"/>
+                    <field name="pdffile"/>
+                    <field name="pdffilename" invisible="True"/>
+                </tree>
+            </field>
+        </record>
+<!--        Cartage Payment Application form-->
+        <record id="cartage_payment_application_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.finance.paymentapplication.form.view</field>
+            <field name="model">panexlogi.finance.paymentapplication</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                         <button name="action_confirm_order"
+                                type="object"
+                                string="Confirm"
+                                invisible="state == 'confirm' or state == 'paid' or state == 'cancel'"
+                                class="btn-danger"/>
+                         <button name="action_unconfirm_order"
+                                type="object"
+                                string="Unconfirm"
+                                invisible="state == 'new' or state == 'paid' or state == 'cancel'"
+                                class="btn-primary"/>
+                         <button name="action_paid_order"
+                                type="object"
+                                string="Paid"
+                                invisible="state == 'new' or state == 'paid' or state == 'cancel'"
+                                class="btn-danger"/>
+                         <button name="action_unpaid_order"
+                                type="object"
+                                string="Unpaid"
+                                invisible="state == 'new' or state == 'confirm' or state == 'cancel'"
+                                class="btn-primary"/>
+                         <button name="action_cancel_order"
+                                type="object"
+                                string="Cancel"
+                                invisible="state == 'confirm' or state == 'paid' or state == 'cancel'"
+                                class="btn-warning"/>
+                         <button name="action_renew_order"
+                                type="object"
+                                string="Renew"
+                                invisible="state == 'confirm' or state == 'paid' or state == 'new'"
+                                class="btn-success"/>
+                         <field
+                                name="state"
+                                widget="statusbar"
+                                statusbar_visible="new,confirm,paid,cancel"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Cartage Payment Application
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <group col="2">
+                            <group string="General">
+                                <field name="date"/>
+                                <field name="type"/>
+<!--                                <field name="waybill_billno"/>-->
+                                <field name="payee"/>
+                                <field name="total_amount"/>
+                            </group>
+                            <group string="Other">
+                                <field name="remark"/>
+                                <field name="pdffile"/>
+                                <field name="pdffilename" invisible="True"/>
+                            </group>
+                        </group>
+                        <notebook string="Details">
+                            <page string="Lines">
+                                <field name="paymentapplicationline_ids">
+                                    <tree editable="bottom">
+                                        <field name="cartagebillno"/>
+                                        <field name="fitem"/>
+                                        <field name="fitem_name"/>
+                                        <field name="amount"/>
+                                        <field name="remark"/>
+                                        <field name="pdffile"/>
+                                        <field name="pdffilename" invisible="True"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+                </form>
+            </field>
+        </record>
+
+<!--        Cartage Payment Application Line tree
+        <record id="cartage_payment_applicationlin_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.paymentapplicationline.tree.view</field>
+            <field name="model">panexlogi.finance.paymentapplicationline</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="invoiceno"/>
+                    <field name="fitem"/>
+                    <field name="fitem_name"/>
+                    <field name="amount"/>
+                    <field name="remark"/>
+                    <field name="pdffile"/>
+                    <field name="pdffilename" invisible="True"/>
+                </tree>
+            </field>
+        </record>
+-->
+
+<!--        cartage Payment Application action-->
+        <record id="cartage_payapp_action" model="ir.actions.act_window">
+            <field name="name">Cartage Payment App</field>
+            <field name="res_model">panexlogi.finance.paymentapplication</field>
+            <field name="context">{'default_type':'cartage'}</field>
+            <field name="domain">[('type','=','cartage')]</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5,0,0),
+                                      (0,0,{'view_mode': 'tree','view_id': ref('cartage_payment_application_tree_view')}),
+                                      (0,0,{'view_mode': 'form','view_id': ref('cartage_payment_application_form_view')})]"/>
+        </record>
+</odoo>

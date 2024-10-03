@@ -1,0 +1,66 @@
+<odoo>
+<!--        Settle Bill outbound Search tree -->
+        <record id="settle_bill_outbound_serch_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.outbound.search.view</field>
+            <field name="model">panexlogi.finance.settlebill.outbound</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="settlebill_billno"/>
+                    <field name="date"/>
+                    <field name="palletqty"/>
+                    <field name="unitprice"/>
+                    <field name="outboundcosts"/>
+                    <field name="cntrno"/>
+                    <field name="amount"/>
+                    <field name="note"/>
+                </search>
+            </field>
+        </record>
+<!--        Settle Bill outbound tree -->
+        <record id="settle_bill_outbound_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.finance.settlebill.outbound.tree.view</field>
+            <field name="model">panexlogi.finance.settlebill.outbound</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="settlebill_billno"/>
+                    <field name="date"/>
+                    <field name="palletqty" sum="Total of Pallet Amount"/>
+                    <field name="unitprice"/>
+                    <field name="outboundcosts" sum="Total of  outbound Costs"/>
+                    <field name="cntrno"/>
+                    <field name="amount" sum="Total of Amount"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+
+<!--        Settle Bill outbound form -->
+        <record id="settle_bill_outbound_form_view" model='ir.ui.view'>
+            <field name="name">panexlogi.finance.settlebill.outbound.form.view</field>
+            <field name="model">panexlogi.finance.settlebill.outbound</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="settlebill_billno"/>
+                            <field name="date"/>
+                            <field name="palletqty"/>
+                            <field name="unitprice"/>
+                            <field name="outboundcosts"/>
+                            <field name="cntrno"/>
+                            <field name="amount"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>                
+                </form>
+            </field>
+        </record>
+
+<!--        Settle Bill outbound action -->
+        <record id="settle_bill_outbound_action" model="ir.actions.act_window">
+            <field name="name">outbound Operating</field>
+            <field name="res_model">panexlogi.finance.settlebill.outbound</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+</odoo>
