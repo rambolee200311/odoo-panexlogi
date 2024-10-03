@@ -8,6 +8,7 @@ from . import waybill_packList
 from . import waybill_shipInvoice
 from . import waybill_customsDuties
 from . import waybill_cargoRelease
+from . import waybill_details
 from . import cartage
 from . import cartage_offer
 from . import cartage_tag
