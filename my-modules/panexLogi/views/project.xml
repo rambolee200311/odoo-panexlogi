@@ -20,16 +20,35 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group>
+                    <group string="Main">
                         <field name="project_name"/>
                         <field name="customer"/>
                         <field name="group"/>
                     </group>
                     <notebook>
+                        <page string="Customs Clearance">
+                            <group>
+                                <field name="clearance_price_rule"/>
+                                <field name="clearance_entry_price"/>
+                                <field name="clearance_extra_price"/>
+                                <field name="clearance_vat_rate"/>
+                            </group>
+                        </page>
+                        <page string="Import Handling">
+                            <group>
+                                <field name="handling_service_charge"/>
+                                <field name="handling_service_fee"/>
+                                <field name="handling_vat_rate"/>
+                            </group>
+                        </page>
+                    </notebook>
+                    <!--
+                    <notebook>
                         <page string="Products">
                             <field name="productids"/>
                         </page>
                     </notebook>
+                    -->
                 </sheet>
             </form>
         </field>

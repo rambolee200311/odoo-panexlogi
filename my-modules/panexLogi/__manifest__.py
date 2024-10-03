@@ -37,6 +37,7 @@
         'views/waybill_custduty.xml',
         'views/waybill_cargoRelease.xml',
         'views/waybill_cargoRelease_line.xml',
+        'views/waybill_details.xml',
         'views/Panex_partner.xml',
         'views/sender.xml',
         'views/receiver.xml',

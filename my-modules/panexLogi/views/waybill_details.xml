@@ -1,0 +1,62 @@
+<odoo>
+<!-- Search for arrival notice -->
+    <record id="waybill_details_view_search" model="ir.ui.view">
+        <field name="name">waybill.details.search.view</field>
+        <field name="model">panexlogi.waybill.details</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="cntrno"/>
+                <field name="cntrnum"/>
+                <field name="note"/>
+<!--                <field name="shipping"/>-->
+            </search>
+        </field>
+    </record>
+<!--    arrival notice tree-->
+    <record id="panexlogi_waybill_details_tree" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.details.tree</field>
+        <field name="model">panexlogi.waybill.details</field>
+        <field name="arch" type="xml">
+            <tree string="Waybill_details_Tree">
+                <field name="cntrno"/>
+                <field name="pallets"/>
+                <field name="cntrnum"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+<!--    arrival notice form-->
+    <record id="panexlogi_waybill_details_form" model="ir.ui.view">
+        <field name="name">panexlogi.waybill.details.form</field>
+        <field name="model">panexlogi.waybill.details</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            Container Details
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="cntrno"/>
+                        <field name="pallets"/>
+                        <field name="cntrnum"/>
+                        <field name="note"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+ <!-- action -->
+    <record id="waybill_details_action" model="ir.actions.act_window">
+        <field name="name">Container Details</field>
+        <field name="res_model">panexlogi.waybill.details</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

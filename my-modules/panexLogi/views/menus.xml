@@ -24,12 +24,14 @@
 
         <menuitem id="import_logi_menu" name="Import" parent="panex_logi_menu" sequence="100" />
         <menuitem id="waybill_menu" name="Waybill" parent="import_logi_menu" sequence="101" action="waybill_action"/>
+        <!--
         <menuitem id="waybill_arrivnotice_menu" name="Arrival Notice" parent="import_logi_menu" sequence="101" action="waybill_arrivnotice_action"/>
         <menuitem id="waybill_commeinvoice_menu" name="Commercial Invoice" parent="import_logi_menu" sequence="102" action="waybill_commeinvoice_action"/>
         <menuitem id="waybill_shipinvoice_menu" name="Shipping Invoice" parent="import_logi_menu" sequence="103" action="waybill_shipinvoice_action"/>
         <menuitem id="waybill_clearinvoice_menu" name="Clearance Invoice" parent="import_logi_menu" sequence="104" action="waybill_clearinvoice_action"/>
         <menuitem id="waybill_customsduties_menu" name="Customs Duties" parent="import_logi_menu" sequence="105" action="waybill_customsduties_action"/>
         <menuitem id="waybill_cargorelease_menu" name="Cargo Release" parent="import_logi_menu" sequence="106" action="waybill_cargorelease_action"/>
+         -->
         <menuitem id="waybill_packlist_menu" name="Packing List" parent="import_logi_menu" sequence="107" action="waybill_packlist_action"/>
 
         <menuitem id="cartage_logi_menu" name="Cartage" parent="panex_logi_menu" sequence="200" />

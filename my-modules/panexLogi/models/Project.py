@@ -12,12 +12,23 @@ class Project(models.Model):
     productids = fields.One2many('panexlogi.project.product', 'projectid', string='Product lines')
     group = fields.Many2one('res.groups', string='Group')
 
+    clearance_price_rule = fields.Boolean(string='Depend on Container Count')
+    clearance_entry_price = fields.Float(string='Entry Item', default=0)
+    clearance_extra_price = fields.Float(string='Extra Item', default=0)
+    clearance_vat_rate = fields.Float(string='Rate of VAT(%)', default=0)
+
+    handling_service_charge = fields.Boolean(string='Handling Service Charge')
+    handling_service_fee = fields.Float(string='Service Fee', default=0)
+    handling_vat_rate = fields.Float(string='Rate of VAT(%)', default=0)
+
+
+
     # 生成明细
     @api.model
     def create(self, value):
         """
         生成跟踪单号
-        """
+
         args_list = []
         # products = ['Customs Clearance', 'Import Handling']
 
@@ -30,6 +41,7 @@ class Project(models.Model):
                 }))  # 建立odoo规定的关联关系！！
         value['productids'] = args_list  # 给关联字段赋值
         return super(Project, self).create(value)
+    """
 
 
 class ProjectPorducts(models.Model):

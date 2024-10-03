@@ -13,6 +13,7 @@ class WaybillDetails(models.Model):
 
     cntrno = fields.Char(string='Container No')
     cntrnum = fields.Integer(string='Contrainer Num', default=1)
+    pallets = fields.Float(string='Pallets',default=26)
     note = fields.Text(string='Note')
 
     waybill_billno = fields.Many2one('panexlogi.waybill')

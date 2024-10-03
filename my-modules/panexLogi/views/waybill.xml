@@ -206,7 +206,7 @@
                         </group>
                      </group>
                     <notebook>
-                        <page string="Details">
+                        <page string="Container Details">
                             <field name="details_ids"/>
                         </page>
                         <page  string="Packing List">
@@ -230,9 +230,11 @@
                         <page  string="Cargo Release">
                             <field name="cargorelease_ids"/>
                         </page>
-                        <!--<page  string="Payment Application">
+                        <!--
+                        <page  string="Payment Application">
                             <field name="paymentapplication_ids"/>
-                        </page>-->
+                        </page>
+                        -->
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
