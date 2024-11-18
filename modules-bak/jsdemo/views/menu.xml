@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- menu -->
+
+        <menuitem id="js_menu" name="JSDEMO" sequence="20"/>
+        <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="js_menu" sequence="2999" action="action_jsdemo_stock_picking_menu"/>
+    </data>
+</odoo>

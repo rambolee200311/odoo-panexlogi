@@ -22,6 +22,7 @@
                 <sheet>
                     <group string="Main">
                         <field name="project_name"/>
+                        <field name="project_code"/>
                         <field name="customer"/>
                         <field name="group"/>
                     </group>
@@ -39,6 +40,20 @@
                                 <field name="handling_service_charge"/>
                                 <field name="handling_service_fee"/>
                                 <field name="handling_vat_rate"/>
+                            </group>
+                        </page>
+                        <page string="Operationg A Trucking">
+                            <group string="Inbound Operating">
+                                <field name="inbound_operating_fix"/>
+                                <field name="inbound_operating_fixfee_per_pallet"/>
+                            </group>
+                            <group string="Inbound Trucking">
+                                <field name="inbound_trucking_fix"/>
+                                <field name="inbound_trucking_fixfee_per_pallet"/>
+                            </group>
+                            <group string="Outbound Operating">
+                                <field name="outbound_operating_fix"/>
+                                <field name="outbound_operating_fixfee_per_pallet"/>
                             </group>
                         </page>
                     </notebook>
@@ -61,6 +76,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="project_name"/>
+                <field name="project_code"/>
                 <field name="customer"/>
                 <field name="group"/>
             </tree>
@@ -73,6 +89,7 @@
         <field name="arch" type="xml">
             <kanban>
                 <field name="project_name"/>
+                <field name="project_code"/>
                 <field name="customer"/>
                 <templates>
                     <t t-name="kanban-box">

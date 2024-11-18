@@ -9,8 +9,8 @@ class GetToken(http.Controller):
 
     def getOdooToken(self, login, password):
         # http://localhost:8088访问odoo的路径，后面的web/session/authenticate固定写法请不要动！！！
-
-        url = "http://localhost:8088/web/session/authenticate"
+        url = "http://panexlogi.beesecure.eu/web/session/authenticate"
+        # url = "http://localhost:8088/web/session/authenticate"
         # url = "http://localhost:8069/web/session/authenticate"
         # 传入需要访问的数据库名称，登录账号与密码 panexDB
         data = {
@@ -73,4 +73,27 @@ class GetToken(http.Controller):
             }
             listIds.append(singID)
         back_data = {'code': 100, 'msg': '新增stock picking成功', 'data': listIds}
+        return (back_data)
+
+    @http.route('/getUserInfo', type='json', auth="user", cors="*", csrf=False)
+    def getUserInfo(self, **kw):
+        user = request.env.user
+        groups = []
+        for r in user.groups_id:
+            groups.append({
+                'application': request.env['res.groups'].search([('id', '=', r.id)]).category_id.name,
+                'group_name': request.env['res.groups'].search([('id', '=', r.id)]).name})
+
+        data = {
+            "name": user.name,
+            "login": user.login,
+            "email": user.email,
+            "company_id": user.company_id.name,
+            "company_name": user.company_id.display_name,
+            "company_phone": user.company_id.phone,
+            "company_email": user.company_id.email,
+            "company_website": user.company_id.website,
+            "groups_id": groups,
+        }
+        back_data = {'code': 100, 'msg': '查询用户信息成功', 'data': data}
         return (back_data)

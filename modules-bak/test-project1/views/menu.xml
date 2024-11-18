@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="panexwd_project1_menu" name="Panexwd_project1" sequence="9100"/>
+        <menuitem id="import_logi_porject1_menu" name="Import" parent="panexwd_project1_menu" sequence="9100" />
+        <menuitem id="waybill_project1_menu" name="Waybill" parent="import_logi_porject1_menu" sequence="9101" action="waybill_project1_action"/>
+    </data>
+</odoo>

@@ -12,6 +12,9 @@ class OutboundOrder(models.Model):
     billno = fields.Char(string='BillNo', readonly=True)
     date = fields.Date(string='Date（单据日期）', required=True, tracking=True, default=fields.Date.today)
     project = fields.Many2one('panexlogi.project', string='Project（项目）', required=True)
+    project_code = fields.Char(string='Project Code', related='project.project_code', readonly=True)
+    warehouse = fields.Many2one(comodel_name='stock.warehouse', string='Warehouse')
+    warehouse_code = fields.Char(string='Warehouse Code', related='warehouse.code', readonly=True)
     remark = fields.Text(string='Remark')
     color = fields.Integer()
     state = fields.Selection(
@@ -36,6 +39,7 @@ class OutboundOrder(models.Model):
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.outbound.order', times)
         values['state'] = 'new'
         return super(OutboundOrder, self).create(values)
+
     """
     @api.onchange('waybill_billno')
     def _get_blno(self):

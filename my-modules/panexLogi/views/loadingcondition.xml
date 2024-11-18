@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- window_action -->
+    <record id="panexlogi_loadingcondition_action" model="ir.actions.act_window">
+        <field name="name">loadingcondition.management</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.loadingcondition</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                create your first one!
+            </p>
+        </field>
+    </record>
+    <!-- Form View -->
+    <record id="loadingcondition_view_form" model="ir.ui.view">
+        <field name="name">panexlogi.loadingcondition.form</field>
+        <field name="model">panexlogi.loadingcondition</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Main">
+                        <field name="loadingcondition_name"/>
+                        <field name="beload"/>
+                        <field name="beunload"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--Search View-->
+        <record id="settle_bill_search_view" model="ir.ui.view">
+            <field name="name">panexlogi.loadingcondition.search</field>
+            <field name="model">panexlogi.loadingcondition</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="loadingcondition_name"/>
+                    <field name="beload"/>
+                    <field name="beunload"/>
+                </search>
+            </field>
+        </record>
+    <!--Tree(List) View-->
+    <record id="loadingcondition_view_tree" model="ir.ui.view">
+        <field name="name">loadingcondition.tree</field>
+        <field name="model">panexlogi.loadingcondition</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="loadingcondition_name"/>
+                <field name="beload"/>
+                <field name="beunload"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

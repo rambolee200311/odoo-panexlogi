@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- window_action -->
+    <record id="panexlogi_country_action" model="ir.actions.act_window">
+        <field name="name">country.management</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.country</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                create your first one!
+            </p>
+        </field>
+    </record>
+    <!-- Form View -->
+    <record id="country_view_form" model="ir.ui.view">
+        <field name="name">panexlogi.country.form</field>
+        <field name="model">panexlogi.country</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Main">
+                        <field name="country_shortname"/>
+                        <field name="country_name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--Search View-->
+        <record id="settle_bill_search_view" model="ir.ui.view">
+            <field name="name">panexlogi.country.search</field>
+            <field name="model">panexlogi.country</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="country_shortname"/>
+                    <field name="country_name"/>
+                </search>
+            </field>
+        </record>
+    <!--Tree(List) View-->
+    <record id="country_view_tree" model="ir.ui.view">
+        <field name="name">country.tree</field>
+        <field name="model">panexlogi.country</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="country_shortname"/>
+                <field name="country_name"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

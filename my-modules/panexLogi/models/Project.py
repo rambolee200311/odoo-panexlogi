@@ -8,6 +8,8 @@ class Project(models.Model):
     _rec_name = "project_name"
 
     project_name = fields.Char(string='Project Name', required=True)
+    project_code = fields.Char(string='Project code', required=True)
+
     customer = fields.Many2one('res.partner', string='Partner Name', required=True)
     productids = fields.One2many('panexlogi.project.product', 'projectid', string='Product lines')
     group = fields.Many2one('res.groups', string='Group')
@@ -21,12 +23,20 @@ class Project(models.Model):
     handling_service_fee = fields.Float(string='Service Fee', default=0)
     handling_vat_rate = fields.Float(string='Rate of VAT(%)', default=0)
 
+    inbound_operating_fix = fields.Boolean(string='Fix Inbound Operating Fee')
+    inbound_operating_fixfee_per_pallet = fields.Float(string='Per Pallte')
 
+    inbound_trucking_fix = fields.Boolean(string='Fix Inbound Operating Fee')
+    inbound_trucking_fixfee_per_pallet = fields.Float(string='Per Container')
+
+    outbound_operating_fix = fields.Boolean(string='Fix Outbound Operating Fee')
+    outbound_operating_fixfee_per_pallet = fields.Float(string='Per Pallte')
 
     # 生成明细
+    """
     @api.model
     def create(self, value):
-        """
+        
         生成跟踪单号
 
         args_list = []

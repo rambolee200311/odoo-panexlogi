@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Action -->
+    <record id="action_delivery" model="ir.actions.act_window">
+        <field name="name">Deliveries</field>
+        <field name="res_model">jsdemo.delivery</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first delivery
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="jsdemo_root" name="JSDEMO" sequence="1"/>
+    <menuitem id="menu_delivery" name="Deliveries" parent="jsdemo_root" action="action_delivery" sequence="2"/>
+</odoo>

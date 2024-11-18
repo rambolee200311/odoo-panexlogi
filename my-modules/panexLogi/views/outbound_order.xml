@@ -30,6 +30,7 @@
                     <group>
                         <field name="date"/>
                         <field name="project"/>
+                        <field name="warehouse"/>
                         <field name="remark"/>
                     </group>
                     <notebook>

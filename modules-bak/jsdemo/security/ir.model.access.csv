@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_jsdemo_demostockpicking,access_jsdemo_demostockpicking,model_jsdemo_demostockpicking,,1,1,1,1
+access_jsdemo_demostockpicking,access_jsdemo_demostockpicking,model_jsdemo_demostockpicking,groups_panex_logistic_manager,1,1,1,1

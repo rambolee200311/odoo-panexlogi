@@ -1,14 +1,61 @@
 import requests
-from odoo import http
+from odoo import http, fields
 from odoo.http import request
 
+
+class getInboundOrderList(http.Controller):
+    @http.route('/getInboundOrderList', type='json', auth="user", cors="*", csrf=False)
+    def getInboundOrderList(self, **kw):
+        # dingdan_h = 4900145711
+        begin_date = '2000-01-01'
+        domain = []
+
+        if kw.get('begin_date'):
+            begin_date = kw.get('begin_date')
+            domain.append(('date', '>=', begin_date))
+
+        end_date = fields.Date.today()
+        if kw.get('end_date'):
+            end_date = kw.get('end_date')
+        domain.append(('date', '<=', end_date))
+
+        if kw.get("warehouse_code"):
+            warehouse_code = kw.get("warehouse_code")
+            domain.append(('warehouse_code', '=', warehouse_code))
+
+        if kw.get("project_code"):
+            project_code = kw.get("project_code")
+            domain.append(('project_code', '=', project_code))
+
+        inbound_orders = request.env['panexlogi.inbound.order'].sudo().search(domain)
+
+        if not inbound_orders:
+            back_data = {'code': 300, 'msg': 'inbound order list不存在'}
+            return (back_data)
+
+        listIds = []
+        for r in inbound_orders:
+            singID = {
+                "billno": r.billno,
+                "date": r.date,
+                "waybillno": r.waybillno,
+                "warehouse_code": r.warehouse_code,
+                "project_code": r.project_code
+            }
+            listIds.append(singID)
+        data = {
+            "orders": listIds
+        }
+        back_data = {'code': 100, 'msg': '查询inbound order list成功', 'data': data}
+        print("back_data==", back_data)
+        return (back_data)
 
 class GetInboundOrder(http.Controller):
     @http.route('/getInboundOrder', type='json', auth="user", cors="*", csrf=False)
     def getPacklist(self, **kw):
         # dingdan_h = 4900145711
         billno = kw.get('billno')
-        print("billno==", billno)
+        # print("billno==", billno)
         inbound_order_by_billno = request.env['panexlogi.inbound.order'].sudo().search(
             [('billno', '=', billno)])  # 随便找个模型查询一条数据
 

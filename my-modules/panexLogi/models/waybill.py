@@ -38,8 +38,37 @@ class Waybill(models.Model):
     pdffile = fields.Binary(string='File（原件）')
     pdffilename = fields.Char(string='File name')
 
+    clearance_fee_budget_amount = fields.Float(string="Budget Amount", default=0)
+    clearance_fee_settle_amount = fields.Float(string="Settle Amount", default=0)
+    clearance_fee_invoice_amount = fields.Float(string="Invoice Amount", default=0)
+
+    handling_fee_budget_amount = fields.Float(string="Budget Amount")
+    handling_fee_settle_amount = fields.Float(string="Settle Amount", default=0)
+    handling_fee_invoice_amount = fields.Float(string="Invoice Amount", default=0)
+
+    inbound_operating_fee_budget_amount = fields.Float(string="Budget Amount", default=0)
+    inbound_operating_fee_settle_amount = fields.Float(string="Settle Amount", default=0)
+    inbound_operating_fee_invoice_amount = fields.Float(string="Invoice Amount", default=0)
+
+    inbound_trucking_fee_budget_amount = fields.Float(string="Budget Amount", default=0)
+    inbound_trucking_fee_settle_amount = fields.Float(string="Settle Amount", default=0)
+    inbound_trucking_fee_invoice_amount = fields.Float(string="Invoice Amount", default=0)
+
+    outbound_operating_fee_budget_amount = fields.Float(string="Budget Amount", default=0)
+    outbound_operating_fee_settle_amount = fields.Float(string="Settle Amount", default=0)
+    outbound_operating_fee_invoice_amount = fields.Float(string="Invoice Amount", default=0)
+
+    outbound_trucking_fee_budget_amount = fields.Float(string="Budget Amount", default=0)
+    outbound_trucking_fee_settle_amount = fields.Float(string="Settle Amount", default=0)
+    outbound_trucking_fee_invoice_amount = fields.Float(string="Invoice Amount", default=0)
+
+    entry_num = fields.Float(string="Entry Num")
+    extra_num = fields.Float(string="Extra Num")
+    pallets_sum = fields.Float(string="Pallets Sum")
+    cntr_note = fields.Text(string="Note")
+
     # 货柜明细
-    details_ids=fields.One2many('panexlogi.waybill.details', 'waybill_billno', string='Details')
+    details_ids = fields.One2many('panexlogi.waybill.details', 'waybill_billno', string='Details')
     # 装箱清单
     packlist_ids = fields.One2many('panexlogi.waybill.packlist', 'waybill_billno', string='Packing List')
     # 到港通知
@@ -126,3 +155,58 @@ class Waybill(models.Model):
                     #     [('project', '=', self.project)]).ids))
                     domain.append(('project', '=', self.env.context['project']))
         return super(Waybill, self).name_search(name, domain + args, operator=operator, limit=limit)
+
+    # 预算计算
+    def action_budget_cal(self):
+        entry_num = 0
+        extra_num = 0
+        pallets_sum = 0
+        cntr_note = ""
+        clearance_entry_price = 0
+        clearance_extra_price = 0
+        clearance_fee_budget_amount = 0
+        handling_fee_budget_amount = 0
+        inbound_operating_fee_budget_amount = 0
+        inbound_trucking_fee_budget_amount = 0
+        outbound_operating_fee_budget_amount = 0
+        if self.details_ids:
+            for rec in self.details_ids:
+                entry_num = 1
+                extra_num += 1
+                pallets_sum += rec.pallets
+                cntr_note += rec.cntrno + ","
+            if extra_num > 0:
+                extra_num -= entry_num
+            self.entry_num = entry_num
+            self.extra_num = extra_num
+            self.pallets_sum = pallets_sum
+            self.cntr_note = cntr_note
+
+            if self.project.clearance_price_rule:
+                clearance_entry_price = self.project.clearance_entry_price
+                clearance_extra_price = self.project.clearance_extra_price
+                # entry+extra
+                clearance_fee_budget_amount = entry_num * clearance_entry_price + extra_num * clearance_extra_price
+            self.clearance_fee_budget_amount = clearance_fee_budget_amount
+
+            if self.project.handling_service_charge:
+                # per bill
+                handling_fee_budget_amount = self.project.handling_service_fee
+            self.handling_fee_budget_amount = handling_fee_budget_amount
+
+            if self.project.inbound_operating_fix:
+                # per pallets
+                inbound_operating_fee_budget_amount = pallets_sum * self.project.inbound_operating_fixfee_per_pallet
+            self.inbound_operating_fee_budget_amount = inbound_operating_fee_budget_amount
+
+            if self.project.inbound_trucking_fix:
+                # per container
+                inbound_trucking_fee_budget_amount = (entry_num + extra_num) * self.project.inbound_trucking_fixfee_per_pallet
+            self.inbound_trucking_fee_budget_amount=inbound_trucking_fee_budget_amount
+
+            if self.project.outbound_operating_fix:
+                # per pallets
+                outbound_operating_fee_budget_amount = pallets_sum * self.project.outbound_operating_fixfee_per_pallet
+            self.outbound_operating_fee_budget_amount = outbound_operating_fee_budget_amount
+
+        return True

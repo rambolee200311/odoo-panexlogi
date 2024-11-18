@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- window_action -->
+    <record id="delivery_request_action" model="ir.actions.act_window">
+        <field name="name">delivery.request.management</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.delivery</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                create your first one!
+            </p>
+        </field>
+    </record>
+    <!-- Form View -->
+    <record id="delivery_view_form" model="ir.ui.view">
+        <field name="name">panexlogi.delivery.form</field>
+        <field name="model">panexlogi.delivery</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Request">
+                        <field name="billno"/>
+                        <field name="date"/>
+                        <field name="project"/>
+                        <field name="loading_ref"/>
+                        <field name="consignee_ref"/>
+                        <field name="delivery_type"/>
+                        <field name="loading_conditon"/>
+                        <field name="unloading_conditon"/>
+                        <field name="package_type"/>
+                        <field name="package_size"/>
+                        <field name="qty"/>
+                        <field name="weight_per_unit"/>
+                        <field name="gross_weight"/>
+                        <field name="name_of_the_goods"/>
+                        <field name="uncode_class"/>
+                    </group>
+                    <notebook>
+                        <page string="Request">
+                            <group string="LOADING" col="8">
+                                <field name="load_address"/>
+                                <field name="load_company_name"/>
+                                <field name="load_contact_phone"/>
+                                <field name="load_postcode"/>
+                                <field name="load_country"/>
+                                <field name="load_country_code"/>
+                                <field name="load_address_timeslot"/>
+                            </group>
+                            <group string="UNLOADING" col="8">
+                                <field name="unload_address"/>
+                                <field name="unload_company_name"/>
+                                <field name="unload_contact_phone"/>
+                                <field name="unload_postcode"/>
+                                <field name="unload_country"/>
+                                <field name="unload_country_code"/>
+                                <field name="delivery_address_timeslot"/>
+                            </group>
+                        </page>
+                        <page string="Quote">
+                            <group string="Common" col="8">
+                                <field name="trucker"/>
+                                <field name="quote"/>
+                                <field name="charged"/>
+                                <field name="profit"/>
+                            </group>
+                            <group string="Extra" col="8">
+                                <field name="extra_cost"/>
+                                <field name="notes"/>
+                            </group>
+                        </page>
+                        <page string="Track">
+                            <field name="planned_for_loading"/>
+                            <field name="loading_date"/>
+                            <field name="delivery_date"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--Search View-->
+        <record id="settle_bill_search_view" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.search</field>
+            <field name="model">panexlogi.delivery</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="project"/>
+                    <field name="loading_ref"/>
+                    <field name="consignee_ref"/>
+                    <field name="load_address"/>
+                    <field name="load_company_name"/>
+                    <field name="load_contact_phone"/>
+                    <field name="load_postcode"/>
+                    <field name="load_country"/>
+                    <field name="load_country_code"/>
+                    <field name="load_address_timeslot"/>
+                    <field name="unload_address"/>
+                    <field name="unload_company_name"/>
+                    <field name="unload_contact_phone"/>
+                    <field name="unload_postcode"/>
+                    <field name="unload_country"/>
+                    <field name="unload_country_code"/>
+                    <field name="delivery_address_timeslot"/>
+                    <field name="delivery_type"/>
+                    <field name="loading_conditon"/>
+                    <field name="unloading_conditon"/>
+                    <field name="package_type"/>
+                    <field name="package_size"/>
+                    <field name="qty"/>
+                    <field name="weight_per_unit"/>
+                    <field name="gross_weight"/>
+                    <field name="name_of_the_goods"/>
+                    <field name="uncode_class"/>
+                    <field name="quote"/>
+                    <field name="charged"/>
+                    <field name="profit"/>
+                    <field name="trucker"/>
+                    <field name="planned_for_loading"/>
+                    <field name="loading_date"/>
+                    <field name="delivery_date"/>
+                    <field name="extra_cost"/>
+                    <field name="notes"/>
+                </search>
+            </field>
+        </record>
+    <!--Tree(List) View-->
+    <record id="delivery_view_tree" model="ir.ui.view">
+        <field name="name">delivery.tree</field>
+        <field name="model">panexlogi.delivery</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="billno"/>
+                <field name="date"/>
+                <field name="project"/>
+                <field name="loading_ref"/>
+                <field name="consignee_ref"/>
+                <field name="load_address"/>
+                <field name="load_company_name"/>
+                <field name="load_contact_phone"/>
+                <field name="load_postcode"/>
+                <field name="load_country"/>
+                <field name="load_country_code"/>
+                <field name="load_address_timeslot"/>
+                <field name="unload_address"/>
+                <field name="unload_company_name"/>
+                <field name="unload_contact_phone"/>
+                <field name="unload_postcode"/>
+                <field name="unload_country"/>
+                <field name="unload_country_code"/>
+                <field name="delivery_address_timeslot"/>
+                <field name="delivery_type"/>
+                <field name="loading_conditon"/>
+                <field name="unloading_conditon"/>
+                <field name="package_type"/>
+                <field name="package_size"/>
+                <field name="qty"/>
+                <field name="weight_per_unit"/>
+                <field name="gross_weight"/>
+                <field name="name_of_the_goods"/>
+                <field name="uncode_class"/>
+                <field name="quote"/>
+                <field name="charged"/>
+                <field name="profit"/>
+                <field name="trucker"/>
+                <field name="planned_for_loading"/>
+                <field name="loading_date"/>
+                <field name="delivery_date"/>
+                <field name="extra_cost"/>
+                <field name="notes"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

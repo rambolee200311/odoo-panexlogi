@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- window_action -->
+    <record id="panexlogi_terminal_action" model="ir.actions.act_window">
+        <field name="name">terminal.management</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.terminal</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                create your first one!
+            </p>
+        </field>
+    </record>
+    <!-- Form View -->
+    <record id="terminal_view_form" model="ir.ui.view">
+        <field name="name">panexlogi.terminal.form</field>
+        <field name="model">panexlogi.terminal</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group string="Main">
+                        <field name="terminal_code"/>
+                        <field name="terminal_name"/>
+                        <field name="terminal_address"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--Search View-->
+        <record id="settle_bill_search_view" model="ir.ui.view">
+            <field name="name">panexlogi.terminal.search</field>
+            <field name="model">panexlogi.terminal</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="terminal_code"/>
+                    <field name="terminal_name"/>
+                    <field name="terminal_address"/>
+                </search>
+            </field>
+        </record>
+    <!--Tree(List) View-->
+    <record id="terminal_view_tree" model="ir.ui.view">
+        <field name="name">terminal.tree</field>
+        <field name="model">panexlogi.terminal</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="terminal_code"/>
+                <field name="terminal_name"/>
+                <field name="terminal_address"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

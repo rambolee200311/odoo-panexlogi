@@ -1,0 +1,106 @@
+<odoo>
+    <data>
+        <!-- Action -->
+        <record id="action_transport_order" model="ir.actions.act_window">
+            <field name="name">Transport Orders</field>
+            <field name="res_model">panexlogi.transport.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create the first transport order
+                </p>
+            </field>
+        </record>
+
+
+        <!-- Form View -->
+        <record id="view_transport_order_form" model="ir.ui.view">
+            <field name="name">transport.order.form</field>
+            <field name="model">panexlogi.transport.order</field>
+            <field name="arch" type="xml">
+                <form string="Transport Order">
+                    <sheet>
+                        <group string="Main">
+                            <field name="billno"/>
+                            <field name="date"/>
+                            <field name="project"/>
+                            <field name="waybill_billno"/>
+                            <field name="waybillno"/>
+                        </group>
+                        <group string="Truck">
+                            <field name="truckco"/>
+                            <field name="truckco_code"/>
+                            <field name="cargodesc"/>
+                        </group>
+                        <group col="4" string="Location">
+                            <field name="collterminal"/>
+                            <field name="collterminal_code"/>
+                            <field name="coldate"/>
+                            <field name="warehouse"/>
+                            <field name="warehouse_code"/>
+                            <field name="unlolocation"/>
+                            <field name="unlodate"/>
+                            <field name="dropterminal"/>
+                            <field name="dropterminal_code"/>
+                            <field name="drop_off_planned_date"/>
+                        </group>
+                        <group>
+                            <field name="special_instructions"/>
+                            <field name="additional_comments"/>
+                            <field name="remark"/>
+                        </group>
+                        <notebook>
+                            <page string="Container NO">
+                                <field name="transportorderdetailids">
+                                    <tree editable="bottom">
+                                        <field name="cntrno"/>
+                                        <field name="remark"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                     <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_transport_order_tree" model="ir.ui.view">
+            <field name="name">transport.order.tree</field>
+            <field name="model">panexlogi.transport.order</field>
+            <field name="arch" type="xml">
+                <tree string="Transport Orders">
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="project"/>
+                    <field name="waybillno"/>
+                    <field name="truckco"/>
+                    <field name="cargodesc"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_transport_order_search" model="ir.ui.view">
+            <field name="name">transport.order.search</field>
+            <field name="model">panexlogi.transport.order</field>
+            <field name="arch" type="xml">
+                <search string="Transport Orders">
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="project"/>
+                    <field name="waybillno"/>
+                    <field name="truckco"/>
+                    <field name="state"/>
+                </search>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -35,3 +35,13 @@ from . import outboundorder
 from . import outboundorder_products
 from . import outboundoperate
 from . import outboundoperate_products
+from . import Country
+from . import DeliveryType
+from . import LoadingCondition
+from . import UnLoadingCondition
+from . import PackageType
+from . import delivery
+from . import terminal
+from . import transportcontract
+from . import transportorder
+from . import transportinvoice

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_jsdomo_delivery,jsdemo.delivery,model_jsdemo_delivery,base.group_user,1,1,1,1
+access_jsdemo_delivery_line,jsdemo.delivery.line,model_jsdemo_deliveryline,base.group_user,1,1,1,1
+access_jsdemo_delivery_line_wizard,jsdemo.delivery.line.wizard,model_jsdemo_deliveryline_wizard,base.group_user,1,1,1,1

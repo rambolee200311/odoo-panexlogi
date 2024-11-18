@@ -8,6 +8,7 @@
             <notebook position="inside">
                 <page string="Panex_Options">
                     <group>
+                        <field name="panex_code"/>
                         <field name="shipline"/>
                         <field name="project"/>
                         <field name="receiver"/>

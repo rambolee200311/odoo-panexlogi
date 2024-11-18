@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_waybill_project1,access_waybill_project1,model_panexwd_europe_waybill_project1,,1,1,1,1

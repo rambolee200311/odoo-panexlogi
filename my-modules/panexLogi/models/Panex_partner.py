@@ -7,6 +7,7 @@ class Partner(models.Model):
 
     _inherit = 'res.partner'
 
+    panex_code = fields.Char(string='Contact Code')
     shipline = fields.Boolean("Shipping(船公司)", default=False)
     project = fields.Boolean("project（项目）", default=False)
     receiver = fields.Boolean("Receiver（收货方）", default=False)
