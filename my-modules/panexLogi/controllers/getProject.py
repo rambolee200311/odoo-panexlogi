@@ -13,6 +13,7 @@ class GetProjectList(http.Controller):
         projectlist = []
         for r in projects:
             project = {
+                "id": r.id,
                 "code": r.project_code,
                 "name": r.project_name,
             }

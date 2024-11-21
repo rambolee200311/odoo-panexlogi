@@ -13,6 +13,7 @@ class GetWareHouseList(http.Controller):
         wearhouselist = []
         for r in warehouses:
             wearhouse = {
+                "id": r.id,
                 "code": r.code,
                 "name": r.name,
             }

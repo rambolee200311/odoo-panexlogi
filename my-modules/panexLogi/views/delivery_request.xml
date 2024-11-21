@@ -19,63 +19,87 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group string="Request">
-                        <field name="billno"/>
-                        <field name="date"/>
-                        <field name="project"/>
-                        <field name="loading_ref"/>
-                        <field name="consignee_ref"/>
-                        <field name="delivery_type"/>
-                        <field name="loading_conditon"/>
-                        <field name="unloading_conditon"/>
-                        <field name="package_type"/>
-                        <field name="package_size"/>
-                        <field name="qty"/>
-                        <field name="weight_per_unit"/>
-                        <field name="gross_weight"/>
-                        <field name="name_of_the_goods"/>
-                        <field name="uncode_class"/>
+                    <div class="oe_title">
+                        <h1>
+                            Delivery Request
+                        </h1>
+                        <h2>
+                            <field name="billno"/>
+                        </h2>
+                    </div>
+                    <group string="Request" col="2">
+                        <group>
+                            <field name="date" colspan="2"/>
+                            <field name="project"/>
+                            <field name="delivery_type"/>
+                        </group>
+                        <group>
+                            <field name="loading_ref"/>
+                            <field name="consignee_ref"/>
+                            <field name="inner_ref"/>
+                        </group>
                     </group>
                     <notebook>
-                        <page string="Request">
-                            <group string="LOADING" col="8">
-                                <field name="load_address"/>
-                                <field name="load_company_name"/>
-                                <field name="load_contact_phone"/>
-                                <field name="load_postcode"/>
-                                <field name="load_country"/>
-                                <field name="load_country_code"/>
-                                <field name="load_address_timeslot"/>
-                            </group>
-                            <group string="UNLOADING" col="8">
-                                <field name="unload_address"/>
-                                <field name="unload_company_name"/>
-                                <field name="unload_contact_phone"/>
-                                <field name="unload_postcode"/>
-                                <field name="unload_country"/>
-                                <field name="unload_country_code"/>
-                                <field name="delivery_address_timeslot"/>
+                        <page string="Detail">
+                            <field name="deliverydetatilids"/>
+                        </page>
+                        <page string="Address">
+                            <group>
+                                <group string="LOADING">
+                                    <field name="loading_conditon"/>
+                                    <field name="load_address"/>
+                                    <field name="load_company_name"/>
+                                    <field name="load_contact_phone"/>
+                                    <field name="load_postcode"/>
+                                    <field name="load_country"/>
+                                    <field name="load_country_code"/>
+                                    <field name="load_address_timeslot"/>
+                                    <field name="planned_for_loading"/>
+                                </group>
+                                <group string="UNLOADING">
+                                    <field name="unloading_conditon"/>
+                                    <field name="unload_address"/>
+                                    <field name="unload_company_name"/>
+                                    <field name="unload_contact_phone"/>
+                                    <field name="unload_postcode"/>
+                                    <field name="unload_country"/>
+                                    <field name="unload_country_code"/>
+                                    <field name="unload_address_timeslot"/>
+                                    <field name="planned_for_unloading"/>
+                                </group>
                             </group>
                         </page>
                         <page string="Quote">
-                            <group string="Common" col="8">
-                                <field name="trucker"/>
-                                <field name="quote"/>
-                                <field name="charged"/>
-                                <field name="profit"/>
+                            <group string="Common" col="2">
+                                <group>
+                                    <field name="trucker"/>
+                                    <field name="quote"/>
+                                </group>
+                                <group>
+                                    <field name="charged"/>
+                                    <field name="profit"/>
+                                </group>
                             </group>
-                            <group string="Extra" col="8">
-                                <field name="extra_cost"/>
-                                <field name="notes"/>
+                            <group string="Extra" col="2">
+                                <group>
+                                    <field name="extra_cost"/>
+                                </group>
+                                <group>
+                                    <field name="notes"/>
+                                </group>
                             </group>
                         </page>
                         <page string="Track">
-                            <field name="planned_for_loading"/>
                             <field name="loading_date"/>
-                            <field name="delivery_date"/>
+                            <field name="unloading_date"/>
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
             </form>
         </field>
     </record>
@@ -103,26 +127,18 @@
                     <field name="unload_postcode"/>
                     <field name="unload_country"/>
                     <field name="unload_country_code"/>
-                    <field name="delivery_address_timeslot"/>
+                    <field name="unload_address_timeslot"/>
                     <field name="delivery_type"/>
                     <field name="loading_conditon"/>
                     <field name="unloading_conditon"/>
-                    <field name="package_type"/>
-                    <field name="package_size"/>
-                    <field name="qty"/>
-                    <field name="weight_per_unit"/>
-                    <field name="gross_weight"/>
-                    <field name="name_of_the_goods"/>
-                    <field name="uncode_class"/>
                     <field name="quote"/>
                     <field name="charged"/>
                     <field name="profit"/>
                     <field name="trucker"/>
                     <field name="planned_for_loading"/>
+                    <field name="planned_for_unloading"/>
                     <field name="loading_date"/>
-                    <field name="delivery_date"/>
-                    <field name="extra_cost"/>
-                    <field name="notes"/>
+                    <field name="unloading_date"/>
                 </search>
             </field>
         </record>
@@ -135,40 +151,12 @@
                 <field name="billno"/>
                 <field name="date"/>
                 <field name="project"/>
-                <field name="loading_ref"/>
-                <field name="consignee_ref"/>
-                <field name="load_address"/>
-                <field name="load_company_name"/>
-                <field name="load_contact_phone"/>
-                <field name="load_postcode"/>
-                <field name="load_country"/>
-                <field name="load_country_code"/>
-                <field name="load_address_timeslot"/>
-                <field name="unload_address"/>
-                <field name="unload_company_name"/>
-                <field name="unload_contact_phone"/>
-                <field name="unload_postcode"/>
-                <field name="unload_country"/>
-                <field name="unload_country_code"/>
-                <field name="delivery_address_timeslot"/>
-                <field name="delivery_type"/>
-                <field name="loading_conditon"/>
-                <field name="unloading_conditon"/>
-                <field name="package_type"/>
-                <field name="package_size"/>
-                <field name="qty"/>
-                <field name="weight_per_unit"/>
-                <field name="gross_weight"/>
-                <field name="name_of_the_goods"/>
-                <field name="uncode_class"/>
-                <field name="quote"/>
-                <field name="charged"/>
-                <field name="profit"/>
+                <field name="load_address" string="load_address"/>
+                <field name="unload_address" string="unload_address"/>
                 <field name="trucker"/>
                 <field name="planned_for_loading"/>
                 <field name="loading_date"/>
-                <field name="delivery_date"/>
-                <field name="extra_cost"/>
+                <field name="unloading_date"/>
                 <field name="notes"/>
             </tree>
         </field>

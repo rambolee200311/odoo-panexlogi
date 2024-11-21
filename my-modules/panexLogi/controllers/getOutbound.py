@@ -37,7 +37,9 @@ class getOutboundOrderList(http.Controller):
             singID = {
                 "billno": r.billno,
                 "date": r.date,
+                "warehouse_id": r.warehouse.id,
                 "warehouse_code": r.warehouse_code,
+                "project_id": r.project.id,
                 "project_code": r.project_code
             }
             listIds.append(singID)
@@ -74,6 +76,10 @@ class GetOutboundOrder(http.Controller):
         data = {
             "billno": outbound_order_by_billno.billno,
             "date": outbound_order_by_billno.date,
+            "warehouse_id": outbound_order_by_billno.warehouse.id,
+            "warehouse_code": outbound_order_by_billno.warehouse_code,
+            "project_id": outbound_order_by_billno.project.id,
+            "project_code": outbound_order_by_billno.project_code,
             "products": listIds
         }
         back_data = {'code': 100, 'msg': '查询outbound order成功', 'data': data}

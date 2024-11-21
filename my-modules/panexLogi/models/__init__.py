@@ -41,6 +41,7 @@ from . import LoadingCondition
 from . import UnLoadingCondition
 from . import PackageType
 from . import delivery
+from . import deliveryquote
 from . import terminal
 from . import transportcontract
 from . import transportorder

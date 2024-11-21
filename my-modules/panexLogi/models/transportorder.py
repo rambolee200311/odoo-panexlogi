@@ -68,11 +68,36 @@ class TransportOrder(models.Model):
         values['state'] = 'new'
         return super(TransportOrder, self).create(values)
 
+    def action_send_email(self):
+        template_id = self.env.ref('panexLogi.email_template_transport_order').id
+        self.env['mail.template'].browse(template_id).send_mail(self.id, force_send=True)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Email sent successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
 class TransportOrderDetail(models.Model):
     _name = 'panexlogi.transport.order.detail'
     _description = 'panexlogi.transport.order.detail'
 
     cntrno = fields.Char(string='Container NO')
+    coldate = fields.Date(string='Collection Date')
+    warehouse = fields.Many2one('stock.warehouse', string='Unloaded Warehouse')
+    warehouse_code = fields.Char(string='Warehouse Code', related='warehouse.code', readonly=True)
+    unlolocation = fields.Char(string='Unloaded Location')
+    unlodate = fields.Date(string='Unloaded Date')
+    dropterminal = fields.Many2one('panexlogi.terminal', string='Empty Container Drop-off Terminal')
+    dropterminal_code = fields.Char(string='Drop-off Terminal Code', related='dropterminal.terminal_code',
+                                    readonly=True)
+    drop_off_planned_date = fields.Date(string='Drop-off Planned Date')
+    special_instructions = fields.Text(string='Special Instructions')
+    additional_comments = fields.Text(string='Additional Comments')
     remark = fields.Text(string='Remark')
+
     transportorderid = fields.Many2one('panexlogi.transport.order', string='Transport Order')

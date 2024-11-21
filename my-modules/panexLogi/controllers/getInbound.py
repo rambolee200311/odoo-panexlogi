@@ -39,7 +39,9 @@ class getInboundOrderList(http.Controller):
                 "billno": r.billno,
                 "date": r.date,
                 "waybillno": r.waybillno,
+                "warehouse_id": r.warehouse.id,
                 "warehouse_code": r.warehouse_code,
+                "project_id": r.project.id,
                 "project_code": r.project_code
             }
             listIds.append(singID)
@@ -49,6 +51,7 @@ class getInboundOrderList(http.Controller):
         back_data = {'code': 100, 'msg': '查询inbound order list成功', 'data': data}
         print("back_data==", back_data)
         return (back_data)
+
 
 class GetInboundOrder(http.Controller):
     @http.route('/getInboundOrder', type='json', auth="user", cors="*", csrf=False)
@@ -78,6 +81,10 @@ class GetInboundOrder(http.Controller):
             "billno": inbound_order_by_billno.billno,
             "date": inbound_order_by_billno.date,
             "waybillno": inbound_order_by_billno.waybillno,
+            "warehouse_id": inbound_order_by_billno.warehouse.id,
+            "warehouse_code": inbound_order_by_billno.warehouse_code,
+            "project_id": inbound_order_by_billno.project.id,
+            "project_code": inbound_order_by_billno.project_code,
             "products": listIds
         }
         back_data = {'code': 100, 'msg': '查询inbound order成功', 'data': data}

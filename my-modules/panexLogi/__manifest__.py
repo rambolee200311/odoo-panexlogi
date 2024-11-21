@@ -63,6 +63,8 @@
         'views/DemoTodo.xml',
         'views/packagetype.xml',
         'views/delivery_request.xml',
+        'views/delivery_detail.xml',
+        'views/delivery_quote.xml',
         'views/DemoStockPicking.xml',
         'views/DemoToDoReport.xml',
         'views/country.xml',

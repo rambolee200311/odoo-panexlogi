@@ -5,7 +5,9 @@
         <field name="name">jsdemo.delivery.form</field>
         <field name="model">jsdemo.delivery</field>
         <field name="arch" type="xml">
+
             <form>
+                <button name="add_line" string="Add Line" type="object" class="oe_stat_button" icon="fa-money"/>
                 <header>
                     <button name="add_line" string="Add Line" type="object" class="btn-primary"/>
                 </header>

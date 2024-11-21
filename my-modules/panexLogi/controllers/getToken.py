@@ -9,8 +9,8 @@ class GetToken(http.Controller):
 
     def getOdooToken(self, login, password):
         # http://localhost:8088访问odoo的路径，后面的web/session/authenticate固定写法请不要动！！！
-        url = "http://panexlogi.beesecure.eu/web/session/authenticate"
-        # url = "http://localhost:8088/web/session/authenticate"
+        # url = "http://panexlogi.beesecure.eu/web/session/authenticate"
+        url = "http://localhost:8088/web/session/authenticate"
         # url = "http://localhost:8069/web/session/authenticate"
         # 传入需要访问的数据库名称，登录账号与密码 panexDB
         data = {

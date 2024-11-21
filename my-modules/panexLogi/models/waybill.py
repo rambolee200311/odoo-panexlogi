@@ -210,3 +210,26 @@ class Waybill(models.Model):
             self.outbound_operating_fee_budget_amount = outbound_operating_fee_budget_amount
 
         return True
+
+    # 生成运输单
+    def action_tranportorder_add(self):
+        for record in self:
+            if record.details_ids:
+                args_list = []
+                for rec in record.details_ids:
+                    args_list.append((0, 0, {
+                        'cntrno': rec.cntrno
+                    }))
+
+                transport_order_vals = {
+                    'waybill_billno': record.id,
+                    'project': record.project.id,
+                    'date': fields.Date.today(),
+                    'state': 'new',
+                    'transportorderdetailids': args_list,
+                }
+                self.env['panexlogi.transport.order'].create(transport_order_vals)
+                return True
+
+            else:
+                raise UserError(_("Please add container details first!"))

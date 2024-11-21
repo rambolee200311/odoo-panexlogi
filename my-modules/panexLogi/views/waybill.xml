@@ -158,10 +158,6 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                     <button name="action_budget_cal"
-                            type="object"
-                            string="Budget"
-                            class="btn-primary"/>
                      <button name="action_confirm_order"
                             type="object"
                             string="Confirm"
@@ -183,6 +179,16 @@
                             statusbar_visible="new,confirm"/>
                  </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_budget_cal"
+                                type="object"
+                                string="Budget"
+                                class="oe_stat_button" icon="fa-money"/>
+                        <button name="action_tranportorder_add"
+                                    type="object"
+                                    string="Transport Order"
+                                    class="oe_stat_button" icon="fa-flask"/>
+                    </div>
                     <div class="oe_title">
                         <h1>
                             Waybill

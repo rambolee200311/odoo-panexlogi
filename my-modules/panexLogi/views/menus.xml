@@ -41,13 +41,14 @@
 -->
         <!-- Menu Item -->
         <menuitem id="menu_transport" name="Transport" parent="panex_logi_menu" sequence="150"/>
-        <menuitem id="menu_transport_contract" name="Transport Contracts" parent="menu_transport" action="action_transport_contract" sequence="151"/>
-        <menuitem id="menu_transport_order" name="Transport Orders" parent="menu_transport" action="action_transport_order" sequence="152"/>
-        <menuitem id="menu_transport_invoice" name="Transport Invoices" parent="menu_transport" action="action_transport_invoice" sequence="153"/>
+        <menuitem id="menu_transport_contract" name="Contracts" parent="menu_transport" action="action_transport_contract" sequence="151"/>
+        <menuitem id="menu_transport_order" name="Orders" parent="menu_transport" action="action_transport_order" sequence="152"/>
+        <menuitem id="menu_transport_invoice" name="Invoices" parent="menu_transport" action="action_transport_invoice" sequence="153"/>
 
 
         <menuitem id="delivery_logi_menu" name="Delivery" parent="panex_logi_menu" sequence="200" />
-        <menuitem id="delivery_order_menu" name="Request" parent="delivery_logi_menu" sequence="201" action="delivery_request_action"/>
+        <menuitem id="delivery_order_menu" name="Requests" parent="delivery_logi_menu" sequence="201" action="delivery_request_action"/>
+        <menuitem id="delivery_quote_menu" name="Quotes" parent="delivery_logi_menu"  sequence="202" action="delivery_quote_action"/>
         
         
         <menuitem id="outlay_menu" name="Outlay" parent="panex_logi_menu" sequence="300" />
