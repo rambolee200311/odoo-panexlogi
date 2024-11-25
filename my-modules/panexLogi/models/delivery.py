@@ -52,6 +52,7 @@ class Delivery(models.Model):
     notes = fields.Text('Notes')
     deliverydetatilids = fields.One2many('panexlogi.delivery.detail', 'deliveryid', 'Delivery Detail')
     deliveryquoteids = fields.One2many('panexlogi.delivery.quote', 'delivery_id', 'Delivery Quote')
+    deliverystatusids = fields.One2many('panexlogi.delivery.status', 'delivery_id', 'Delivery Status')
 
     @api.onchange('quote', 'charged', 'extra_cost')
     def _onchange_profit(self):
@@ -65,6 +66,16 @@ class Delivery(models.Model):
         times = fields.Date.today()
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.delivery', times)
         return super(Delivery, self).create(values)
+
+    # 跳转wizard视图
+    def add_delivery_status(self):
+        return {
+            'name': 'Add Status',
+            'type': 'ir.actions.act_window',
+            'res_model': 'panexlogi.delivery.status.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+        }
 
 
 class DeliveryDetail(models.Model):
@@ -85,3 +96,43 @@ class DeliveryDetail(models.Model):
     deliveryid = fields.Many2one('panexlogi.delivery', 'Delivery ID')
 
 
+class DeliveryStatus(models.Model):
+    _name = 'panexlogi.delivery.status'
+    _description = 'panexlogi.delivery.status'
+    _inherit = ["mail.thread", "mail.activity.mixin"]
+
+    delivery_id = fields.Many2one('panexlogi.delivery', 'Delivery ID')
+    date = fields.Datetime('Date', default=fields.Datetime.now(), tracking=True)
+    status = fields.Char('Status', tracking=True)
+    description = fields.Text('Description')
+
+
+class DeliveryStatusWizard(models.TransientModel):
+    _name = 'panexlogi.delivery.status.wizard'
+    _description = 'panexlogi.delivery.status.wizard'
+
+    date = fields.Datetime('Date', default=fields.Datetime.now())
+    status = fields.Selection(
+        selection=[
+            ('order', 'Order Placed'),
+            ('transit', 'In Transit'),
+            ('delivery', 'Delivered'),
+            ('cancel', 'Cancel'),
+            ('return', 'Return'),
+            ('other', 'Other'),
+            ('complete', 'Complete'),
+        ],
+        default='order',
+        string='status',
+        tracking=True
+    )
+    description = fields.Text('Description')
+
+    def add_line(self):
+        self.env['panexlogi.delivery.status'].sudo().create({
+            'date': self.date,
+            'status': self.status,
+            'description': self.description,
+            'delivery_id': self.env.context.get('active_id'),
+        })
+        return {'type': 'ir.actions.act_window_close'}

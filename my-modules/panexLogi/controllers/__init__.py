@@ -6,3 +6,4 @@ from . import getInbound
 from . import getOutbound
 from . import getWarehouse
 from . import getProject
+from . import getProduct

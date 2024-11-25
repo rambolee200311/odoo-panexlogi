@@ -29,15 +29,15 @@
                             <th>container no</th>
                             <th>collect date</th>
                             <th>unload warehouse</th>
-                            <th>unload location</th>
+                           <!-- <th>unload location</th>-->
                             <th>drop off</th>
                         </tr>
                         <t t-foreach="object.transportorderdetailids" t-as="item">
                             <tr>
                                 <td><t t-esc="item.cntrno"/></td>
                                 <td><t t-esc="item.coldate"/></td>
-                                <td><t t-esc="item.warehouse_code"/></td>
-                                <td><t t-esc="item.unlolocation"/></td>
+                                <td><t t-esc="item.warehouse_code"/><!--</td>
+                                <td>--><t t-esc="item.unlolocation"/></td>
                                 <td><t t-esc="item.dropterminal_code"/></td>
                             </tr>
                         </t>
@@ -63,7 +63,11 @@
                             <button name="action_send_email"
                                         type="object"
                                         string="Send Email"
-                                        class="oe_stat_button" icon="fa-mail"/>
+                                        class="oe_stat_button" icon="fa-send"/>
+                            <button name="action_create_inbound_order"
+                                        type="object"
+                                        string="Create Inbound Order"
+                                        class="oe_stat_button" icon="fa-building"/>
                         </div>
                         <div class="oe_title">
                             <h1>

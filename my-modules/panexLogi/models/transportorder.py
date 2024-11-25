@@ -68,6 +68,7 @@ class TransportOrder(models.Model):
         values['state'] = 'new'
         return super(TransportOrder, self).create(values)
 
+    # 发邮件给卡车公司
     def action_send_email(self):
         template_id = self.env.ref('panexLogi.email_template_transport_order').id
         self.env['mail.template'].browse(template_id).send_mail(self.id, force_send=True)
@@ -77,6 +78,56 @@ class TransportOrder(models.Model):
             'params': {
                 'title': 'Success',
                 'message': 'Email sent successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    # 生成入库单
+    def action_create_inbound_order(self):
+        # 生成入库订单
+        owarehouse = 0
+        iwarehouse = 0
+        transport_order_details = []
+        for record in self:
+            for detail in record.transportorderdetailids:
+                if owarehouse != detail.warehouse.id and detail.warehouse.id :
+                    owarehouse = detail.warehouse.id
+                    transport_order_detail = self.env['panexlogi.transport.order.detail'].search(
+                        [('warehouse', '=', owarehouse)])
+                    transport_order_details.append(transport_order_detail)
+            for order_detail in transport_order_details:
+                # inbound_order_product_ids
+
+                detail_list = []
+                for rec in order_detail:
+                    # way bill pack list
+                    packlist = self.env['panexlogi.waybill.packlist'].search(
+                        [('cntrno', '=', rec.cntrno)])
+                    for pack in packlist:
+                        detail_list.append((0, 0, {
+                            'cntrno': pack.cntrno,
+                            'product_id': pack.product_id.id,
+                            'batch': pack.batch,
+                            'pcs': pack.pcs,
+                            'pallets': pack.pallets,
+                        }))
+                    iwarehouse = rec.warehouse.id
+                    # inbound_order
+                order = {
+                    'date': fields.Date.today(),
+                    'project': record.project.id,
+                    'warehouse': iwarehouse,
+                    'inbound_order_product_ids': detail_list,
+                }
+                self.env['panexlogi.inbound.order'].create(order)
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Inbound Order create successfully!',
                 'type': 'success',
                 'sticky': False,
             }

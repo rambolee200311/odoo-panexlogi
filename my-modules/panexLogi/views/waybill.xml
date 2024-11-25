@@ -187,7 +187,7 @@
                         <button name="action_tranportorder_add"
                                     type="object"
                                     string="Transport Order"
-                                    class="oe_stat_button" icon="fa-flask"/>
+                                    class="oe_stat_button" icon="fa-truck"/>
                     </div>
                     <div class="oe_title">
                         <h1>

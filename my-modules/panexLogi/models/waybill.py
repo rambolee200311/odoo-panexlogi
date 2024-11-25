@@ -209,7 +209,16 @@ class Waybill(models.Model):
                 outbound_operating_fee_budget_amount = pallets_sum * self.project.outbound_operating_fixfee_per_pallet
             self.outbound_operating_fee_budget_amount = outbound_operating_fee_budget_amount
 
-        return True
+        return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': 'Success',
+                        'message': 'Budget calculate successfully!',
+                        'type': 'success',
+                        'sticky': False,
+                    }
+                }
 
     # 生成运输单
     def action_tranportorder_add(self):
@@ -229,7 +238,16 @@ class Waybill(models.Model):
                     'transportorderdetailids': args_list,
                 }
                 self.env['panexlogi.transport.order'].create(transport_order_vals)
-                return True
+                return {
+                            'type': 'ir.actions.client',
+                            'tag': 'display_notification',
+                            'params': {
+                                'title': 'Success',
+                                'message': 'Transport order create successfully!',
+                                'type': 'success',
+                                'sticky': False,
+                            }
+                        }
 
             else:
                 raise UserError(_("Please add container details first!"))
