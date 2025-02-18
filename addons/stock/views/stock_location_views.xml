@@ -31,6 +31,10 @@
                     <h1><field name="name" placeholder="e.g. Spare Stock"/></h1>
                     <label for="location_id"/>
                     <h2><field name="location_id" placeholder="e.g. Physical Locations" options="{'no_create': True}"/></h2>
+                    <!--20241127 barcode-->
+                    <label for="barcode"/>
+                    <h2><field name="barcode" placeholder="Barcode"/></h2>
+
 
                     <group>
                         <group string="Additional Information" name="additional_info">

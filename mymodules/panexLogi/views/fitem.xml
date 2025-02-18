@@ -1,0 +1,53 @@
+<odoo>
+    <!-- window_action -->
+    <record id="panexlogi_fitems_action" model="ir.actions.act_window">
+        <field name="name">fitems.management</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.fitems</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                create your first one!
+            </p>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="fitems_view_form" model="ir.ui.view">
+        <field name="name">fitems.form</field>
+        <field name="model">panexlogi.fitems</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="booking_code"/>
+                        <field name="code" string="Charge Code"/>
+                        <field name="name" string="Charge Description"/>
+                        <field name="remark"/>
+                        <field name="remark1" string="For LI"/>
+                        <field name="be_income"/>
+                        <field name="be_outcome"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--Tree(List) View-->
+    <record id="fitems_view_tree" model="ir.ui.view">
+        <field name="name">fitems.tree</field>
+        <field name="model">panexlogi.fitems</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="booking_code"/>
+                <field name="code" string="Charge Code"/>
+                <field name="name" string="Charge Description"/>
+                <field name="remark"/>
+                <field name="remark1" string="For LI"/>
+                <field name="be_income"/>
+                <field name="be_outcome"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

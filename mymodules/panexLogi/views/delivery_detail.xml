@@ -1,0 +1,83 @@
+<odoo>
+    <data>
+        <!-- Action
+        <record id="action_delivery_detail" model="ir.actions.act_window">
+            <field name="name">Delivery Details</field>
+            <field name="res_model">panexlogi.delivery.detail</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create the first delivery detail
+                </p>
+            </field>
+        </record>
+         -->
+        <!-- Menu Item
+        <menuitem id="menu_delivery_detail" name="Delivery Details" parent="your_parent_menu_id" action="action_delivery_detail"/>
+         -->
+        <!-- Form View -->
+        <record id="view_delivery_detail_form" model="ir.ui.view">
+            <field name="name">delivery.detail.form</field>
+            <field name="model">panexlogi.delivery.detail</field>
+            <field name="arch" type="xml">
+                <form string="Delivery Detail">
+                    <sheet>
+                        <group>
+                            <field name="product"/>
+                            <field name="product_name"/>
+                            <field name="adr"/>
+                            <field name="qty"/>
+                            <field name="package_size"/>
+                            <field name="weight_per_unit"/>
+                            <field name="gross_weight"/>
+                            <field name="uncode"/>
+                            <field name="class_no"/>
+                            <field name="cntrno"/>
+                            <field name="remark"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_delivery_detail_tree" model="ir.ui.view">
+            <field name="name">delivery.detail.tree</field>
+            <field name="model">panexlogi.delivery.detail</field>
+            <field name="arch" type="xml">
+                <tree string="Delivery Details">
+                    <field name="product"/>
+                    <field name="product_name"/>
+                    <field name="adr"/>
+                    <field name="qty"/>
+                    <field name="package_size"/>
+                    <field name="weight_per_unit"/>
+                    <field name="gross_weight"/>
+                    <field name="uncode"/>
+                    <field name="class_no"/>
+                    <field name="cntrno"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_delivery_detail_search" model="ir.ui.view">
+            <field name="name">delivery.detail.search</field>
+            <field name="model">panexlogi.delivery.detail</field>
+            <field name="arch" type="xml">
+                <search string="Delivery Details">
+                    <field name="adr"/>
+                    <field name="qty"/>
+                    <field name="package_size"/>
+                    <field name="weight_per_unit"/>
+                    <field name="gross_weight"/>
+                    <field name="product"/>
+                    <field name="product_name"/>
+                    <field name="uncode"/>
+                    <field name="class_no"/>
+                    <field name="cntrno"/>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

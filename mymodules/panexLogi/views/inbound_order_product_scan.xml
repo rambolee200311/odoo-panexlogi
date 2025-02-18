@@ -1,0 +1,86 @@
+<odoo>
+    <data>
+        <!-- Action -->
+        <record id="action_inbound_order_products_scan" model="ir.actions.act_window">
+            <field name="name">Inbound Order Products Scan</field>
+            <field name="res_model">panexlogi.inbound.order.products.scan</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first Inbound Order Products Scan
+                </p>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_inbound_order_products_scan_form" model="ir.ui.view">
+            <field name="name">inbound.order.products.scan.form</field>
+            <field name="model">panexlogi.inbound.order.products.scan</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="date"/>
+                            <field name="pda_id"/>
+                            <field name="warehouse_id"/>
+                            <field name="location_id"/>
+                            <field name="product_id"/>
+                            <field name="batch"/>
+                            <field name="pcs"/>
+                            <field name="pallets"/>
+                            <field name="cntrno"/>
+                            <field name="palletdno"/>
+                            <field name="sncode"/>
+                            <field name="inbound_order_products_id"/>
+                            <field name="be_del"/>
+                            <field name="ori_pda_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_inbound_order_products_scan_tree" model="ir.ui.view">
+            <field name="name">inbound.order.products.scan.tree</field>
+            <field name="model">panexlogi.inbound.order.products.scan</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="date"/>
+                    <field name="pda_id"/>
+                    <field name="warehouse_id"/>
+                    <field name="location_id"/>
+                    <field name="product_id"/>
+                    <field name="batch"/>
+                    <field name="pcs"/>
+                    <field name="pallets"/>
+                    <field name="cntrno"/>
+                    <field name="palletdno"/>
+                    <field name="sncode"/>
+                    <field name="inbound_order_products_id"/>
+                    <field name="be_del"/>
+                    <field name="ori_pda_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_inbound_order_products_scan_search" model="ir.ui.view">
+            <field name="name">inbound.order.products.scan.search</field>
+            <field name="model">panexlogi.inbound.order.products.scan</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date"/>
+                    <field name="pda_id"/>
+                    <field name="product_id"/>
+                    <field name="batch"/>
+                    <field name="pcs"/>
+                    <field name="pallets"/>
+                    <field name="cntrno"/>
+                    <field name="palletdno"/>
+                    <field name="inbound_order_products_id"/>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

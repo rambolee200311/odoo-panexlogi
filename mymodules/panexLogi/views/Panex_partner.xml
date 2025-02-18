@@ -1,0 +1,51 @@
+<odoo>
+  <!--<data>-->
+      <record model="ir.ui.view" id="shipping_line_list">
+          <field name="name">partner_option</field>
+          <field name="model">res.partner</field>
+          <field name="inherit_id" ref="base.view_partner_form"/>
+          <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Panex_Options">
+                    <group>
+                        <field name="panex_code"/>
+                        <field name="shipline"/>
+                        <field name="project"/>
+                        <field name="receiver"/>
+                        <field name="truck"/>
+                        <field name="agency"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+      </record>
+    <!--</data>-->
+     <record id="product_option_form" model="ir.ui.view">
+        <field name="name">product.option.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Panex Options">
+                    <group col="2">
+                        <group col="4" string="Panex Code">
+                            <field name="code"/>
+                            <field name="k_number"/>
+                            <field name="hs_code"/>
+                            <field name="sku"/>
+                            <field name="model"/>
+                        </group>
+                        <group col="4" string="Panex Logistic">
+                            <field name="net_weight"/>
+                            <field name="net_weight_unit"/>
+                            <field name="gross_weight"/>
+                            <field name="gross_weight_unit"/>
+                            <field name="volume"/>
+                            <field name="volume_unit"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+     </record>
+</odoo>

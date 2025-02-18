@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- action -->
+        <record id="waybill_action" model="ir.actions.act_window">
+            <field name="name">Waybill</field>
+            <field name="res_model">panexlogi.waybill</field>
+            <field name="view_mode">kanban,calendar,tree,form</field>
+        </record>
+
+
+
+        <record id="action_partner" model="ir.actions.act_window">
+            <field name="name">Partner_Panex</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <!-- menu -->
+
+        <menuitem id="panex_logi_menu" name="Panex" sequence="10"/>
+
+        <menuitem id="import_logi_menu" name="Import" parent="panex_logi_menu" sequence="100" />
+        <menuitem id="waybill_menu" name="Waybill" parent="import_logi_menu" sequence="101" action="waybill_action"/>
+        <!--
+        <menuitem id="waybill_arrivnotice_menu" name="Arrival Notice" parent="import_logi_menu" sequence="101" action="waybill_arrivnotice_action"/>
+        <menuitem id="waybill_commeinvoice_menu" name="Commercial Invoice" parent="import_logi_menu" sequence="102" action="waybill_commeinvoice_action"/>
+        <menuitem id="waybill_shipinvoice_menu" name="Shipping Invoice" parent="import_logi_menu" sequence="103" action="waybill_shipinvoice_action"/>
+        <menuitem id="waybill_clearinvoice_menu" name="Clearance Invoice" parent="import_logi_menu" sequence="104" action="waybill_clearinvoice_action"/>
+        <menuitem id="waybill_customsduties_menu" name="Customs Duties" parent="import_logi_menu" sequence="105" action="waybill_customsduties_action"/>
+        <menuitem id="waybill_cargorelease_menu" name="Cargo Release" parent="import_logi_menu" sequence="106" action="waybill_cargorelease_action"/>
+         -->
+        <menuitem id="waybill_packlist_menu" name="Packing List" parent="import_logi_menu" sequence="107" action="waybill_packlist_action"/>
+<!--
+        <menuitem id="cartage_logi_menu" name="Cartage" parent="panex_logi_menu" sequence="200" />
+        <menuitem id="cartage_order_menu" name="Order" parent="cartage_logi_menu" sequence="201" action="cartage_order_action"/>
+        <menuitem id="cartage_offer_menu" name="Offer" parent="cartage_logi_menu" sequence="202" action="cartage_offer_action1"/>
+        <menuitem id="cartage_trail_menu" name="Trail" parent="cartage_logi_menu" sequence="202" action="cartage_trail_action1"/>
+-->
+        <!-- Menu Item -->
+        <menuitem id="menu_transport" name="Transport" parent="panex_logi_menu" sequence="150"/>
+        <menuitem id="menu_transport_contract" name="Contracts" parent="menu_transport" action="action_transport_contract" sequence="151"/>
+        <menuitem id="menu_transport_order" name="Orders" parent="menu_transport" action="action_transport_order" sequence="152"/>
+        <menuitem id="menu_transport_invoice" name="Invoices" parent="menu_transport" action="action_transport_invoice" sequence="153"/>
+        <menuitem id="menu_transport_invoice_detail" name="Invoice Details" parent="menu_transport" action="action_transport_invoice_detail" sequence="154"/>
+
+        <menuitem id="delivery_logi_menu" name="Delivery" parent="panex_logi_menu" sequence="200" />
+        <menuitem id="delivery_order_menu" name="Requests" parent="delivery_logi_menu" sequence="201" action="delivery_request_action"/>
+        <menuitem id="delivery_quote_menu" name="Quotes" parent="delivery_logi_menu"  sequence="202" action="delivery_quote_action"/>
+        
+        
+        <menuitem id="outlay_menu" name="Outlay" parent="panex_logi_menu" sequence="300" />
+        <menuitem id="import_payment_application_menu" name="Import Pay APP" parent="outlay_menu" sequence="301" action="import_payapp_action"/>
+        <menuitem id="cartage_payment_application_menu" name="Cartage Pay APP" parent="outlay_menu" sequence="302" action="cartage_payapp_action"/>
+
+        <menuitem id="income_menu" name="Income" parent="panex_logi_menu" sequence="400" />
+        <menuitem id="income_settle_bill_menu" name="Bill of Settlement" parent="income_menu" sequence="401" action="settle_bill_action"/>
+        <menuitem id="income_settle_bill_clearance_menu" name="Customs Clearance" parent="income_menu" sequence="402" action="settle_bill_clearance_action"/>
+        <menuitem id="income_settle_bill_handling_menu" name="Import Handling" parent="income_menu" sequence="403" action="settle_bill_handling_action"/>
+        <menuitem id="income_settle_bill_inbound_menu" name="Inbound Operating" parent="income_menu" sequence="404" action="settle_bill_inbound_action"/>
+        <menuitem id="income_settle_bill_outbound_menu" name="Outbound Operating" parent="income_menu" sequence="405" action="settle_bill_outbound_action"/>
+        <menuitem id="income_settle_bill_delivery_menu" name="Outbound Delivery" parent="income_menu" sequence="406" action="settle_bill_delivery_action"/>
+
+        <menuitem id="wms_menu" name="WMS" parent="panex_logi_menu" sequence="500" />
+        <menuitem id="inbound_menu" name="Inbound" parent="wms_menu" sequence="501" />
+        <menuitem id="panexlogi_inboundorder_menu" name="Inbound Order" parent="inbound_menu" sequence="502" action="panexlogi_inboundorder_action"/>
+        <menuitem id="panexlogi_inboundoperate_menu" name="Inbound Operate" parent="inbound_menu" sequence="503" action="panexlogi_inboundoperate_action"/>
+        <menuitem id="panexlogi_inboundorder_product_scan_menu" name="Inbound Product Scan" parent="inbound_menu" sequence="504" action="action_inbound_order_products_scan"/>
+        <menuitem id="outbound_menu" name="Outbound" parent="wms_menu" sequence="511" />
+        <menuitem id="panexlogi_outboundorder_menu" name="Outbound Order" parent="outbound_menu" sequence="512" action="panexlogi_outboundorder_action"/>
+        <menuitem id="panexlogi_outboundoperate_menu" name="Outbound Operate" parent="outbound_menu" sequence="513" action="panexlogi_outboundoperate_action"/>
+
+
+
+        <menuitem id="configuration_menu" name="Configuration" parent="panex_logi_menu" sequence="900" />
+        <menuitem id="partner_menu" name="Partner files" parent="configuration_menu" sequence="901" action="action_partner"/>
+<!--    <menuitem id="sender_menu" name="Spot files" parent="configuration_menu" sequence="902" action="sender_action"/>
+        <menuitem id="receiver_menu" name="Receiver files" parent="configuration_menu" sequence="903" action="receiver_action"/>-->
+        <menuitem id="cartage_tag_menu" name="Cartage Tag files" parent="configuration_menu" sequence="904" action="cartage_tag_action"/>
+        <menuitem id="panex_project_menu" name="Project files" parent="configuration_menu" sequence="905" action="panexlogi_project_action"/>
+        <menuitem id="panex_fitems_menu" name="Fitems files" parent="configuration_menu" sequence="906" action="panexlogi_fitems_action"/>
+        <menuitem id="panex_country_menu" name="Country files" parent="configuration_menu" sequence="907" action="panexlogi_country_action"/>
+        <menuitem id="panex_deliverytype_menu" name="DeliveryType files" parent="configuration_menu" sequence="908" action="panexlogi_deliverytype_action"/>
+        <menuitem id="panex_loadingcondition_menu" name="Loading Condition files" parent="configuration_menu" sequence="909" action="panexlogi_loadingcondition_action"/>
+        <menuitem id="panex_packagetype_menu" name="packagetype files" parent="configuration_menu" sequence="907" action="panexlogi_packagetype_action"/>
+        <menuitem id="panex_terminal_menu" name="terminal files" parent="configuration_menu" sequence="908" action="panexlogi_terminal_action"/>
+        <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
+        <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->
+
+        <menuitem id="report_menu" name="Reporting" parent="panex_logi_menu" sequence="800" />
+        <menuitem id="report_demotodo_menu" name="DemoToDo Report" parent="report_menu" sequence="801" action="action_panexlogi_demotodo_report_all"/>
+
+    </data>
+</odoo>

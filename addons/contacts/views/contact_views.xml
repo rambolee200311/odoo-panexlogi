@@ -14,6 +14,7 @@
           </p>
         </field>
     </record>
+
     <record id="action_contacts_view_kanban" model="ir.actions.act_window.view">
         <field name="sequence" eval="0"/>
         <field name="view_mode">kanban</field>

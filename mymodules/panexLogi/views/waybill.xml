@@ -1,0 +1,339 @@
+<odoo>
+<!-- Search for waybill -->
+    <record id="waybill_view_search" model="ir.ui.view">
+        <field name="name">waybill.search.view</field>
+        <field name="model">panexlogi.waybill</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="project"/>
+                <field name="billno"/>
+                <field name="date"/>
+                <field name="shipping"/>
+                <field name="shipper"/>
+                <field name="consignee"/>
+                <field name="docno"/>
+                <field name="expref"/>
+                <field name="waybillno"/>
+                <field name="sevtype"/>
+                <filter
+                    name="shipping"
+                    context="{
+                        'group_by' : 'shipping'
+                    }"
+                />
+            </search>
+        </field>
+    </record>
+<!--waybill kanban-->
+    <record id="waybill_view_kanban" model="ir.ui.view">
+        <field name="name">waybill.kanban</field>
+        <field name="model">panexlogi.waybill</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <!--
+                <field name="billno"/>
+                <field name="waybill_billno"/>
+                <field name="date"/>
+                <field name="block_date"/>
+                <field name="project"/>
+                <field name="shipping"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div clasds="oe_kanban_detail">
+                                <ul>
+                                    <li>
+                                        <field name="billno"/>
+                                    </li>
+                                    <li>
+                                        <span >Waybill No（提单号）:</span>
+                                        <field name="waybill_billno"/>
+                                    </li>
+                                    <li>
+                                        <field name="date"/>
+                                    </li>
+                                    <li>
+                                    <field name="block_date"/>
+                                    </li>
+                                    <li>
+                                        <field name="project"/>
+                                    </li>
+                                    <li>
+                                        <field name="shipping"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+                -->
+                <field name="color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_color_{{kanban_getcolor(record.color.raw_value)}}">
+                            <div class="oe_dropdown_kanban">
+                                <div class="oe_dropdown_toggle">
+                                    <i class="fa fa-bars fa-lg"/>
+                                    <ul class="oe_dropdown_menu">
+                                        <li>
+                                            <a type="edit">Edit</a>
+                                        </li>
+                                        <li>
+                                            <ul class="oe_kanban_colorpicker" datafield="color" role="popup"/>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="oe_clear"></div>
+                            </div>
+                            <div t-attf-class="oe_kanban_content">
+                                BillNo:
+                                <field name="billno"/>
+                                <br/>
+                                Waybill No（提单号）:
+                                <field name="waybillno"/>
+                                <br/>
+                                Project（项目）:
+                                <field name="project"/>
+                                <br/>
+                                Shipper（船公司）:
+                                <field name="shipping"/>
+                                <br/>
+                                Date（提单日期）:
+                                <field name="date"/>
+                                 <br/>
+                                Shipper（发货方）:
+                                <field name="shipper"/>
+                                <br/>
+                                Consignee（收货方）:
+                                <field name="consignee"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+
+            </kanban>
+        </field>
+    </record>
+
+<!--    waybill calendar-->
+    <record id="waybill_view_calendar" model="ir.ui.view">
+        <field name="name">waybill.calendar</field>
+        <field name="model">panexlogi.waybill</field>
+        <field name="arch" type="xml">
+            <calendar string="Waybill"
+                      date_start="date" date_stop="date"
+                      color="color" mode="month">
+                <field name="billno"/>
+                <field name="waybillno"/>
+            </calendar>
+        </field>
+    </record>
+
+<!--waybill tree-->
+     <record id="waybill_view_tree" model="ir.ui.view">
+        <field name="name">waybill.tree</field>
+        <field name="model">panexlogi.waybill</field>
+        <field name="arch" type="xml">
+            <tree string="Seawaybill_Tree"  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'">
+                <field name="project"/>
+                <field name="billno"/>
+                <field name="date"/>
+                <field name="first_arrivnotice_date" string="EDate"/>
+                <field name="adr"/>
+                <field name="shipping"/>
+                <field name="shipper"/>
+                <field name="consignee"/>
+                <field name="docno"/>
+                <field name="expref"/>
+                <field name="waybillno"/>
+                <field name="sevtype"/>
+                <field name="pdffile" filename="pdffilename"/>
+                <field name="pdffilename" invisible="True"/>
+                <field name="state"/>
+            </tree>
+        </field>
+     </record>
+<!--waybill form-->
+     <record id="waybill_view_form" model="ir.ui.view">
+        <field name="name">waybill.form</field>
+        <field name="model">panexlogi.waybill</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                     <button name="action_confirm_order"
+                            type="object"
+                            string="Confirm"
+                            invisible="state == 'confirm' or state == 'cancel'"
+                            class="btn-danger"/>
+                     <button name="action_unconfirm_order"
+                            type="object"
+                            string="Unconfirm"
+                            invisible="state == 'new' or state == 'cancel'"
+                            class="btn-primary"/>
+                     <button name="action_cancel_order"
+                            type="object"
+                            string="Cancel"
+                            invisible="state == 'confirm' or state == 'cancel'"
+                            class="btn-warning"/>
+                     <field
+                            name="state"
+                            widget="statusbar"
+                            statusbar_visible="new,confirm"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="add_actual_date"
+                                    type="object"
+                                    string="Actual Arrival"
+                                    class="oe_stat_button" icon="fa-building"/>
+                        <button name="action_budget_cal"
+                                type="object"
+                                string="Budget"
+                                class="oe_stat_button" icon="fa-money"/>
+                        <button name="action_tranportorder_add"
+                                    type="object"
+                                    string="Transport Order"
+                                    class="oe_stat_button" icon="fa-truck"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            Waybill
+                        </h1>
+                        <h2>
+                            <field name="billno"/>
+                        </h2>
+                    </div>
+                    <group col="2">
+                        <group string="General">
+                            <field name="project" readonly="state!='new'"/>
+                            <field name="shipping" readonly="state!='new'"/>
+                            <field name="shipper" readonly="state!='new'"/>
+                            <field name="consignee" readonly="state!='new'"/>
+                            <field name="sevtype" readonly="state!='new'"/>
+                            <field name="pdffile" filename="pdffilename" readonly="state!='new'"/>
+                            <field name="pdffilename" invisible="True"/>
+                        </group>
+                        <group string="Index">
+                            <field name="waybillno" readonly="state!='new'"/>
+                            <field name="docno" readonly="state!='new'"/>
+                            <field name="expref" readonly="state!='new'"/>
+                            <field name="date" readonly="state!='new'"/>
+                            <field name="week" readonly="state!='new'"/>
+                            <field name="adr" readonly="state!='new'"/>
+                        </group>
+                     </group>
+                    <notebook>
+                        <page string="Container Details">
+                            <field name="details_ids"/>
+                        </page>
+                        <page  string="Packing List">
+                            <field name="packlist_ids"/>
+                        </page>
+                        <page  string="Arrival Notice">
+                            <field name="arrivnotice_ids"/>
+                        </page>
+                         <page  string="Commercial Invoice">
+                            <field name="commeinvoice_ids"/>
+                        </page>
+                         <page  string="Shipping Invoice">
+                            <field name="shipinvoice_ids"/>
+                        </page>
+                        <page  string="Clearance Invoice">
+                            <field name="clearinvoice_ids"/>
+                        </page>
+                        <page  string="Warehousing Invoice">
+                            <field name="customsduties_ids"/>
+                        </page>
+                        <page  string="Cargo Release">
+                            <field name="cargorelease_ids"/>
+                        </page>
+                        <page string="Income">
+                            <group string="Main" col="8">
+                                <field name="entry_num"/>
+                                <field name="extra_num"/>
+                                <field name="pallets_sum"/>
+                            </group>
+                            <group string="Customs Clearance"  col="8">
+                                <field name="clearance_fee_budget_amount"/>
+                                <field name="clearance_fee_settle_amount"/>
+                                <field name="clearance_fee_invoice_amount"/>
+                            </group>
+                            <group string="Import Handling"  col="8">
+                                <field name="handling_fee_budget_amount"/>
+                                <field name="handling_fee_settle_amount"/>
+                                <field name="handling_fee_invoice_amount"/>
+                            </group>
+                            <group string="Inbound Operating"  col="8">
+                                <field name="inbound_operating_fee_budget_amount"/>
+                                <field name="inbound_operating_fee_settle_amount"/>
+                                <field name="inbound_operating_fee_invoice_amount"/>
+                            </group>
+                            <group string="Inbound Trucking"  col="8">
+                                <field name="inbound_trucking_fee_budget_amount"/>
+                                <field name="inbound_trucking_fee_settle_amount"/>
+                                <field name="inbound_trucking_fee_invoice_amount"/>
+                            </group>
+                             <group string="Outbound Operating"  col="8">
+                                <field name="outbound_operating_fee_budget_amount"/>
+                                <field name="outbound_operating_fee_settle_amount"/>
+                                <field name="outbound_operating_fee_invoice_amount"/>
+                            </group>
+                            <group string="Outbound Trucking"  col="8">
+                                <field name="outbound_trucking_fee_budget_amount"/>
+                                <field name="outbound_trucking_fee_settle_amount"/>
+                                <field name="outbound_trucking_fee_invoice_amount"/>
+                            </group>
+                            <group string="Containers">
+                                <field name="cntr_note"/>
+                            </group>
+                        </page>
+
+                        <page  string="Other Docs">
+                            <field name="otherdocs_ids"/>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+     </record>
+
+    <record id="view_tree_waybill_otherdocs" model="ir.ui.view">
+        <field name="name">waybill.otherdocs.tree</field>
+        <field name="model">panexlogi.waybill.otherdocs</field>
+        <field name="arch" type="xml">
+            <tree string="Other Documents">
+                <field name="description"/>
+                <field name="file" filename="filename"/>
+                <field name="filename" invisible="True"/>
+                <!--<field name="waybill_billno"/>-->
+            </tree>
+        </field>
+    </record>
+    <record id="view_form_waybill_otherdocs" model="ir.ui.view">
+        <field name="name">waybill.otherdocs.form</field>
+        <field name="model">panexlogi.waybill.otherdocs</field>
+        <field name="arch" type="xml">
+            <form string="Other Documents">
+                <sheet>
+                    <group>
+                        <field name="description"/>
+                        <field name="file" filename="filename"/>
+                        <field name="filename" invisible="True"/>
+                        <field name="waybill_billno"  readonly="True"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+<!--waybill action-->
+
+
+
+</odoo>

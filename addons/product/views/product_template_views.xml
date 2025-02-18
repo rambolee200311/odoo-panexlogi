@@ -92,6 +92,7 @@
                 <field name="currency_id"/>
                 <field name="activity_state"/>
                 <field name="categ_id"/>
+                <field name="model"/>
                 <progressbar field="activity_state" colors='{"planned": "success", "today": "warning", "overdue": "danger"}'/>
                 <templates>
                     <t t-name="kanban-box">
@@ -113,6 +114,9 @@
                                     <strong>
                                         <t t-esc="record.product_variant_count.value"/> Variants
                                     </strong>
+                                </div>
+                                <div name="model" class="mt-1">
+                                    Model: <field name="model"></field>
                                 </div>
                                 <div name="product_lst_price" class="mt-1">
                                     Price: <field name="list_price" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"></field>

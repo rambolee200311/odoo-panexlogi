@@ -1,0 +1,188 @@
+<odoo>
+    <data>
+        <!-- Action -->
+        <record id="action_transport_invoice" model="ir.actions.act_window">
+            <field name="name">Transport Invoices</field>
+            <field name="res_model">panexlogi.transport.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create the first transport invoice
+                </p>
+            </field>
+        </record>
+        <!--Detail Action -->
+        <record id="action_transport_invoice_detail" model="ir.actions.act_window">
+            <field name="name">Transport Invoice Details</field>
+            <field name="res_model">panexlogi.transport.invoice.detail</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create the first transport invoice detail
+                </p>
+            </field>
+        </record>
+
+
+        <!-- Form View -->
+        <record id="view_transport_invoice_form" model="ir.ui.view">
+            <field name="name">transport.invoice.form</field>
+            <field name="model">panexlogi.transport.invoice</field>
+            <field name="arch" type="xml">
+                <form string="Transport Invoice">
+                    <header>
+                         <button name="action_confirm_order"
+                                type="object"
+                                string="Confirm"
+                                invisible="state == 'confirm' or state == 'cancel'"
+                                class="btn-danger"/>
+                         <button name="action_unconfirm_order"
+                                type="object"
+                                string="Unconfirm"
+                                invisible="state == 'new' or state == 'cancel'"
+                                class="btn-primary"/>
+                         <button name="action_cancel_order"
+                                type="object"
+                                string="Cancel"
+                                invisible="state == 'confirm' or state == 'cancel'"
+                                class="btn-warning"/>
+                         <field
+                                name="state"
+                                widget="statusbar"
+                                statusbar_visible="new,confirm"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Invoice
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <group col="2">
+                            <group col="2">
+                                <field name="date"/>
+                                <field name="due_date"/>
+                                <field name="truckco"/>
+                                <field name="truckco_code"/>
+                                <field name="pdffile" filename="pdffilename"/>
+                                <field name="pdffilename" invisible="True"/>
+                            </group>
+                            <group>
+                                <field name="invoiceno"/>
+                                <field name="amount"/>
+                                <field name="remark"/>
+                                <field name="check_message"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Details">
+                                <field name="transportinvoicedetailids">
+                                    <tree>
+                                        <field name="waybillno"/>
+                                        <field name="cntrno"/>
+                                        <field name="collterminal_name"/>
+                                        <field name="dropterminal_name"/>
+                                        <field name="unlolocation"/>
+                                        <field name="unlodate"/>
+                                        <field name="unitprice"/>
+                                        <field name="surcharge"/>
+                                        <field name="adrcharge"/>
+                                        <field name="dieselcharge"/>
+                                        <field name="waithours"/>
+                                        <field name="extrahours"/>
+                                        <field name="remark"/>
+                                        <field name="check"/>
+                                        <field name="check_message"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_transport_invoice_tree" model="ir.ui.view">
+            <field name="name">transport.invoice.tree</field>
+            <field name="model">panexlogi.transport.invoice</field>
+            <field name="arch" type="xml">
+                <tree string="Transport Invoices">
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="due_date"/>
+                    <field name="truckco"/>
+                    <field name="amount"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_transport_invoice_search" model="ir.ui.view">
+            <field name="name">transport.invoice.search</field>
+            <field name="model">panexlogi.transport.invoice</field>
+            <field name="arch" type="xml">
+                <search string="Transport Invoices">
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="due_date"/>
+                    <field name="truckco"/>
+                    <field name="state"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- detail tree view-->
+        <record id="view_transport_invoice_detail_tree" model="ir.ui.view">
+        <field name="name">transport.invoice.detail.tree</field>
+            <field name="model">panexlogi.transport.invoice.detail</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="transportinvoiceid"/>
+                    <field name="waybillno"/>
+                    <field name="cntrno"/>
+                    <field name="collterminal_name"/>
+                    <field name="dropterminal_name"/>
+                    <field name="unlolocation"/>
+                    <field name="unitprice"/>
+                    <field name="surcharge"/>
+                    <field name="waithours"/>
+                    <field name="extrahours"/>
+                    <field name="remark"/>
+                </tree>
+            </field>
+        </record>
+        <!-- detail form view-->
+        <record id="view_transport_invoice_detail_form" model="ir.ui.view">
+            <field name="name">transport.invoice.detail.form</field>
+            <field name="model">panexlogi.transport.invoice.detail</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="waybillno"/>
+                            <field name="cntrno"/>
+                            <field name="collterminal"/>
+                            <field name="dropterminal"/>
+                            <field name="unlolocation"/>
+                            <field name="unitprice"/>
+                            <field name="surcharge"/>
+                            <field name="waithours"/>
+                            <field name="extrahours"/>
+                            <field name="remark"/>
+                            <field name="transportinvoiceid"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
