@@ -95,3 +95,7 @@ class DeliveryQuote(models.Model):
         for rec in self:
             rec.state = 'cancel'
             return True
+
+    def on_unlink(self):
+        if self.state != 'cancel':
+            raise UserError(_("You can not delete approved or rejected quote, try to cancel it first"))

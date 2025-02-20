@@ -15,12 +15,8 @@
                 <field name="expref"/>
                 <field name="waybillno"/>
                 <field name="sevtype"/>
-                <filter
-                    name="shipping"
-                    context="{
-                        'group_by' : 'shipping'
-                    }"
-                />
+                <filter name="my_bills" string="My Bills" domain="[('create_uid', '=', uid)]"/>
+                <filter string="All Bills" name="all_bills" domain="[]"/>
             </search>
         </field>
     </record>
@@ -29,7 +25,7 @@
         <field name="name">waybill.kanban</field>
         <field name="model">panexlogi.waybill</field>
         <field name="arch" type="xml">
-            <kanban>
+            <kanban limit="20">
                 <!--
                 <field name="billno"/>
                 <field name="waybill_billno"/>
@@ -134,7 +130,8 @@
         <field name="name">waybill.tree</field>
         <field name="model">panexlogi.waybill</field>
         <field name="arch" type="xml">
-            <tree string="Seawaybill_Tree"  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'">
+            <tree string="Seawaybill_Tree"  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'"
+            limit="20">
                 <field name="project"/>
                 <field name="billno"/>
                 <field name="date"/>

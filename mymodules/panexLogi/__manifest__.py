@@ -19,10 +19,11 @@
     'category': 'Uncategorized',
     'version': '0.1',
     # any module necessary for this one to work correctly
-    'depends': ['base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource'],
+    'depends': ['base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource', 'web'],
 
     # always loaded
     'data': [
+        #'views/assets.xml',
         'security/panexlogi_security.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
@@ -91,7 +92,10 @@
             # 'panexLogi/static/lib/x-spreadsheet/x_spreadsheet_widget.js',
             # 'my-modules/panexLogi/static/lib/x-spreadsheet/xspreadsheet.js',
             # 'my-modules/panexLogi/static/lib/x-spreadsheet/xspreadsheet.css',
+            'panexLogi/static/src/scss/custom_styles.css',
+            #'panexLogi/static/src/js/custom_menu.js',
         ]
     },
-
+    'installable': True,
+    'application': True,
 }

@@ -73,10 +73,12 @@
                 <field name="waybill_billno"/>
                 <field name="invno"/>
                 <field name="date"/>
+                <field name="due_date"/>
+                <field name="payee"/>
                 <field name="project"/>
-                <field name="desc"/>
+                <field name="usdtotal"/>
                 <field name="eurtotal"/>
-                <field name="pdffile"/>
+                <field name="pdffile" filename="pdffilename"/>
                 <field name="pdffilename" invisible="True"/>
                 <field name="state"/>
             </tree>
@@ -106,22 +108,27 @@
                      <button name="action_confirm_order"
                             type="object"
                             string="Confirm"
-                            invisible="state == 'confirm' or state == 'cancel'"
+                            invisible="state == 'confirm' or state == 'cancel' or state == 'apply'"
                             class="btn-danger"/>
                      <button name="action_unconfirm_order"
                             type="object"
                             string="Unconfirm"
-                            invisible="state == 'new' or state == 'cancel'"
+                            invisible="state == 'new' or state == 'cancel' or state == 'apply'"
                             class="btn-primary"/>
                      <button name="action_cancel_order"
                             type="object"
                             string="Cancel"
-                            invisible="state == 'confirm' or state == 'cancel'"
+                            invisible="state == 'confirm' or state == 'cancel' or state == 'apply'"
                             class="btn-warning"/>
+                     <button name="create_payment_application"
+                            type="object"
+                            string="Apply Pay"
+                            invisible="state == 'new' or state == 'cancel' or state == 'apply'"
+                            class="btn-primary"/>
                      <field
                             name="state"
                             widget="statusbar"
-                            statusbar_visible="new,confirm"/>
+                            statusbar_visible="new,confirm,apply"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -132,16 +139,34 @@
                             <field name="billno"/>
                         </h2>
                     </div>
-                    <group>
-                        <field name="waybill_billno" readonly="state!='new'"/>
-                        <field name="project" readonly="state!='new'"/>
-                        <field name="date" readonly="state!='new'"/>
-                        <field name="invno" readonly="state!='new'"/>
-                        <field name="desc" readonly="state!='new'"/>
-                        <field name="eurtotal" readonly="state!='new'"/>
-                        <field name="pdffile" filename="pdffilename" readonly="state!='new'"/>
-                        <field name="pdffilename" invisible="True"/>
+                    <group col="2">
+                        <group col="2">
+                            <field name="payee" readonly="state!='new'"/>
+                            <field name="project" readonly="state!='new'"/>
+                            <field name="date" readonly="state!='new'"/>
+                            <field name="due_date" readonly="state!='new'"/>
+                            <field name="invno" readonly="state!='new'"/>
+                        </group>
+                        <group col="2">
+                            <field name="usdtotal" readonly="state!='new'"/>
+                            <field name="eurtotal" readonly="state!='new'"/>
+                            <field name="pdffile" filename="pdffilename" readonly="state!='new'"/>
+                            <field name="pdffilename" invisible="True"/>
+                        </group>
                     </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="waybillclearinvoicedetail_ids" readonly="state!='new'">
+                                <tree string="Lines" editable="bottom">
+                                    <field name="fitem"/>
+                                    <field name="fitem_name"/>
+                                    <field name="amount"/>
+                                    <field name="amount_usd"/>
+                                    <field name="remark"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" />

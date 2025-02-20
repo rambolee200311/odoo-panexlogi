@@ -126,6 +126,8 @@ class Delivery(models.Model):
         self.extra_cost = extra_cost
 
 
+
+
 class DeliveryDetail(models.Model):
     _name = 'panexlogi.delivery.detail'
     _description = 'panexlogi.delivery.detail'

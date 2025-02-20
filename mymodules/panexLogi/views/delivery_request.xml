@@ -158,6 +158,19 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Quote Log">
+                            <field name="deliveryquoteids">
+                                <tree create="true" delete="false">
+                                    <field name="date"/>
+                                    <field name="trucker"/>
+                                    <field name="quote"/>
+                                    <field name="additional_cost"/>
+                                    <field name="profit"/>
+                                    <field name="remark"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
@@ -212,7 +225,7 @@
         <field name="name">delivery.tree</field>
         <field name="model">panexlogi.delivery</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree create="true" delete="false">
                 <field name="billno"/>
                 <field name="date"/>
                 <field name="project"/>

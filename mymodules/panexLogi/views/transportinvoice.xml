@@ -52,6 +52,12 @@
                                 statusbar_visible="new,confirm"/>
                     </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="create_payment_application"
+                                    type="object"
+                                    string="Apply Payment"
+                                    class="oe_stat_button" icon="fa-money"/>
+                        </div>
                         <div class="oe_title">
                             <h1>
                                 Invoice
@@ -81,6 +87,7 @@
                                 <field name="transportinvoicedetailids">
                                     <tree>
                                         <field name="waybillno"/>
+                                        <field name="project"/>
                                         <field name="cntrno"/>
                                         <field name="collterminal_name"/>
                                         <field name="dropterminal_name"/>

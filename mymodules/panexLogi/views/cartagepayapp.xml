@@ -1,4 +1,24 @@
 <odoo>
+    <!--        Cartage Payment Application search-->
+    <record id="view_payment_application_search" model="ir.ui.view">
+        <field name="name">panexlogi.finance.paymentapplication.search</field>
+        <field name="model">panexlogi.finance.paymentapplication</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="billno"/>
+                <field name="source"/>
+                <field name="source_Code"/>
+                <field name="invoiceno"/>
+                <field name="invoice_date"/>
+                <field name="due_date"/>
+                <field name="payee"/>
+                <field name="date"/>
+                <field name="payee"/>
+                <field name="total_amount"/>
+                <filter string="Trucking" name="filter_trucking" domain="[('type', '=', 'trucking')]" context="{'default_type': 'trucking'}"/>
+            </search>
+        </field>
+    </record>
     <!--        Cartage Payment Application tree-->
         <record id="cartage_payment_application_tree_view" model="ir.ui.view">
             <field name="name">panexlogi.finance.paymentapplication.tree.view</field>
@@ -6,13 +26,16 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="billno"/>
-                    <field name="type"/>
-<!--                    <field name="waybill_billno"/>-->
+                    <field name="source"/>
+                    <field name="source_Code"/>
+                    <field name="invoiceno"/>
+                    <field name="invoice_date"/>
+                    <field name="due_date"/>
                     <field name="payee"/>
                     <field name="date"/>
                     <field name="total_amount"/>
                     <field name="remark"/>
-                    <field name="pdffile"/>
+                    <field name="pdffile" filename="pdffilename"/>
                     <field name="pdffilename" invisible="True"/>
                 </tree>
             </field>
@@ -62,7 +85,7 @@
                     <sheet>
                         <div class="oe_title">
                             <h1>
-                                Cartage Payment Application
+                                Trucking Payment Application
                             </h1>
                             <h2>
                                 <field name="billno"/>
@@ -75,10 +98,15 @@
 <!--                                <field name="waybill_billno"/>-->
                                 <field name="payee"/>
                                 <field name="total_amount"/>
+                                <field name="source"/>
+                                <field name="source_Code"/>
                             </group>
                             <group string="Other">
+                                <field name="invoiceno"/>
+                                <field name="invoice_date"/>
+                                <field name="due_date"/>
                                 <field name="remark"/>
-                                <field name="pdffile"/>
+                                <field name="pdffile" filename="pdffilename"/>
                                 <field name="pdffilename" invisible="True"/>
                             </group>
                         </group>
@@ -86,15 +114,26 @@
                             <page string="Lines">
                                 <field name="paymentapplicationline_ids">
                                     <tree editable="bottom">
-                                        <field name="cartagebillno"/>
+                                        <field name="billno"/>
+                                        <field name="project"/>
                                         <field name="fitem"/>
                                         <field name="fitem_name"/>
                                         <field name="amount"/>
                                         <field name="remark"/>
-                                        <field name="pdffile"/>
+                                        <field name="pdffile" filename="pdffilename"/>
                                         <field name="pdffilename" invisible="True"/>
                                     </tree>
                                 </field>
+                            </page>
+                            <page string="Payment">
+                                <group col="2">
+                                    <field name="pay_date"/>
+                                    <field name="pay_amount"/>
+                                    <field name="pay_amount_usd"/>
+                                    <field name="pay_remark"/>
+                                    <field name="pay_pdffile" filename="pay_pdffilename"/>
+                                    <field name="pay_pdffilename" invisible="True"/>
+                                </group>
                             </page>
                         </notebook>
                     </sheet>
@@ -127,10 +166,10 @@
 
 <!--        cartage Payment Application action-->
         <record id="cartage_payapp_action" model="ir.actions.act_window">
-            <field name="name">Cartage Payment App</field>
+            <field name="name">Trucking Payment App</field>
             <field name="res_model">panexlogi.finance.paymentapplication</field>
-            <field name="context">{'default_type':'cartage'}</field>
-            <field name="domain">[('type','=','cartage')]</field>
+            <field name="context">{'default_type':'trucking'}</field>
+            <field name="domain">[('type','=','trucking')]</field>
             <field name="view_mode">tree,form</field>
             <field name="view_ids" eval="[(5,0,0),
                                       (0,0,{'view_mode': 'tree','view_id': ref('cartage_payment_application_tree_view')}),

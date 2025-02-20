@@ -53,7 +53,7 @@
         
         <menuitem id="outlay_menu" name="Outlay" parent="panex_logi_menu" sequence="300" />
         <menuitem id="import_payment_application_menu" name="Import Pay APP" parent="outlay_menu" sequence="301" action="import_payapp_action"/>
-        <menuitem id="cartage_payment_application_menu" name="Cartage Pay APP" parent="outlay_menu" sequence="302" action="cartage_payapp_action"/>
+        <menuitem id="cartage_payment_application_menu" name="Trucking Pay APP" parent="outlay_menu" sequence="302" action="cartage_payapp_action"/>
 
         <menuitem id="income_menu" name="Income" parent="panex_logi_menu" sequence="400" />
         <menuitem id="income_settle_bill_menu" name="Bill of Settlement" parent="income_menu" sequence="401" action="settle_bill_action"/>

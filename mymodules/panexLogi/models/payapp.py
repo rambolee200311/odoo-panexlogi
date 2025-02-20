@@ -14,12 +14,12 @@ class PaymentApplication(models.Model):
     date = fields.Date(string='Date', required=True)
     payee = fields.Many2one('res.partner', string='Payee（收款方）', required=True, tracking=True)
     remark = fields.Text(string='Remark', tracking=True)
-    pdffile = fields.Binary(string='File（原件）')
+    pdffile = fields.Binary(string='Invoice File（原件）')
     pdffilename = fields.Char(string='File name')
     total_amount = fields.Float(string='Amount（欧元金额）', compute='_compute_amount', tracking=True,
                                 store=True)
     total_amount_usd = fields.Float(string='Amount（美元金额）', compute='_compute_amount', tracking=True,
-                                store=True)
+                                    store=True)
     state = fields.Selection(
         selection=[
             ('new', 'New'),
@@ -33,7 +33,18 @@ class PaymentApplication(models.Model):
     )
     color = fields.Integer()
     paymentapplicationline_ids = fields.One2many('panexlogi.finance.paymentapplicationline', 'payapp_billno')
+    source = fields.Char(string='Source', readonly=True)
+    source_Code = fields.Char(string='Source Code', readonly=True)
+    invoiceno = fields.Char(string='Invoice No(发票号)', readonly=True)
+    invoice_date = fields.Date(string='Invoice Date(发票日期)', readonly=True)
+    due_date = fields.Date(string='Due Date(到期日)', readonly=True)
 
+    pay_date = fields.Date(string='Pay Date(付款日期)', tracking=True)
+    pay_amount = fields.Float(string='Pay Amount（欧元金额）', tracking=True)
+    pay_amount_usd = fields.Float(string='Pay Amount（美元金额）', tracking=True)
+    pay_remark = fields.Text(string='Pay Remark', tracking=True)
+    pay_pdffile = fields.Binary(string='Pay File（原件）')
+    pay_pdffilename = fields.Char(string='Pay File name')
     @api.model
     def create(self, values):
         """
@@ -44,10 +55,12 @@ class PaymentApplication(models.Model):
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.finance.paymentapplication', times)
         values['state'] = 'new'
         return super(PaymentApplication, self).create(values)
+
     """
     confirm paid 状态下不可删除
     ↓↓↓    
     """
+
     def unlink(self):
         if self.state in ['confirm', 'paid']:
             raise UserError('You cannot delete a record with state: %s' % self.state)
@@ -129,6 +142,7 @@ class PaymentApplicationLine(models.Model):
     _rec_name = 'billno'
 
     billno = fields.Char(string='Code', readonly=True)
+    project = fields.Many2one('panexlogi.project', string='Project（项目）', tracking=True)
     invoiceno = fields.Char(string='Invoice No(发票号)', tracking=True)
     invoice_date = fields.Date(string='Invoice Date(发票日期)', tracking=True)
     due_date = fields.Date(string='Due Date(到期日)', tracking=True)

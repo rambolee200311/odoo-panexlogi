@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from odoo.exceptions import UserError
 
+
 # 清关费用发票
 
 class WaybillClearInvoice(models.Model):
@@ -11,11 +12,17 @@ class WaybillClearInvoice(models.Model):
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _rec_name = 'billno'
 
+    payee = fields.Many2one('res.partner', string='Payee（收款人）', required=True)
     billno = fields.Char(string='Commer Invoice No', readonly=True, tracking=True)
     invno = fields.Char(string='Invoice No（发票号）', required=True, tracking=True)
     date = fields.Date(string='Issue Date（发票日期）', required=True, tracking=True)
+    due_date = fields.Date(string='Due Date（到期日）', required=True,
+                           tracking=True)
     desc = fields.Char(string='Description(费用名称)', tracking=True)
-    eurtotal = fields.Float(string='Total_of_EUR', required=True, tracking=True)
+    usdtotal = fields.Float(string='Total_of_USD', store=True,
+                            tracking=True, compute='_compute_total_usd')
+    eurtotal = fields.Float(string='Total_of_EUR', store=True,
+                            tracking=True, compute='_compute_total_eur')
     pdffile = fields.Binary(string='File（原件）', tracking=True)
     pdffilename = fields.Char(string='File name')
     waybill_billno = fields.Many2one('panexlogi.waybill')
@@ -27,12 +34,13 @@ class WaybillClearInvoice(models.Model):
             ('new', 'New'),
             ('confirm', 'Confirm'),
             ('cancel', 'Cancel'),
+            ('apply', 'Apply Pay'),
         ],
         default='new',
         string="State",
         tracking=True
     )
-
+    waybillclearinvoicedetail_ids = fields.One2many('panexlogi.waybill.clearinvoice.detail', 'clearinvoiceinvoiceid')
     @api.model
     def create(self, values):
         """
@@ -70,3 +78,97 @@ class WaybillClearInvoice(models.Model):
             else:
                 rec.state = 'cancel'
                 return True
+
+    @api.depends('waybillclearinvoicedetail_ids.amount')
+    def _compute_total_eur(self):
+        for rec in self:
+            rec.eurtotal = 0
+            if rec.waybillclearinvoicedetail_ids:
+                rec.eurtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount'))
+
+    @api.depends('waybillclearinvoicedetail_ids.amount_usd')
+    def _compute_total_usd(self):
+        for rec in self:
+            rec.usdtotal = 0
+            if rec.waybillclearinvoicedetail_ids:
+                rec.usdtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount_usd'))
+
+    # Create PaymentApplication
+    def create_payment_application(self):
+        # check if state is confirm
+        if self.state != 'confirm':
+            raise UserError(_("You can only create Payment Application for a confirmed Clearance Invoice"))
+        # Check if PaymentApplication already exists
+        domain = [
+            ('source', '=', 'Clearance Invoice')
+            , ('source_Code', '=', self.billno)
+            , ('state', '!=', 'cancel')
+            , ('type', '=', 'import')]
+
+        existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain)
+        if existing_records:
+            raise UserError(_('Payment Application already exists for this Clearance Invoice'))
+
+        # Create PaymentApplication
+        for record in self:
+            # Create PaymentApplication
+            payment_application = self.env['panexlogi.finance.paymentapplication'].create({
+                'date': fields.Date.today(),
+                'type': 'import',
+                'source': 'Clearance Invoice',
+                'payee': record.payee.id,
+                'source_Code': record.billno,
+                'pdffile': record.pdffile,
+                'pdffilename': record.pdffilename,
+                'invoiceno': record.invno,
+                'invoice_date': record.date,
+                'due_date': record.due_date,
+                'waybill_billno': record.waybill_billno.id,
+            })
+            for records in record.waybillclearinvoicedetail_ids:
+                # Create PaymentApplicationLine
+                if records.amount != 0 or records.amount_usd != 0:
+                    self.env['panexlogi.finance.paymentapplicationline'].create({
+                        'fitem': records.fitem.id,
+                        'payapp_billno': payment_application.id,
+                        'amount': records.amount,
+                        'amount_usd': records.amount_usd,
+                        'remark': records.remark,
+                        'project': record.project.id,
+                    })
+            record.state = 'apply'
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Import Payment Application create successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    # unlink method
+    def unlink(self):
+        for record in self:
+            domain = [
+                ('source', '=', 'Clearance Invoice'),
+                ('source_Code', '=', record.billno),
+                ('state', '!=', 'cancel'),
+                ('type', '=', 'import')
+            ]
+            existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain)
+            if existing_records:
+                raise UserError(_('You cannot delete a Clearance Invoice that has a Payment Application.'))
+        return super(WaybillClearInvoice, self).unlink()
+
+class WaybillClearInvoiceDetail(models.Model):
+    _name = 'panexlogi.waybill.clearinvoice.detail'
+    _description = 'panexlogi.waybill.clearinvoice.detail'
+
+    fitem = fields.Many2one('panexlogi.fitems', string='Item(费用项目)', tracking=True)
+    fitem_name = fields.Char(string='Item Name(费用项目名称)', related='fitem.name', readonly=True)
+    amount = fields.Float(string='Amount（欧元金额）', tracking=True)
+    amount_usd = fields.Float(string='Amount（美元金额）', tracking=True)
+    remark = fields.Text(string='Remark', tracking=True)
+    clearinvoiceinvoiceid = fields.Many2one('panexlogi.waybill.clearinvoice', tracking=True)

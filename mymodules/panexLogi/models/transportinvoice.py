@@ -110,6 +110,7 @@ class TransportInvoice(models.Model):
                         detail.check = False
                         detail.check_message = 'waybillno not exist'
                     else:
+                        detail.project = waybill_record[0].project
                         billno = waybill_record[0].id
 
                     cntrno = detail.cntrno
@@ -161,6 +162,108 @@ class TransportInvoice(models.Model):
                 rec.state = 'cancel'
                 return True
 
+    # Create PaymentApplication
+    def create_payment_application(self):
+        # check if state is confirm
+        if self.state != 'confirm':
+            raise UserError(_("You can only create Payment Application for a confirmed Transport Invoice"))
+        # Check if PaymentApplication already exists
+        domain = [
+            ('source', '=', 'Transport Invoice')
+            , ('source_Code', '=', self.billno)
+            , ('state', '!=', 'cancel')
+            , ('type', '=', 'trucking')]
+
+        existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain)
+        if existing_records:
+            raise UserError(_('Payment Application already exists for this Transport Invoice'))
+
+        for record in self:
+            # Create PaymentApplication
+            payment_application = self.env['panexlogi.finance.paymentapplication'].create({
+                'date': fields.Date.today(),
+                'type': 'trucking',
+                'source': 'Transport Invoice',
+                'payee': record.truckco.id,
+                'source_Code': record.billno,
+                'pdffile': record.pdffile,
+                'pdffilename': record.pdffilename,
+                'invoiceno': record.invoiceno,
+                'invoice_date': record.date,
+                'due_date': record.due_date,
+            })
+            # Unit price= INT
+            for records in record.transportinvoicedetailids:
+                # Create PaymentApplicationLine
+                if records.unitprice != 0:
+                    self.env['panexlogi.finance.paymentapplicationline'].create({
+                        'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'INT')]).id,
+                        'payapp_billno': payment_application.id,
+                        'amount': records.unitprice,
+                        'remark': records.remark,
+                        'project': records.project.id,
+                    })
+                # ADR Surcharge= ADR
+                if records.adrcharge != 0:
+                    self.env['panexlogi.finance.paymentapplicationline'].create({
+                        'invoiceno': record.invoiceno,
+                        'invoice_date': record.date,
+                        'due_date': record.due_date,
+                        'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'ADR')]).id,
+                        'payapp_billno': payment_application.id,
+                        'amount': records.adrcharge,
+                        'remark': records.remark,
+                        'project': records.project.id,
+                    })
+                # Wait Hours= WAI
+                if records.waithours != 0:
+                    self.env['panexlogi.finance.paymentapplicationline'].create({
+                        'invoiceno': record.invoiceno,
+                        'invoice_date': record.date,
+                        'due_date': record.due_date,
+                        'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'WAI')]).id,
+                        'payapp_billno': payment_application.id,
+                        'amount': records.waithours,
+                        'remark': records.remark,
+                        'project': records.project.id,
+                    })
+                # Terminal Surcharge= TSU
+                if records.surcharge != 0:
+                    self.env['panexlogi.finance.paymentapplicationline'].create({
+                        'invoiceno': record.invoiceno,
+                        'invoice_date': record.date,
+                        'due_date': record.due_date,
+                        'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'TSU')]).id,
+                        'payapp_billno': payment_application.id,
+                        'amount': records.surcharge,
+                        'remark': records.remark,
+                        'project': records.project.id,
+                    })
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Trucking Payment Application create successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+    # Auto calculate amount
+    @api.onchange('transportinvoicedetailids.unitprice',
+                  'transportinvoicedetailids.surcharge',
+                  'transportinvoicedetailids.waithours',
+                  'transportinvoicedetailids.extrahours',
+                  'transportinvoicedetailids.adrcharge',
+                  'transportinvoicedetailids.dieselcharge')
+    def _onchange_amount(self):
+        for record in self:
+            record.amount = 0
+            sum_amount = 0
+            for detail in record.transportinvoicedetailids:
+                sum_amount += detail.unitprice + detail.surcharge + detail.waithours + detail.extrahours + detail.adrcharge + detail.dieselcharge
+            record.amount = sum_amount
+
 
 class TransportInvoiceDetail(models.Model):
     _name = 'panexlogi.transport.invoice.detail'
@@ -208,3 +311,4 @@ class TransportInvoiceDetail(models.Model):
             existing_records = self.search(domain)
             if existing_records:
                 raise UserError(_('bl&container must be unique'))
+
