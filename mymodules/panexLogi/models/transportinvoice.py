@@ -1,6 +1,6 @@
 from odoo import _, models, fields, api, exceptions
 from odoo.exceptions import UserError
-from odoo.tools import json
+import json
 
 
 class TransportInvoice(models.Model):
@@ -41,21 +41,25 @@ class TransportInvoice(models.Model):
                                               compute='_compute_transportinvoicedetail_json',
                                               inverse='_set_transportinvoicedetail_json')
 
+    allow_notunique = fields.Boolean(string='Allow Not Unique', default=False)
+    reason_notunique = fields.Text(string='Reason Not Unique')
+
     @api.depends('transportinvoicedetailids')
     def _compute_transportinvoicedetail_json(self):
         for record in self:
             details = []
             for detail in record.transportinvoicedetailids:
                 details.append({
+                    'waybillno': detail.waybillno,
                     'cntrno': detail.cntrno,
-                    'collterminal': detail.collterminal.id,
-                    'warehouse': detail.warehouse.id,
+                    'collterminal_name': detail.collterminal_name,
+                    'dropterminal_name': detail.dropterminal_name,
                     'unlolocation': detail.unlolocation,
-                    'unlodate': detail.unlodate,
-                    'dropterminal': detail.dropterminal.id,
                     'unitprice': detail.unitprice,
                     'surcharge': detail.surcharge,
+                    'adrcharge': detail.adrcharge,
                     'waithours': detail.waithours,
+                    'diselcharge': detail.dieselcharge,
                     'extrahours': detail.extrahours,
                     'remark': detail.remark,
                 })
@@ -68,14 +72,14 @@ class TransportInvoice(models.Model):
             for detail in details:
                 record.transportinvoicedetailids = [(0, 0, {
                     'cntrno': detail['cntrno'],
-                    'collterminal': detail['collterminal'],
-                    'warehouse': detail['warehouse'],
+                    'collterminal_name': detail['collterminal_name'],
+                    'dropterminal_name': detail['dropterminal_name'],
                     'unlolocation': detail['unlolocation'],
-                    'unlodate': detail['unlodate'],
-                    'dropterminal': detail['dropterminal'],
                     'unitprice': detail['unitprice'],
                     'surcharge': detail['surcharge'],
+                    'adrcharge': detail['adrcharge'],
                     'waithours': detail['waithours'],
+                    'diselcharge': detail['diselcharge'],
                     'extrahours': detail['extrahours'],
                     'remark': detail['remark'],
                 })]
@@ -249,6 +253,7 @@ class TransportInvoice(models.Model):
                 'sticky': False,
             }
         }
+
     # Auto calculate amount
     @api.onchange('transportinvoicedetailids.unitprice',
                   'transportinvoicedetailids.surcharge',
@@ -263,6 +268,8 @@ class TransportInvoice(models.Model):
             for detail in record.transportinvoicedetailids:
                 sum_amount += detail.unitprice + detail.surcharge + detail.waithours + detail.extrahours + detail.adrcharge + detail.dieselcharge
             record.amount = sum_amount
+
+
 
 
 class TransportInvoiceDetail(models.Model):
@@ -301,14 +308,16 @@ class TransportInvoiceDetail(models.Model):
     @api.constrains('waybillno', 'cntrno')
     def _check_waybillno_id(self):
         for r in self:
-            domain = [
-                ('waybillno', '=', r.waybillno),
-                ('cntrno', '=', r.cntrno),
-                ('transportinvoiceid.truckco', '=', r.transportinvoiceid.truckco.id),
-                ('transportinvoiceid.state', '!=', 'cancel'),
-                ('id', '!=', r.id),
-            ]
-            existing_records = self.search(domain)
-            if existing_records:
-                raise UserError(_('bl&container must be unique'))
-
+            # when allow_notunique is True, skip the check
+            # when not unique, raise error
+            if not r.transportinvoiceid.allow_notunique:
+                domain = [
+                    ('waybillno', '=', r.waybillno),
+                    ('cntrno', '=', r.cntrno),
+                    ('transportinvoiceid.truckco', '=', r.transportinvoiceid.truckco.id),
+                    ('transportinvoiceid.state', '!=', 'cancel'),
+                    ('id', '!=', r.id),
+                ]
+                existing_records = self.search(domain)
+                if existing_records:
+                    raise UserError(_('bl&container must be unique'))

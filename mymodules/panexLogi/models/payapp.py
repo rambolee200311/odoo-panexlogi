@@ -45,6 +45,8 @@ class PaymentApplication(models.Model):
     pay_remark = fields.Text(string='Pay Remark', tracking=True)
     pay_pdffile = fields.Binary(string='Pay File（原件）')
     pay_pdffilename = fields.Char(string='Pay File name')
+    payment_id = fields.Many2one('panexlogi.finance.payment', string='Payment')
+
     @api.model
     def create(self, values):
         """
@@ -132,6 +134,69 @@ class PaymentApplication(models.Model):
                 order.can_unlink = True
 
     can_unlink = fields.Boolean(string='Can Unlink', compute='_compute_can_unlink', store=True)
+
+    # select multi rows create a payment
+    def action_create_payment_from_selected(self):
+        selected_applications = self.browse(self.env.context.get('active_ids'))
+
+        # Ensure at least one record is selected
+        if not selected_applications:
+            raise UserError("Please select at least one payment application.")
+        payee = selected_applications[0].payee
+        state = selected_applications[0].state
+        # Ensure all in confirm state
+        if state != 'confirm':
+            raise UserError("Please select the confirm state.")
+        for application in selected_applications:
+            if not application.paymentapplicationline_ids:
+                raise UserError("Please check selected payment whether have at least on line.")
+            # Ensure select records are in the same payee and in the same state
+            if application.payee != payee:
+                raise UserError("Please select the same payee.")
+            if application.state != state:
+                raise UserError("Please select the same state.")
+            # Ensure select record not create payment
+            type = 'payment'
+            source = application.type,
+            souce_code = application.billno
+            domain = [('source', '=', source), ('source_code', '=', souce_code)]
+            payment = self.env['panexlogi.finance.payment.line'].search(domain)
+            if payment:
+                raise UserError("Please select the record which had not created payment.")
+
+        # Create a new payment (you can customize this logic as needed)
+        new_payment = self.env['panexlogi.finance.payment'].create({
+            'type': 'payment',  # Example: Outbound payment
+            'payee': payee.id,
+            'pay_date': fields.Date.today(),
+        })
+        for application in selected_applications:
+            # Create payment lines for each selected record
+            for rec in application.paymentapplicationline_ids:
+                self.env['panexlogi.finance.payment.line'].create({
+                    'payment_id': new_payment.id,
+                    'source': application.type,
+                    'source_code': application.billno,
+                    'project': rec.project.id,
+                    'fitem': rec.fitem.id,
+                    'pay_amount': rec.amount,
+                    'pay_amount_usd': rec.amount_usd,
+                    'invoice_date': application.invoice_date,
+                    'due_date': application.due_date,
+                    'invoiceno': application.invoiceno,
+                    'pay_remark': rec.remark,
+                })
+            # Update the payment application with the new payment
+            application.payment_id = new_payment.id
+
+        # Open the newly created Payment form
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'panexlogi.finance.payment',
+            'res_id': new_payment.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
 
 
 # 付款申请明细

@@ -1,0 +1,196 @@
+<odoo>
+    <data>
+
+        <!-- Delivery Invoice search view-->
+        <record id="view_delivery_invoice_search" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.invoice.search</field>
+            <field name="model">panexlogi.delivery.invoice</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="invoiceno"/>
+                    <field name="date"/>
+                    <field name="due_date"/>
+                    <field name="truckco"/>
+                    <field name="state"/>
+                </search>
+            </field>
+        </record>
+        <!-- Delivery Invoice tree view-->
+        <record id="view_delivery_invoice_tree" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.invoice.tree</field>
+            <field name="model">panexlogi.delivery.invoice</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="billno"/>
+                    <field name="invoiceno"/>
+                    <field name="date"/>
+                    <field name="due_date"/>
+                    <field name="truckco"/>
+                    <field name="amount"/>
+                    <field name="amount_usd"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Delivery Invoice form view-->
+        <record id="view_delivery_invoice_form" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.invoice.form</field>
+            <field name="model">panexlogi.delivery.invoice</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_confirm_order"
+                                type="object"
+                                string="Confirm"
+                                invisible="state == 'confirm' or state == 'cancel'"
+                                class="btn-danger"/>
+                         <button name="action_unconfirm_order"
+                                type="object"
+                                string="Unconfirm"
+                                invisible="state == 'new' or state == 'cancel'"
+                                class="btn-primary"/>
+                         <button name="action_cancel_order"
+                                type="object"
+                                string="Cancel"
+                                invisible="state == 'confirm' or state == 'cancel'"
+                                class="btn-warning"/>
+                         <field
+                                name="state"
+                                widget="statusbar"
+                                statusbar_visible="new,confirm"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                Delivery Invoice
+                            </h1>
+                            <h1>
+                                <field name="billno"/>
+                            </h1>
+                        </div>
+                        <group col="2">
+                            <group col="2" string="Main">
+                                <field name="invoiceno"/>
+                                <field name="date"/>
+                                <field name="due_date"/>
+                                <field name="truckco"/>
+                                <field name="truckco_code"/>
+                                <field name="remark"/>
+                            </group>
+                            <group col="2" string="Info">
+                                <field name="amount" string="Amount EUR(不含税)"/>
+                                <field name="amount_usd" string="Amount USD（不含税)"/>
+                                <field name="tax" string="VAT EUR"/>
+                                <field name="tax_usd" string="VAT USD"/>
+                                <field name="tax_rate" string="VAT rate"/>
+                                <field name="amount_tax"  string="Amount EUR(含税)"/>
+                                <field name="amount_tax_usd" string="Amount USD(含税)"/>
+                                <field name="pdffile" filename="pdffilename"/>
+                                <field name="pdffilename" invisible="True"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Details">
+                                <field name="deliveryinvoicedetailids">
+                                    <tree>
+                                        <field name="date_order_no"/>
+                                        <field name="destinations_comments"/>
+                                        <field name="inner_ref"/>
+                                        <field name="rates"/>
+                                        <field name="amount"/>
+                                        <field name="amount_usd"/>
+                                        <field name="check"/>
+                                        <field name="check_message"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- Delivery Invoice detail tree-->
+        <record id="view_delivery_invoice_detail_tree" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.invoice.detail.tree</field>
+            <field name="model">panexlogi.delivery.invoice.detail</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="deleveryinvoiceid"/>
+                    <field name="date_order_no"/>
+                    <field name="destinations_comments"/>
+                    <field name="inner_ref"/>
+                    <field name="rates"/>
+                    <field name="amount"/>
+                    <field name="amount_usd"/>
+                    <field name="check"/>
+                    <field name="check_message"/>
+                </tree>
+            </field>
+        </record>
+
+         <record id="view_delivery_invoice_detail_search" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.invoice.detail.search</field>
+            <field name="model">panexlogi.delivery.invoice.detail</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="deleveryinvoiceid"/>
+                    <field name="date_order_no"/>
+                    <field name="destinations_comments"/>
+                    <field name="inner_ref"/>
+                    <field name="rates"/>
+                    <field name="amount"/>
+                    <field name="amount_usd"/>
+                    <field name="check"/>
+                    <field name="check_message"/>
+                </search>
+            </field>
+        </record>
+        <record id="view_delivery_invoice_detail_form" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.invoice.detail.form</field>
+            <field name="model">panexlogi.delivery.invoice.detail</field>
+            <field name="arch" type="xml">
+                <form string="Delivery Invoice Detail">
+                    <sheet>
+                        <group>
+                            <field name="deleveryinvoiceid"/>
+                            <field name="date_order_no"/>
+                            <field name="destinations_comments"/>
+                            <field name="inner_ref"/>
+                            <field name="waybillno"/>
+                            <field name="cntrno"/>
+                            <field name="rates"/>
+                            <field name="amount"/>
+                            <field name="amount_usd"/>
+                            <field name="tax"/>
+                            <field name="tax_usd"/>
+                            <field name="amount_tax"/>
+                            <field name="amount_tax_usd"/>
+                            <field name="check"/>
+                            <field name="check_message"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- Delivery Invoice action-->
+        <record id="action_delivery_invoice" model="ir.actions.act_window">
+            <field name="name">Delivery Invoices</field>
+            <field name="res_model">panexlogi.delivery.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_delivery_invoice_tree"/>
+        </record>
+        <!-- Delivery Invoice detail action-->
+        <record id="action_delivery_invoice_detail" model="ir.actions.act_window">
+            <field name="name">Delivery Invoice Details</field>
+            <field name="res_model">panexlogi.delivery.invoice.detail</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_delivery_invoice_detail_tree"/>
+        </record>
+    </data>
+</odoo>

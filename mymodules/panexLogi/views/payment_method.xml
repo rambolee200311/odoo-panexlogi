@@ -1,0 +1,52 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_payment_method_tree" model="ir.ui.view">
+        <field name="name">panexlogi.finance.payment.method.tree</field>
+        <field name="model">panexlogi.finance.payment.method</field>
+        <field name="arch" type="xml">
+            <tree delete="false">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Search View -->
+    <record id="view_payment_method_search" model="ir.ui.view">
+        <field name="name">panexlogi.finance.payment.method.search</field>
+        <field name="model">panexlogi.finance.payment.method</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="state"/>
+            </search>
+        </field>
+    </record>
+    <!-- Form View -->
+    <record id="view_payment_method_form" model="ir.ui.view">
+        <field name="name">panexlogi.finance.payment.method.form</field>
+        <field name="model">panexlogi.finance.payment.method</field>
+        <field name="arch" type="xml">
+            <form delete="false">
+                <header>
+                    <button name="action_active" type="object" string="Active" class="btn-primary"
+                            invisible="state=='active'"/>
+                    <button name="action_cancel" type="object" string="Cancel" class="btn-secondary"
+                            invisible="state=='cancel'"/>
+                    <widget name="web_ribbon" title="Active" bg_color="bg-success"
+                            invisible="state=='cancel'"/>
+                    <widget name="web_ribbon" title="Cancel" bg_color="bg-danger"
+                            invisible="state!='cancel'"/>
+                </header>
+                <sheet>
+                    <group col="2">
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="state" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

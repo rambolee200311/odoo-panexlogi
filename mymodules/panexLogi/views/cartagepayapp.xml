@@ -25,6 +25,10 @@
             <field name="model">panexlogi.finance.paymentapplication</field>
             <field name="arch" type="xml">
                 <tree>
+                    <header>
+                        <!-- Add a button to create a payment from selected records -->
+                        <button string="Create Payment" type="object" name="action_create_payment_from_selected" class="btn-primary"/>
+                    </header>
                     <field name="billno"/>
                     <field name="source"/>
                     <field name="source_Code"/>

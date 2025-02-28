@@ -42,13 +42,13 @@
                     </header>
                     <sheet>
                         <div class="oe_title">
-                        <h1>
-                            Delivery Quote
-                        </h1>
-                        <h2>
-                            <field name="billno"/>
-                        </h2>
-                    </div>
+                            <h1>
+                                Delivery Quote
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
                         <group col="2" string="Main">
                             <field name="delivery_id"/>
                             <field name="date"/>
@@ -83,26 +83,27 @@
                             <field name="remark"/>
                             <field name="state"/>
                         </group>
+                        <notebook>
+                            <page string="Details">
+                                <field name="deliverydetailids">
+                                    <tree>
+                                        <field name="product"/>
+                                        <field name="product_name"/>
+                                        <field name="adr"/>
+                                        <field name="qty"/>
+                                        <field name="package_size"/>
+                                        <field name="weight_per_unit"/>
+                                        <field name="gross_weight"/>
+                                        <field name="uncode"/>
+                                        <field name="class_no"/>
+                                        <field name="cntrno"/>
+                                        <field name="remark"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
-                    <notebook>
-                        <page string="Details">
-                            <field name="deliverydetailids">
-                                <tree>
-                                    <field name="product"/>
-                                    <field name="product_name"/>
-                                    <field name="adr"/>
-                                    <field name="qty"/>
-                                    <field name="package_size"/>
-                                    <field name="weight_per_unit"/>
-                                    <field name="gross_weight"/>
-                                    <field name="uncode"/>
-                                    <field name="class_no"/>
-                                    <field name="cntrno"/>
-                                    <field name="remark"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </notebook>
+
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" />
                         <field name="activity_ids" widget="mail_activity" />

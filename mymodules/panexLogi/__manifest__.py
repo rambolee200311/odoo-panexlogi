@@ -19,7 +19,7 @@
     'category': 'Uncategorized',
     'version': '0.1',
     # any module necessary for this one to work correctly
-    'depends': ['base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource', 'web'],
+    'depends': ['base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource', 'web', 'spreadsheet'],
 
     # always loaded
     'data': [
@@ -66,6 +66,7 @@
         'views/delivery_request.xml',
         'views/delivery_detail.xml',
         'views/delivery_quote.xml',
+        'views/delivery_invoice.xml',
         'views/DemoStockPicking.xml',
         'views/DemoToDoReport.xml',
         'views/country.xml',
@@ -74,9 +75,11 @@
         'views/transportcontract.xml',
         'views/transportorder.xml',
         'views/transportinvoice.xml',
-        'views/menus.xml',
-        'views/sequence.xml',
+        'views/payment_method.xml',
+        'views/payment.xml',
         'report/report.xml',
+        'views/sequence.xml',
+        'views/menus.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
@@ -94,6 +97,10 @@
             # 'my-modules/panexLogi/static/lib/x-spreadsheet/xspreadsheet.css',
             'panexLogi/static/src/scss/custom_styles.css',
             #'panexLogi/static/src/js/custom_menu.js',
+            'https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.4/dist/xspreadsheet.css',
+            'https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.4/dist/xspreadsheet.js',
+            'panexLogi/static/src/js/XSpreadsheetWidget.js',
+            # Your custom widget
         ]
     },
     'installable': True,

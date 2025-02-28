@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_panexlogin_partner,panexlogi.partner,model_res_partner,,1,1,1,1
+access_panexlogin_paymentmethod,panexlogi.paymentmethod,model_panexlogi_finance_payment_method,,1,1,1,1
 access_panexlogin_sender,panexlogi.sender,model_panexlogi_sender,,1,1,1,1
 access_panexlogin_receiver,panexlogi.receiver,model_panexlogi_receiver,,1,1,1,1
 access_panexlogin_project,panexlogi.project,model_panexlogi_project,,1,1,1,1
@@ -69,3 +70,7 @@ access_panexlogi_transport_order_otherdocs,access_panexlogi_transport_order_othe
 access_panexlogi_transport_order_arrived_wizard,access_panexlogi_transport_order_arrived_wizard,model_panexlogi_transport_order_arrived_wizard,,1,1,1,1
 access_panexlogi_transport_invoice,access_panexlogi_transport_invoice,model_panexlogi_transport_invoice,,1,1,1,1
 access_panexlogi_transport_invoice_detail,access_panexlogi_transport_invoice_detail,model_panexlogi_transport_invoice_detail,,1,1,1,1
+access_panexlogi_finance_payment,access_panexlogi_finance_payment,model_panexlogi_finance_payment,,1,1,1,1
+access_panexlogi_finance_payment_line,access_panexlogi_finance_payment_line,model_panexlogi_finance_payment_line,,1,1,1,1
+access_panexlogi_delivery_invoice,access_panexlogi_delivery_invoice,model_panexlogi_delivery_invoice,,1,1,1,1
+access_panexlogi_delivery_invoice_detail,access_panexlogi_delivery_invoice_detail,model_panexlogi_delivery_invoice_detail,,1,1,1,1

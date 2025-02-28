@@ -82,27 +82,37 @@
                                 <field name="check_message"/>
                             </group>
                         </group>
+                        <group col="2">
+                            <group col="2">
+                                <field name="allow_notunique" groups="panexLogi.groups_panex_logistic_manager"/>
+                            </group>
+                            <group col="2">
+                                <field name="reason_notunique" groups="panexLogi.groups_panex_logistic_manager"/>
+                            </group>
+                        </group>
                         <notebook>
                             <page string="Details">
-                                <field name="transportinvoicedetailids">
-                                    <tree>
-                                        <field name="waybillno"/>
-                                        <field name="project"/>
-                                        <field name="cntrno"/>
-                                        <field name="collterminal_name"/>
-                                        <field name="dropterminal_name"/>
-                                        <field name="unlolocation"/>
-                                        <field name="unlodate"/>
-                                        <field name="unitprice"/>
-                                        <field name="surcharge"/>
-                                        <field name="adrcharge"/>
-                                        <field name="dieselcharge"/>
-                                        <field name="waithours"/>
-                                        <field name="extrahours"/>
-                                        <field name="remark"/>
-                                        <field name="check"/>
-                                        <field name="check_message"/>
-                                    </tree>
+                                <field name="transportinvoicedetailids" >
+                                <tree>
+                                    <field name="waybillno"/>
+                                    <field name="project"/>
+                                    <field name="cntrno"/>
+                                    <field name="collterminal_name"/>
+                                    <field name="dropterminal_name"/>
+                                    <field name="unlolocation"/>
+                                    <field name="unlodate"/>
+                                    <field name="unitprice"/>
+                                    <field name="surcharge"/>
+                                    <field name="adrcharge"/>
+                                    <field name="dieselcharge"/>
+                                    <field name="waithours"/>
+                                    <field name="extrahours"/>
+                                    <field name="remark"/>
+                                    <field name="check"/>
+                                    <field name="check_message"/>
+                                </tree>
+                                <!--
+                                widget="x_spreadsheet"-->
                                 </field>
                             </page>
                         </notebook>

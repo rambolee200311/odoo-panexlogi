@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
         <!-- action -->
         <record id="waybill_action" model="ir.actions.act_window">
             <field name="name">Waybill</field>
             <field name="res_model">panexlogi.waybill</field>
-            <field name="view_mode">kanban,calendar,tree,form</field>
+            <field name="view_mode">tree,kanban,calendar,form</field>
         </record>
-
-
-
         <record id="action_partner" model="ir.actions.act_window">
             <field name="name">Partner_Panex</field>
             <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="action_payment_method" model="ir.actions.act_window">
+            <field name="name">Payment_Method</field>
+            <field name="res_model">panexlogi.finance.payment.method</field>
             <field name="view_mode">tree,form</field>
         </record>
 
@@ -49,11 +50,13 @@
         <menuitem id="delivery_logi_menu" name="Delivery" parent="panex_logi_menu" sequence="200" />
         <menuitem id="delivery_order_menu" name="Requests" parent="delivery_logi_menu" sequence="201" action="delivery_request_action"/>
         <menuitem id="delivery_quote_menu" name="Quotes" parent="delivery_logi_menu"  sequence="202" action="delivery_quote_action"/>
-        
-        
+        <menuitem id="delivery_invoice_menu" name="Invoice" parent="delivery_logi_menu"  sequence="203" action="action_delivery_invoice"/>
+        <menuitem id="delivery_invoice_detail_menu" name="Invoice Details" parent="delivery_logi_menu"  sequence="204" action="action_delivery_invoice_detail"/>
+
         <menuitem id="outlay_menu" name="Outlay" parent="panex_logi_menu" sequence="300" />
         <menuitem id="import_payment_application_menu" name="Import Pay APP" parent="outlay_menu" sequence="301" action="import_payapp_action"/>
         <menuitem id="cartage_payment_application_menu" name="Trucking Pay APP" parent="outlay_menu" sequence="302" action="cartage_payapp_action"/>
+        <menuitem id="finance_payment_menu" name="Payment" parent="outlay_menu" sequence="309" action="action_finance_payment" />
 
         <menuitem id="income_menu" name="Income" parent="panex_logi_menu" sequence="400" />
         <menuitem id="income_settle_bill_menu" name="Bill of Settlement" parent="income_menu" sequence="401" action="settle_bill_action"/>
@@ -86,6 +89,7 @@
         <menuitem id="panex_loadingcondition_menu" name="Loading Condition files" parent="configuration_menu" sequence="909" action="panexlogi_loadingcondition_action"/>
         <menuitem id="panex_packagetype_menu" name="packagetype files" parent="configuration_menu" sequence="907" action="panexlogi_packagetype_action"/>
         <menuitem id="panex_terminal_menu" name="terminal files" parent="configuration_menu" sequence="908" action="panexlogi_terminal_action"/>
+        <menuitem id="panex_paymentmethod_menu" name="Payment Method" parent="configuration_menu" sequence="909" action="action_payment_method"/>
         <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->
 

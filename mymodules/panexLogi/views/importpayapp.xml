@@ -26,7 +26,12 @@
             <field name="model">panexlogi.finance.paymentapplication</field>
             <field name="arch" type="xml">
                 <tree>
+                    <header>
+                        <!-- Add a button to create a payment from selected records -->
+                        <button string="Create Payment" type="object" name="action_create_payment_from_selected" class="btn-primary"/>
+                    </header>
                     <field name="billno"/>
+                    <field name="state"/>
                     <field name="type"/>
                     <field name="waybill_billno"/>
                     <field name="payee"/>
@@ -105,12 +110,13 @@
                                 <field name="source_Code"/>
                             </group>
                             <group string="Other" col="2">
-                                <field name="invoiceno"/>
-                                <field name="invoice_date"/>
-                                <field name="due_date"/>
+                                <field name="invoiceno" readonly="state!='new'"/>
+                                <field name="invoice_date" readonly="state!='new'"/>
+                                <field name="due_date" readonly="state!='new'"/>
                                 <field name="remark" readonly="state!='new'"/>
                                 <field name="pdffile"  filename="pdffilename" readonly="state!='new'"/>
                                 <field name="pdffilename" invisible="True"/>
+                                <field name="payment_id" readonly="state!='new'"/>
                             </group>
                         </group>
                         <notebook string="Details">

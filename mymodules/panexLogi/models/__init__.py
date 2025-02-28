@@ -46,3 +46,5 @@ from . import terminal
 from . import transportcontract
 from . import transportorder
 from . import transportinvoice
+from . import Payment
+from . import deliveryinvoice
