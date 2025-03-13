@@ -34,7 +34,7 @@ class DeliveryInvoice(models.Model):
         selection=[
             ('new', 'New'),
             ('confirm', 'Confirm'),
-            ('received', 'Received'),
+            ('apply', 'Apply Pay'),
             ('cancel', 'Cancel'),
         ],
         default='new',
@@ -102,8 +102,8 @@ class DeliveryInvoice(models.Model):
 
             # check combination of truckco and inner ref is exist in delivery order,and write check_message ,check is false
             for record in self.deliveryinvoicedetailids:
-                domain = [('trucker', '=', self.truckco.id), ('inner_ref', '=', record.inner_ref)]
-                if self.env['panexlogi.delivery'].search_count(domain) == 0:
+                domain = [('deliveryid.trucker', '=', self.truckco.id), ('cntrno', '=', record.inner_ref)]
+                if self.env['panexlogi.delivery.detail'].search_count(domain) == 0:
                     record.check = False
                     record.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
                     self.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
@@ -187,6 +187,67 @@ class DeliveryInvoice(models.Model):
         for r in self:
             r.amount_tax = r.amount + r.tax
             r.amount_tax_usd = r.amount_usd + r.tax_usd
+
+    # Create PaymentApplication
+    def create_payment_application(self):
+        # check if state is confirm
+        if self.state != 'confirm':
+            raise UserError(_("You can only create Payment Application for a confirmed Delivery Invoice"))
+        # Check if PaymentApplication already exists
+        domain = [
+            ('source', '=', 'Delivery Invoice')
+            , ('source_Code', '=', self.billno)
+            , ('state', '!=', 'cancel')
+            , ('type', '=', 'trucking')]
+
+        existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain)
+        if existing_records:
+            raise UserError(_('Payment Application already exists for this Transport Invoice'))
+
+        for record in self:
+            # Create PaymentApplication
+            payment_application = self.env['panexlogi.finance.paymentapplication'].create({
+                'date': fields.Date.today(),
+                'type': 'trucking',
+                'source': 'Delivery Invoice',
+                'payee': record.truckco.id,
+                'source_Code': record.billno,
+                'pdffile': record.pdffile,
+                'pdffilename': record.pdffilename,
+                'invoiceno': record.invoiceno,
+                'invoice_date': record.date,
+                'due_date': record.due_date,
+            })
+            # Unit price= OUD
+            for records in self.deliveryinvoicedetailids:
+                self.env['panexlogi.finance.paymentapplicationline'].create({
+                    'payapp_billno': payment_application.id,
+                    'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'OUD')]).id,
+                    'amount': records.amount,
+                    'amount_usd': records.amount_usd,
+                    'remark': records.inner_ref,
+                })
+
+            self.env['panexlogi.finance.paymentapplicationline'].create({
+                'payapp_billno': payment_application.id,
+                'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'OUD')]).id,
+                'amount': record.tax,
+                'amount_usd': record.tax_usd,
+                'remark': 'VAT-'+str(record.tax_rate)+'%',
+            })
+            # 修改状态
+            record.state = 'apply'
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Trucking Payment Application create successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
 
 class DeliveryInvoiceDetail(models.Model):

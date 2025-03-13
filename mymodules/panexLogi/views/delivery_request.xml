@@ -12,6 +12,27 @@
             </p>
         </field>
     </record>
+    <!-- Email View -->
+    <record id="email_delivery_template_inform_content" model="mail.template">
+        <field name="name">Inform Content</field>
+        <field name="model_id" ref="panexLogi.model_panexlogi_delivery"/>
+        <field name="subject">Delivery Request Email</field>
+        <field name="email_from">fallback@example.com</field>
+        <field name="email_to">{{ object.inform_email_to or 'fallback@example.com' }}</field>
+        <field name="body_html" type="html">
+            <div>
+                Please focus on: <t t-out="object.billno | default('')"/>  <br/><br/>
+                Inform Content: <t t-out="object.inform_content | default('')"/> <br/><br/>
+            </div>
+            <div>
+                <br/>Best Regards<br/><br/>
+                <t t-out="user.name | default('')"/> <br/><br/>
+                <img t-attf-src="/logo.png?company={{ user.company_id.id }}"
+                     style="padding: 0px; margin: 0px; height: 48px;"
+                     t-att-alt="user.company_id.name"/>
+            </div>
+        </field>
+    </record>
     <!-- Map View
         <record id="view_delivery_quote_map" model="ir.ui.view">
             <field name="name">delivery.quote.map</field>
@@ -68,6 +89,10 @@
                                         type="object"
                                         string="Tracking"
                                         class="oe_stat_button" icon="fa-building"/>
+                            <button name="send_delivery_emails"
+                                        type="object"
+                                        string="Inform"
+                                        class="oe_stat_button" icon="fa-envelope"/>
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -79,14 +104,15 @@
                     </div>
                     <group string="Request" col="2">
                         <group>
-                            <field name="date" colspan="2"/>
-                            <field name="project"/>
-                            <field name="delivery_type"/>
+                            <field name="date" colspan="2" readonly="state!='new'"/>
+                            <field name="project" readonly="state!='new'"/>
+                            <field name="delivery_type" readonly="state!='new'"/>
+                            <field name="adr" readonly="state!='new'"/>
                         </group>
                         <group>
-                            <field name="loading_ref"/>
-                            <field name="consignee_ref"/>
-                            <field name="inner_ref"/>
+                            <field name="loading_ref" readonly="state!='new'"/>
+                            <field name="consignee_ref" readonly="state!='new'"/>
+                            <field name="inner_ref" readonly="state!='new'"/>
                         </group>
                         <group>
                             <field name="pdffile" filename="pdffilename"/>
@@ -94,47 +120,60 @@
                             <field name="notes"/>
                         </group>
                     </group>
+                    <group string="Inform" col="2">
+                        <group>
+                            <field name="need_inform"/>
+                            <field name="inform_date"/>
+                        </group>
+                        <group>
+                            <field name="inform_content"/>
+                        </group>
+                        <group>
+                            <field name="inform_receiver" widget="many2many_tags"/>
+                            <field name="inform_email_to"/>
+                        </group>
+                    </group>
                     <notebook>
                         <page string="Detail">
-                            <field name="deliverydetatilids"/>
+                            <field name="deliverydetatilids" readonly="state!='new'"/>
                         </page>
                         <page string="Address">
                             <group>
                                 <group string="LOADING">
-                                    <field name="loading_conditon"/>
-                                    <field name="load_address"/>
-                                    <field name="load_company_name"/>
-                                    <field name="load_contact_phone"/>
-                                    <field name="load_postcode"/>
-                                    <field name="load_country"/>
-                                    <field name="load_country_code"/>
-                                    <field name="load_address_timeslot"/>
-                                    <field name="planned_for_loading"/>
+                                    <field name="loading_conditon" readonly="state!='new'"/>
+                                    <field name="load_address" readonly="state!='new'"/>
+                                    <field name="load_company_name" readonly="state!='new'"/>
+                                    <field name="load_contact_phone" readonly="state!='new'"/>
+                                    <field name="load_postcode" readonly="state!='new'"/>
+                                    <field name="load_country" readonly="state!='new'"/>
+                                    <field name="load_country_code" readonly="state!='new'"/>
+                                    <field name="load_address_timeslot" readonly="state!='new'"/>
+                                    <field name="planned_for_loading" readonly="state!='new'"/>
                                 </group>
                                 <group string="UNLOADING">
-                                    <field name="unloading_conditon"/>
-                                    <field name="unload_address"/>
-                                    <field name="unload_company_name"/>
-                                    <field name="unload_contact_phone"/>
-                                    <field name="unload_postcode"/>
-                                    <field name="unload_country"/>
-                                    <field name="unload_country_code"/>
-                                    <field name="unload_address_timeslot"/>
-                                    <field name="planned_for_unloading"/>
+                                    <field name="unloading_conditon" readonly="state!='new'"/>
+                                    <field name="unload_address" readonly="state!='new'"/>
+                                    <field name="unload_company_name" readonly="state!='new'"/>
+                                    <field name="unload_contact_phone" readonly="state!='new'"/>
+                                    <field name="unload_postcode" readonly="state!='new'"/>
+                                    <field name="unload_country" readonly="state!='new'"/>
+                                    <field name="unload_country_code" readonly="state!='new'"/>
+                                    <field name="unload_address_timeslot" readonly="state!='new'"/>
+                                    <field name="planned_for_unloading" readonly="state!='new'"/>
                                 </group>
                             </group>
                         </page>
                         <page string="Quote">
                             <group string="Common" col="2">
                                 <group>
-                                    <field name="trucker"/>
-                                    <field name="quote"/>
-                                    <field name="additional_cost"/>
-                                    <field name="extra_cost"/>
+                                    <field name="trucker"  readonly="state!='new'"/>
+                                    <field name="quote" readonly="state!='new'"/>
+                                    <field name="additional_cost" readonly="state!='new'"/>
+                                    <field name="extra_cost" readonly="state!='new'"/>
                                 </group>
                                 <group>
-                                    <field name="charged"/>
-                                    <field name="profit"/>
+                                    <field name="charged" readonly="state!='new'"/>
+                                    <field name="profit" readonly="state!='new'"/>
                                 </group>
                             </group>
                             <!--
@@ -149,12 +188,12 @@
                             -->
                         </page>
                         <page string="Track">
-                            <field name="deliverystatusids" readonly="true">
+                            <field name="deliverystatusids">
                                 <tree>
-                                    <field name="date"/>
-                                    <field name="status"/>
-                                    <field name="extra_cost"/>
-                                    <field name="description"/>
+                                    <field name="date" readonly="true"/>
+                                    <field name="status" readonly="true"/>
+                                    <field name="extra_cost" readonly="true"/>
+                                    <field name="description" readonly="true"/>
                                 </tree>
                             </field>
                         </page>
@@ -182,7 +221,7 @@
         </field>
     </record>
     <!--Search View-->
-        <record id="settle_bill_search_view" model="ir.ui.view">
+        <record id="delivery_view_search" model="ir.ui.view">
             <field name="name">panexlogi.delivery.search</field>
             <field name="model">panexlogi.delivery</field>
             <field name="arch" type="xml">
@@ -215,8 +254,6 @@
                     <field name="trucker"/>
                     <field name="planned_for_loading"/>
                     <field name="planned_for_unloading"/>
-                    <field name="loading_date"/>
-                    <field name="unloading_date"/>
                 </search>
             </field>
         </record>
@@ -233,8 +270,7 @@
                 <field name="unload_address" string="unload_address"/>
                 <field name="trucker"/>
                 <field name="planned_for_loading"/>
-                <field name="loading_date"/>
-                <field name="unloading_date"/>
+                <field name="planned_for_unloading"/>
                 <field name="notes"/>
             </tree>
         </field>

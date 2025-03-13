@@ -1,0 +1,126 @@
+
+  <odoo>
+    <!-- Form View for Trucking -->
+    <record id="view_form_trucking" model="ir.ui.view">
+        <field name="name">jsdemo.trucking.form</field>
+        <field name="model">jsdemo.trucking</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Trucking Order</h1>
+                        <div class="oe_button_box" name="button_box">
+                        <button name="action_add_section"
+                                    string="Add Section"
+                                    type="object"
+                                    class="oe_highlight"/>
+                            <button name="action_add_note"
+                                    string="Add Note"
+                                    type="object"/>
+                        </div>
+                        <div class="alert alert-info" role="alert">
+                            <i class="fa fa-info-circle"/>
+                            Fill in the order details including project reference, trucker information,
+                            and list all items being transported. Use remarks for special instructions.
+                        </div>
+                    </div>
+                    <group>
+                        <field name="date"/>
+                        <field name="project"/>
+                        <field name="trucker"/>
+                        <field name="price"/>
+                    </group>
+                    <group>
+                        <field name="remark" colspan="4"/>
+                    </group>
+                    <notebook>
+                        <page string="Items">
+                            <field name="trucking_line_ids">
+                                <tree editable="top">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="product_id"
+                                           invisible="display_type!=False"/>
+                                    <field name="quantity"
+                                           invisible="display_type!=False"/>
+                                    <field name="price"
+                                           invisible="display_type!=False"/>
+                                    <field name="name"
+                                           invisible="display_type!=False"
+                                           placeholder="Enter section title/note..."/>
+                                    <control>
+                                        <create name="create" string="Add Line"/>
+                                    </control>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View for Trucking -->
+    <record id="view_tree_trucking" model="ir.ui.view">
+        <field name="name">jsdemo.trucking.tree</field>
+        <field name="model">jsdemo.trucking</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="project"/>
+                <field name="trucker"/>
+                <field name="price"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View for Trucking -->
+    <record id="view_search_trucking" model="ir.ui.view">
+        <field name="name">jsdemo.trucking.search</field>
+        <field name="model">jsdemo.trucking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="project"/>
+                <field name="trucker"/>
+                <filter string="Today's Records" name="today" domain="[('date','=', context_today())]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Project" name="group_project" context="{'group_by':'project'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_trucking_paste_wizard_form" model="ir.ui.view">
+        <field name="name">trucking.paste.wizard.form</field>
+        <field name="model">jsdemo.trucking.paste.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="trucking_id" invisible="1"/>
+                    <field name="pasted_data"
+                           placeholder="Paste your data here (Product Name[TAB]Quantity[TAB]Price)"
+                           nolabel="1"
+                           widget="textarea"
+                           class="oe_inline"/>
+                </group>
+                <footer>
+                    <button name="action_import" string="Import" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="product_trucking_section" model="product.product">
+        <field name="name">Trucking Section</field>
+        <field name="detailed_type">service</field>
+        <!--<field name="sale_line_warn">section</field>-->
+    </record>
+
+    <record id="product_trucking_note" model="product.product">
+        <field name="name">Trucking Note</field>
+        <field name="detailed_type">service</field>
+        <!--<field name="sale_line_warn">note</field>-->
+    </record>
+
+</odoo>

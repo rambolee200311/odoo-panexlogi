@@ -74,8 +74,9 @@
         <menuitem id="outbound_menu" name="Outbound" parent="wms_menu" sequence="511" />
         <menuitem id="panexlogi_outboundorder_menu" name="Outbound Order" parent="outbound_menu" sequence="512" action="panexlogi_outboundorder_action"/>
         <menuitem id="panexlogi_outboundoperate_menu" name="Outbound Operate" parent="outbound_menu" sequence="513" action="panexlogi_outboundoperate_action"/>
-
-
+        <menuitem id="warehouse_invoice_menu" name="Invoice" parent="wms_menu" sequence="521" />
+        <menuitem id="panexlogi_warehouse_invoice_menu" name="Warehouse Invoices"  parent="warehouse_invoice_menu"  action="action_warehouse_invoice" sequence="522"/>
+        <menuitem id="panexlogi_warehouse_invoice_detail_menu" name="Warehouse Invoice Details"  parent="warehouse_invoice_menu"  action="action_warehouse_invoice_detail" sequence="523"/>
 
         <menuitem id="configuration_menu" name="Configuration" parent="panex_logi_menu" sequence="900" />
         <menuitem id="partner_menu" name="Partner files" parent="configuration_menu" sequence="901" action="action_partner"/>
@@ -89,7 +90,9 @@
         <menuitem id="panex_loadingcondition_menu" name="Loading Condition files" parent="configuration_menu" sequence="909" action="panexlogi_loadingcondition_action"/>
         <menuitem id="panex_packagetype_menu" name="packagetype files" parent="configuration_menu" sequence="907" action="panexlogi_packagetype_action"/>
         <menuitem id="panex_terminal_menu" name="terminal files" parent="configuration_menu" sequence="908" action="panexlogi_terminal_action"/>
-        <menuitem id="panex_paymentmethod_menu" name="Payment Method" parent="configuration_menu" sequence="909" action="action_payment_method"/>
+	<menuitem id="panex_paymentmethod_menu" name="Payment Method" parent="configuration_menu" sequence="909" action="action_payment_method"/>
+	<menuitem id="panex_project_type_menu" name="Project Type" parent="configuration_menu" sequence="910" action="action_project_type"/>
+
         <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->
 

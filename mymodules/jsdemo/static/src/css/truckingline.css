@@ -1,0 +1,10 @@
+.o_trucking_line_section {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    border-left: 3px solid #0d6efd;
+}
+
+.o_trucking_line_note {
+    background-color: #fff3cd;
+    font-style: italic;
+}

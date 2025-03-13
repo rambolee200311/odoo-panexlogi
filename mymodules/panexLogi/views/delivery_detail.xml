@@ -23,16 +23,17 @@
                 <form string="Delivery Detail">
                     <sheet>
                         <group>
+                            <field name="loading_ref"/>
+                            <field name="cntrno"/>
                             <field name="product"/>
                             <field name="product_name"/>
                             <field name="adr"/>
+                             <field name="uncode"/>
                             <field name="qty"/>
                             <field name="package_size"/>
                             <field name="weight_per_unit"/>
                             <field name="gross_weight"/>
-                            <field name="uncode"/>
                             <field name="class_no"/>
-                            <field name="cntrno"/>
                             <field name="remark"/>
                         </group>
                     </sheet>
@@ -46,16 +47,18 @@
             <field name="model">panexlogi.delivery.detail</field>
             <field name="arch" type="xml">
                 <tree string="Delivery Details">
+                    <field name="loading_ref"/>
+                    <field name="cntrno"/>
                     <field name="product"/>
                     <field name="product_name"/>
                     <field name="adr"/>
+                     <field name="uncode"/>
                     <field name="qty"/>
                     <field name="package_size"/>
                     <field name="weight_per_unit"/>
                     <field name="gross_weight"/>
-                    <field name="uncode"/>
                     <field name="class_no"/>
-                    <field name="cntrno"/>
+                    <field name="remark"/>
                 </tree>
             </field>
         </record>

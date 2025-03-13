@@ -18,12 +18,12 @@
     # for the full list
     'category': 'Uncategorized',
     'version': '0.1',
+
     # any module necessary for this one to work correctly
     'depends': ['base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource', 'web', 'spreadsheet'],
 
     # always loaded
     'data': [
-        #'views/assets.xml',
         'security/panexlogi_security.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
@@ -77,9 +77,12 @@
         'views/transportinvoice.xml',
         'views/payment_method.xml',
         'views/payment.xml',
-        'report/report.xml',
+        'views/warehouse_invoice.xml',
+        'data/ir_cron_data.xml',
         'views/sequence.xml',
+        'report/report.xml',
         'views/menus.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [
@@ -87,22 +90,10 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # 'node_modules/@odoo/owl/dist/owl.es.js',
-            # 'panexLogi/static/src/js/samplecollection_barcode_handler.js',
-            # 'static/src/xml/*.xml',
-            # 'static/src/xml/samplecollection_barcode_handler.xml',
-            # 'panexLogi/static/src/js/fields/*.js',
-            # 'panexLogi/static/lib/x-spreadsheet/x_spreadsheet_widget.js',
-            # 'my-modules/panexLogi/static/lib/x-spreadsheet/xspreadsheet.js',
-            # 'my-modules/panexLogi/static/lib/x-spreadsheet/xspreadsheet.css',
-            'panexLogi/static/src/scss/custom_styles.css',
-            #'panexLogi/static/src/js/custom_menu.js',
-            'https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.4/dist/xspreadsheet.css',
-            'https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.4/dist/xspreadsheet.js',
-            'panexLogi/static/src/js/XSpreadsheetWidget.js',
-            # Your custom widget
+             # 'static/src/js/samplecollection_barcode_handler.js',
+             # 'static/src/xml/*.xml',
+             # 'static/src/xml/samplecollection_barcode_handler.xml'
         ]
     },
-    'installable': True,
-    'application': True,
+
 }

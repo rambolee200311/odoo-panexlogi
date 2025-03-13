@@ -1,0 +1,174 @@
+<!--  Views (views/warehouse_invoice_views.xml) -->
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_warehouse_invoice_form" model="ir.ui.view">
+            <field name="name">warehouse.invoice.form</field>
+            <field name="model">panexlogi.warehouse.invoice</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_confirm_order"
+                            type="object"
+                            string="Confirm"
+                            invisible="state == 'confirm' or state == 'cancel' or state == 'apply'"
+                            class="btn-danger"/>
+                         <button name="action_unconfirm_order"
+                                type="object"
+                                string="Unconfirm"
+                                invisible="state == 'new' or state == 'cancel' or state == 'apply'"
+                                class="btn-primary"/>
+                         <button name="action_cancel_order"
+                                type="object"
+                                string="Cancel"
+                                invisible="state == 'confirm' or state == 'cancel' or state == 'apply'"
+                                class="btn-warning"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="create_payment_application"
+                                    type="object"
+                                    string="Apply Payment"
+                                    class="oe_stat_button" icon="fa-money"/>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                Warehouse Invoice
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <group col="2">
+                            <group col="2">
+                                <field name="payee"/>
+                                <field name="invno"/>
+                                <field name="date"/>
+                                <field name="due_date"/>
+                                <field name="project"/>
+                                <field name="tax_rate"/>
+                            </group>
+                            <group  col="2">
+                                <field name="eurtotal"/>
+                                <field name="usdtotal"/>
+                                <field name="vat"/>
+                                <field name="vat_usd"/>
+                                <field name="pdffile" filename="pdffilename"/>
+                                <field name="pdffilename" invisible="True"/>
+                                <field name="remark"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Details">
+                                <field name="warehouseinvoicedetailids">
+                                    <tree editable="bottom">
+                                        <field name="be_bonded"/>
+                                        <field name="fitem"/>
+                                        <field name="amount"/>
+                                        <field name="amount_usd"/>
+                                        <field name="vat"/>
+                                        <field name="vat_usd"/>
+                                        <field name="project"/>
+                                        <field name="waybillno"/>
+                                        <field name="cntrno"/>
+                                        <field name="cntrnum"/>
+                                        <field name="pallets"/>
+                                        <field name="pcs"/>
+                                        <field name="remark"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_warehouse_invoice_tree" model="ir.ui.view">
+            <field name="name">warehouse.invoice.tree</field>
+            <field name="model">panexlogi.warehouse.invoice</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="billno"/>
+                    <field name="invno"/>
+                    <field name="date"/>
+                    <field name="payee"/>
+                    <field name="state"/>
+                    <field name="usdtotal"/>
+                    <field name="eurtotal"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_warehouse_invoice_search" model="ir.ui.view">
+            <field name="name">warehouse.invoice.search</field>
+            <field name="model">panexlogi.warehouse.invoice</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="invno"/>
+                    <field name="date"/>
+                    <field name="payee"/>
+                    <field name="state"/>
+                    <field name="usdtotal"/>
+                    <field name="eurtotal"/>
+                </search>
+            </field>
+        </record>
+
+        <!--Detail Tree View -->
+        <record id="view_warehouse_invoice_detail_tree" model="ir.ui.view">
+            <field name="name">warehouse.invoice.detail.tree</field>
+            <field name="model">panexlogi.warehouse.invoice.detail</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="warehouseinvoiceid"/>
+                    <field name="be_bonded"/>
+                    <field name="fitem" string="Cost Item"/>
+                    <field name="amount" string="EUR Amount"/>
+                    <field name="amount_usd" string="USD Amount"/>
+                    <field name="vat" string="EUR VAT"/>
+                    <field name="vat_usd" string="USD VAT"/>
+                    <field name="project" string="Project"/>
+                    <field name="waybillno" string="BL No"/>
+                    <field name="cntrno" string="Container No"/>
+                    <field name="cntrnum" string="Container Qty"/>
+                    <field name="pallets" string="Pallets"/>
+                    <field name="pcs" string="Pieces"/>
+                    <field name="remark" string="Remarks"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--Detail Action -->
+        <record id="action_warehouse_invoice_detail" model="ir.actions.act_window">
+            <field name="name">Warehouse Invoice Details</field>
+            <field name="res_model">panexlogi.warehouse.invoice.detail</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Add new invoice details
+                </p>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_warehouse_invoice" model="ir.actions.act_window">
+            <field name="name">Warehouse Invoices</field>
+            <field name="res_model">panexlogi.warehouse.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_warehouse_invoice_search"/>
+        </record>
+
+
+    </data>
+</odoo>
+

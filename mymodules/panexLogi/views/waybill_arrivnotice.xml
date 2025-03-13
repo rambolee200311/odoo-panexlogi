@@ -154,10 +154,10 @@
         <field name="arch" type="xml">
             <form string="Actual Arrival">
                 <group>
-                    <field name="adate"/>
-                    <field name="terminal"/>
-                    <field name="remark"/>
-                    <field name="blockdays" hide="true"/>
+                    <field name="ata"/>
+                    <field name="eta"/>
+                    <field name="terminal_a"/>
+                    <field name="eta_remark"/>
                 </group>
                 <footer>
                     <button name="update_existing_record" string="确认" type="object" class="btn-primary"/>

@@ -89,17 +89,35 @@ class PaymentApplication(models.Model):
         for rec in self:
             if rec.state != 'confirm':
                 raise UserError(_("You only can unconfirm Confirmed Order"))
-            else:
-                rec.state = 'new'
-                return True
+            if rec.payment_id:
+                raise UserError(_("You can't unconfirm paid application"))
+            rec.state = 'new'
+            return True
 
     def action_cancel_order(self):
         for rec in self:
             if rec.state != 'new':
-                raise UserError(_("You only can cancel New Order"))
-            else:
-                rec.state = 'cancel'
-                return True
+                raise UserError(_("You only can cancel New application"))
+            if rec.payment_id:
+                raise UserError(_("You can't cancel paid application"))
+
+            # change shipping invoice state
+            if rec.source == 'Shipping Invoice' and rec.type == 'import':
+                shipinvoice = self.env['panexlogi.waybill.shipinvoice'].search([('billno', '=', rec.source_Code)])
+                if shipinvoice:
+                    shipinvoice.state = 'confirm'
+                else:
+                    raise exceptions.ValidationError('Can not find the Shipping Invoice')
+            # change clearance invoice state
+            if rec.source == 'Clearance Invoice' and rec.type == 'import':
+                clearanceinvoice = self.env['panexlogi.waybill.clearinvoice'].search([('billno', '=', rec.source_Code)])
+                if clearanceinvoice:
+                    clearanceinvoice.state = 'confirm'
+                else:
+                    raise exceptions.ValidationError('Can not find the Clearance Invoice')
+
+            rec.state = 'cancel'
+            return True
 
     def action_paid_order(self):
         for rec in self:

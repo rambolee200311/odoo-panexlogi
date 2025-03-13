@@ -25,7 +25,7 @@ class TransportInvoice(models.Model):
         selection=[
             ('new', 'New'),
             ('confirm', 'Confirm'),
-            ('received', 'Received'),
+            ('apply', 'Apply Pay'),
             ('cancel', 'Cancel'),
         ],
         default='new',
@@ -243,6 +243,8 @@ class TransportInvoice(models.Model):
                         'remark': records.remark,
                         'project': records.project.id,
                     })
+            # 修改状态
+            record.state = 'apply'
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -269,7 +271,17 @@ class TransportInvoice(models.Model):
                 sum_amount += detail.unitprice + detail.surcharge + detail.waithours + detail.extrahours + detail.adrcharge + detail.dieselcharge
             record.amount = sum_amount
 
-
+    def unlink(self):
+        """
+        删除
+        """
+        for record in self:
+            if record.state not in ['cancel']:
+                raise UserError(_('Only the cancled Invoice can be deleted!'))
+        # 删除明细
+        self.env['panexlogi.transport.invoice.detail'].search([('transportinvoiceid', 'in', self.ids)]).unlink()
+        # 删除附件
+        return super(TransportInvoice, self).unlink()
 
 
 class TransportInvoiceDetail(models.Model):

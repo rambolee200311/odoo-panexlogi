@@ -68,7 +68,7 @@
                         </group>
                         <group col="2" string="Quote">
                             <group>
-                                <field name="delivery_id"/>
+                                <field name="delivery_id" readonly="True"/>
                                 <field name="date"/>
                             </group>
                             <group>
@@ -81,12 +81,17 @@
                         <group col="2" string="Truck">
                             <field name="trucker"/>
                             <field name="remark"/>
-                            <field name="state"/>
+                            <!--<field name="state"/>-->
                         </group>
                         <notebook>
                             <page string="Details">
                                 <field name="deliverydetailids">
-                                    <tree>
+                                    <tree editable="bottom">
+                                        <field name="loading_ref"/>
+                                        <field name="cntrno"/>
+                                        <field name="quote"/>
+                                        <field name="additional_cost"/>
+                                        <field name="extra_cost"/>
                                         <field name="product"/>
                                         <field name="product_name"/>
                                         <field name="adr"/>
@@ -96,7 +101,6 @@
                                         <field name="gross_weight"/>
                                         <field name="uncode"/>
                                         <field name="class_no"/>
-                                        <field name="cntrno"/>
                                         <field name="remark"/>
                                     </tree>
                                 </field>

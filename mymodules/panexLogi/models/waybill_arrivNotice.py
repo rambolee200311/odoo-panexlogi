@@ -9,30 +9,44 @@ class WaybillArrivNoticeWizard(models.TransientModel):
     _name = 'panexlogi.waybill.arrivnotice.wizard'
     _description = 'panexlogi.waybill.arrivnotice.wizard'
 
-    adate = fields.Date(string='ADate（实际到达日期）', tracking=True)
-    terminal = fields.Many2one('panexlogi.terminal', string='Collection Terminal')
-    remark = fields.Text(string='Remark')
-    blockdays = fields.Integer(string='Block days',default=90)
+    eta = fields.Date(string='ETA', tracking=True)
+    ata = fields.Date(string='ATA', tracking=True)
+    terminal_a = fields.Many2one('panexlogi.terminal', string='Terminal of Arrival', tracking=True)
+    eta_remark = fields.Text(string='Remark', tracking=True)
     ''''
     waybill_billno = fields.Char(string="BillNo")
     date = fields.Date(string='Date（到达日期）')
     blockdays = fields.Integer(string='Block days')
     pdffile = fields.Binary(string='File（原件）')
     '''
-    def update_existing_record(self):
-        # Find the existing record
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super(WaybillArrivNoticeWizard, self).default_get(fields_list)
+        # 获取当前上下文中的运单 ID
         active_id = self.env.context.get('active_id')
-        existing_record = self.env['panexlogi.waybill.arrivnotice'].search([('waybill_billno', '=', active_id)],
-                                                                           limit=1)
+        if active_id:
+            waybill = self.env['panexlogi.waybill'].browse(active_id)
+            # 将已有值赋给向导字段
+            res.update({
+                'eta': waybill.eta,
+                'ata': waybill.ata,
+                'terminal_a': waybill.terminal_a.id,
+                'eta_remark': waybill.eta_remark,
+            })
+        return res
+
+    def update_existing_record(self):
+        active_id = self.env.context.get('active_id')
+        existing_record = self.env['panexlogi.waybill'].browse(active_id)
         if not existing_record:
             raise UserError("No existing record found with the given BillNo")
-
-        # Update the existing record
+        # 修正字段名：terminal_a（原代码中写成了 terminal）
         existing_record.write({
-            'adate': self.adate,
-            'terminal': self.terminal,
-            'remark': self.remark,
-            'state': 'arrived',
+            'eta': self.eta,
+            'ata': self.ata,
+            'terminal_a': self.terminal_a.id,  # 使用 terminal_a
+            'eta_remark': self.eta_remark,
         })
         return {'type': 'ir.actions.act_window_close'}
 

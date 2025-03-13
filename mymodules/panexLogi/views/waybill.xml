@@ -6,8 +6,10 @@
         <field name="arch" type="xml">
             <search>
                 <field name="project"/>
+                <field name="project_type"/>
                 <field name="billno"/>
-                <field name="date"/>
+                <field name="eta"/>
+                <field name="ata"/>
                 <field name="shipping"/>
                 <field name="shipper"/>
                 <field name="consignee"/>
@@ -133,9 +135,11 @@
             <tree string="Seawaybill_Tree"  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'"
             limit="20">
                 <field name="project"/>
+                <field name="project_type"/>
                 <field name="billno"/>
-                <field name="date"/>
-                <field name="first_arrivnotice_date" string="EDate"/>
+                <field name="eta"/>
+                <field name="ata"/>
+                <!--<field name="first_arrivnotice_date" string="EDate"/>-->
                 <field name="adr"/>
                 <field name="shipping"/>
                 <field name="shipper"/>
@@ -203,6 +207,7 @@
                     <group col="2">
                         <group string="General">
                             <field name="project" readonly="state!='new'"/>
+                            <field name="project_type" readonly="state!='new'"/>
                             <field name="shipping" readonly="state!='new'"/>
                             <field name="shipper" readonly="state!='new'"/>
                             <field name="consignee" readonly="state!='new'"/>
@@ -217,8 +222,22 @@
                             <field name="date" readonly="state!='new'"/>
                             <field name="week" readonly="state!='new'"/>
                             <field name="adr" readonly="state!='new'"/>
+                            <field name="remark"/>
                         </group>
-                     </group>
+                    </group>
+                    <group col="2">
+                        <group string="Departure">
+                            <field name="etd" readonly="state!='new'"/>
+                            <field name="atd" readonly="state!='new'"/>
+                            <field name="terminal_d" readonly="state!='new'"/>
+                        </group>
+                        <group string="Arrival">
+                            <field name="eta" readonly="state!='new'"/>
+                            <field name="ata" readonly="state!='new'"/>
+                            <field name="terminal_a" readonly="state!='new'"/>
+                            <field name="eta_remark" readonly="state!='new'"/>
+                        </group>
+                    </group>
                     <notebook>
                         <page string="Container Details">
                             <field name="details_ids"/>
@@ -226,17 +245,17 @@
                         <page  string="Packing List">
                             <field name="packlist_ids"/>
                         </page>
-                        <page  string="Arrival Notice">
+                        <!--<page  string="Arrival Notice">
                             <field name="arrivnotice_ids"/>
-                        </page>
+                        </page>-->
                          <page  string="Commercial Invoice">
                             <field name="commeinvoice_ids"/>
                         </page>
                          <page  string="Shipping Invoice">
-                            <field name="shipinvoice_ids"/>
+                            <field name="shipinvoice_ids" delete="0"/>
                         </page>
                         <page  string="Clearance Invoice">
-                            <field name="clearinvoice_ids"/>
+                            <field name="clearinvoice_ids" delete="0"/>
                         </page>
                         <page  string="Warehousing Invoice">
                             <field name="customsduties_ids"/>

@@ -16,20 +16,26 @@ Long description of module's purpose
     # for the full list
     'category': 'Uncategorized',
     'version': '0.1',
-
     # any module necessary for this one to work correctly
-    'depends': ['base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource'],
-
+    'depends': ['web', 'base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource'],
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/delivery.xml',
         'views/menu.xml',
         'views/deliverylinewizard.xml',
+        'views/trucking.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            #'https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.4/dist/xspreadsheet.css',
+            #'https://cdn.jsdelivr.net/npm/x-data-spreadsheet@1.1.4/dist/xspreadsheet.js',
+            'jsdemo/static/src/css/truckingline.css',
+            'jsdemo/static/src/css/spreadsheet.css',
+            'jsdemo/static/src/js/list_view.js',
+        ]},
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
 }
-

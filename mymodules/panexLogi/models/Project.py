@@ -4,12 +4,12 @@ from odoo.exceptions import ValidationError
 
 class Project(models.Model):
     _name = 'panexlogi.project'
-    _description = 'Project'
+    _description = 'panexlogi.project'
     _rec_name = "project_name"
 
     project_name = fields.Char(string='Project Name', required=True)
     project_code = fields.Char(string='Project code', required=True)
-
+    project_type = fields.Many2one('panexlogi.project.type', string='Project Type')
     customer = fields.Many2one('res.partner', string='Partner Name', required=True)
     productids = fields.One2many('panexlogi.project.product', 'projectid', string='Product lines')
     group = fields.Many2one('res.groups', string='Group')
@@ -69,3 +69,12 @@ class ProjectPorductName(models.Model):
     _description = 'Project.productname'
 
     name = fields.Char('Name')
+
+class ProjectType(models.Model):
+    _name = 'panexlogi.project.type'
+    _description = 'Project Type'
+    _rec_name = "name"
+
+    name = fields.Char('Name')
+    remark = fields.Text('Remark')
+    projectid = fields.Many2one('panexlogi.project')

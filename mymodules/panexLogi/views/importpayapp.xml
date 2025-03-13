@@ -79,11 +79,6 @@
                                 string="Cancel"
                                 invisible="state == 'confirm' or state == 'paid' or state == 'cancel'"
                                 class="btn-warning"/>
-                         <button name="action_renew_order"
-                                type="object"
-                                string="Renew"
-                                invisible="state == 'confirm' or state == 'paid' or state == 'new'"
-                                class="btn-success"/>
                          <field
                                 name="state"
                                 widget="statusbar"

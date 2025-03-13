@@ -12,7 +12,15 @@
         </field>
     </record>
 
+    <!-- Trucking Action -->
+        <record id="action_trucking" model="ir.actions.act_window">
+            <field name="name">Trucking Orders</field>
+            <field name="res_model">jsdemo.trucking</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
     <!-- Menu -->
     <menuitem id="jsdemo_root" name="JSDEMO" sequence="1"/>
     <menuitem id="menu_delivery" name="Deliveries" parent="jsdemo_root" action="action_delivery" sequence="2"/>
+    <menuitem id="menu_trucking" name="Trucking Orders" parent="jsdemo_root" action="action_trucking" sequence="3"/>
 </odoo>

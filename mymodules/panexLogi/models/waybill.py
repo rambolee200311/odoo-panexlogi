@@ -27,14 +27,15 @@ class Waybill(models.Model):
         string='Service Type', default="1")
     # project = fields.Char(string='Project（项目）', required=True)
     project = fields.Many2one('panexlogi.project', string='Project（项目）', required=True, tracking=True)
+    project_type = fields.Many2one('panexlogi.project.type', string='Project Type')
     date = fields.Date(string='Date（提单日期）', required=True, tracking=True, default=fields.Date.today)
     week = fields.Integer(string='Week-arrival（周数）', compute='_get_week')
     shipping = fields.Many2one('res.partner', string='Shipping Line', domain=[('shipline', '=', 'True')],
-                               required=True, tracking=True)
+                               tracking=True)
     shipper = fields.Many2one('res.partner', string='Shipper/Exporter',
-                              required=True, tracking=True)
+                               tracking=True)
     consignee = fields.Many2one('res.partner', string='Consignee/Importer',
-                                required=True, tracking=True)
+                                tracking=True)
     pdffile = fields.Binary(string='File（原件）')
     pdffilename = fields.Char(string='File name')
 
@@ -102,6 +103,31 @@ class Waybill(models.Model):
     )
     first_arrivnotice_date = fields.Date(string='First Arrival Notice Date', compute='_compute_first_arrivnotice_date')
     adr = fields.Boolean(string='ADR')
+    remark = fields.Text(string='Remark')
+    '''
+    ETD: 预计离港日期
+    ATD: 实际离港日期
+    ATA: 实际到港日期
+    ETA: 预计到港日期
+    '''
+
+    etd = fields.Date(string='ETD', tracking=True)
+    atd = fields.Date(string='ATD', tracking=True)
+    terminal_d = fields.Char(string='Terminal of Departure', tracking=True)
+    eta = fields.Date(string='ETA', tracking=True)
+    ata = fields.Date(string='ATA', tracking=True, readonly=True)
+    terminal_a = fields.Many2one('panexlogi.terminal', string='Terminal of Arrival', tracking=True)
+    eta_remark = fields.Text(string='ETA Remark')
+    transport_order = fields.One2many('panexlogi.transport.order', 'waybill_billno', string='Transport Order')
+
+    # Autofill project_type when project is selected
+    @api.onchange('project')
+    def _onchange_project(self):
+        for record in self:
+            if record.project:
+                record.project_type = record.project.project_type
+            else:
+                record.project_type = False
 
     @api.depends('arrivnotice_ids.date')
     def _compute_first_arrivnotice_date(self):
@@ -152,6 +178,10 @@ class Waybill(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can cancel New Order"))
             else:
+                if rec.shipinvoice_ids.state != 'cancel':
+                    raise UserError(_("shipping invoice must be cancel first"))
+                if rec.clearinvoice_ids.state != 'cancel':
+                    raise UserError(_("clearance invoice must be cancel first"))
                 rec.state = 'cancel'
                 return True
 
@@ -245,7 +275,7 @@ class Waybill(models.Model):
 
             if record.details_ids:
                 args_list = []
-                iRow = 0;
+                iRow = 0
                 for rec in record.details_ids:
                     args_list.append((0, 0, {
                         'cntrno': rec.cntrno
@@ -254,7 +284,7 @@ class Waybill(models.Model):
 
                 if iRow == 0:
                     raise UserError(_("Please add container details first!"))
-
+                # 更新当前记录的关联字段
                 transport_order_vals = {
                     'waybill_billno': record.id,
                     'project': record.project.id,
@@ -299,6 +329,27 @@ class Waybill(models.Model):
             existing_records = self.search(domain)
             if existing_records:
                 raise UserError(_('waybillno must be unique per Waybill'))
+
+    def unlink(self):
+        for rec in self:
+            if rec.state != 'cancel':
+                raise UserError(_("You can not delete approved or rejected quote, try to cancel it first"))
+            rec.details_ids.unlink()
+            rec.packlist_ids.unlink()
+            rec.arrivnotice_ids.unlink()
+            rec.commeinvoice_ids.unlink()
+            if rec.shipinvoice_ids.state == 'cancel':
+                rec.shipinvoice_ids.unlink()
+            else:
+                raise UserError(_("shipping invoice must be cancel first"))
+            if rec.clearinvoice_ids.state == 'cancel':
+                rec.clearinvoice_ids.unlink()
+            else:
+                raise UserError(_("clearance invoice must be cancel first"))
+            rec.customsduties_ids.unlink()
+            rec.cargorelease_ids.unlink()
+            rec.otherdocs_ids.unlink()
+        return super(Waybill, self).unlink()
 
 
 # 其他附件

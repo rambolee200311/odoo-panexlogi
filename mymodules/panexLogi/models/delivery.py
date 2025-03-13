@@ -3,6 +3,9 @@ import pytz
 
 from odoo import _, models, fields, api, exceptions
 from odoo.exceptions import UserError, ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 # 卡车运单
@@ -58,6 +61,13 @@ class Delivery(models.Model):
     pdffile = fields.Binary(string='POD File')
     pdffilename = fields.Char(string='POD File name')
 
+    need_inform = fields.Boolean(string='Need', default=False)
+    inform_date = fields.Date(string='Date')
+    inform_content = fields.Text(string='Content')
+    inform_receiver = fields.Many2many('res.partner', string='Receivers',
+                                       domain=[('user_ids', '!=', False), ('email', '!=', False)])
+    inform_email_to = fields.Char(compute='_compute_email_to', string="Email To", store=True)
+
     color = fields.Integer()
     state = fields.Selection(
         selection=[
@@ -69,6 +79,7 @@ class Delivery(models.Model):
         string="State",
         tracking=True
     )
+    adr = fields.Boolean(string='ADR')
 
     def action_confirm_order(self):
         for rec in self:
@@ -125,7 +136,92 @@ class Delivery(models.Model):
             extra_cost += r.extra_cost
         self.extra_cost = extra_cost
 
+    # automatically send emails and Odoo messages
+    def _send_inform_content(self):
+        automatically = True
+        self._send_delivery_emails(automatically)
 
+    # get email recipients
+    @api.depends('inform_receiver')
+    def _compute_email_to(self):
+        for record in self:
+            # Filter partners with valid emails
+            valid_partners = record.inform_receiver.filtered(lambda p: p.email)
+            emails = valid_partners.mapped('email')
+            record.inform_email_to = ', '.join(emails) if emails else False  # Set to False if empty
+            _logger.debug('Computed inform_email_to: %s', record.inform_email_to)
+
+    # manually send emails and Odoo messages
+    def send_delivery_emails(self):
+        automatically = False
+        self._send_delivery_emails(automatically)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Delivery Inform Successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+    def _send_delivery_emails(self, automatically=False):
+        now = fields.Date.today()  # UTC-aware
+        tomorrow = now + timedelta(days=1)
+        subject = 'Delivery Inform'
+        # Filter deliveries
+        if automatically:
+            deliveries = self.search([
+                ('inform_date', '<=', tomorrow),  # Use <= for safety
+                ('need_inform', '=', True)
+            ])
+            subject += f'(auto-{now})'
+        else:
+            deliveries = self
+            subject += f'(manu-{now})'
+
+        server_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        current_user_email = self.env.user.email
+        for delivery in deliveries:
+            if delivery.inform_receiver:
+                # template_id = self.env.ref('panexLogi.email_delivery_template_inform_content').id
+                # self.env['mail.template'].browse(template_id).send_mail(delivery.id, force_send=True)
+                bill_url = f'{server_url}/web#id={delivery.id}&model=panexlogi.delivery&view_type=form'
+                logo_url = f'{server_url}/logo.png?company={self.env.user.company_id.id}'
+                content = f'Content:{delivery.inform_content}'
+                # Send email
+                """
+                mail_values = {
+                    'subject': subject,
+                    'email_to': delivery.inform_email_to or 'fallback@example.com',  # Ensure email is set
+                    'body_html': f'''
+                                         <div>
+                                            <p>Please focus on </p>
+                                            <p>Bill No: <a href="{bill_url}">{delivery.billno}</a></p>
+                                            <p>{content}</p>
+                                         </div>   
+                                         <div>
+                                            <p>Best regards,</p>
+                                            <p>{self.env.user.name}</p>
+                                            <img src="{logo_url}" alt="Company Logo" />
+                                         </div>
+                                        ''',
+                    'email_from': current_user_email
+                }
+                self.env['mail.mail'].create(mail_values).send()
+                message_type='comment',
+                """
+                # Send Odoo message
+                delivery.message_post(
+                    body=content,
+                    subject=subject,
+                    partner_ids=delivery.inform_receiver.ids,
+                    message_type='notification',
+                    subtype_xmlid='mail.mt_note',
+                    email_layout_xmlid='mail.mail_notification_light',  # Force email layout
+                    force_send=True,  # Send immediately, bypassing the queue
+                )
 
 
 class DeliveryDetail(models.Model):
@@ -133,6 +229,8 @@ class DeliveryDetail(models.Model):
     _description = 'panexlogi.delivery.detail'
     _inherit = ["mail.thread", "mail.activity.mixin"]
 
+    loading_ref = fields.Char(string='Loading Ref')
+    cntrno = fields.Char('Cantainer No')
     product = fields.Many2one('product.product', 'Product')
     product_name = fields.Char('Product Name', related='product.name', readonly=True)
     qty = fields.Float('Quantity', default=1)
@@ -140,14 +238,15 @@ class DeliveryDetail(models.Model):
     package_size = fields.Char('Size L*W*H')
     weight_per_unit = fields.Float('Weight PER Unit')
     gross_weight = fields.Float('Gross Weight')
-
     uncode = fields.Char('UN CODE')
     class_no = fields.Char('Class')
-    cntrno = fields.Char('Cantainer No')
     deliveryid = fields.Many2one('panexlogi.delivery', 'Delivery ID')
     # 2025018 wangpeng 是否是ADR goods. 点是的话，就必须要填Uncode。 点选否的话，就不用必填UN code.
     adr = fields.Boolean(string='ADR')
     remark = fields.Text('Remark')
+    quote = fields.Float('Quote', default=0)  # 报价
+    additional_cost = fields.Float('Additional Cost', default=0)  # 额外费用
+    extra_cost = fields.Float('Extra Cost', default=0)  # 额外费用
 
     @api.constrains('adr', 'uncode')
     def _check_uncode_required(self):

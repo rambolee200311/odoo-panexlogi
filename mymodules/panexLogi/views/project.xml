@@ -21,10 +21,11 @@
             <form>
                 <sheet>
                     <group string="Main">
+                        <field name="project_type"/>
                         <field name="project_name"/>
                         <field name="project_code"/>
                         <field name="customer"/>
-                        <field name="group"/>
+                        <field name="group" groups="panexLogi.groups_panex_logistic_manager"/>
                     </group>
                     <notebook>
                         <page string="Customs Clearance">
@@ -68,6 +69,20 @@
             </form>
         </field>
     </record>
+    <!--search(List) View-->
+    <record id="project_view_search" model="ir.ui.view">
+        <field name="name">project.search</field>
+        <field name="model">panexlogi.project</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="project_type"/>
+                <field name="project_name"/>
+                <field name="project_code"/>
+                <field name="customer"/>
+                <field name="group"/>
+            </search>
+        </field>
+    </record>
 
     <!--Tree(List) View-->
     <record id="project_view_tree" model="ir.ui.view">
@@ -75,6 +90,7 @@
         <field name="model">panexlogi.project</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="project_type"/>
                 <field name="project_name"/>
                 <field name="project_code"/>
                 <field name="customer"/>
@@ -88,6 +104,7 @@
         <field name="model">panexlogi.project</field>
         <field name="arch" type="xml">
             <kanban>
+                <field name="project_type"/>
                 <field name="project_name"/>
                 <field name="project_code"/>
                 <field name="customer"/>
@@ -122,5 +139,33 @@
                 <field name="remark"/>
             </tree>
         </field>
+    </record>
+    <!--project type search View-->
+    <record id="view_project_type_search" model="ir.ui.view">
+        <field name="name">project.type.search</field>
+        <field name="model">panexlogi.project.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="remark"/>
+            </search>
+        </field>
+    </record>
+    <!--project type treee View-->
+    <record id="view_project_type_tree" model="ir.ui.view">
+        <field name="name">project.type.tree</field>
+        <field name="model">panexlogi.project.type</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="name"/>
+                <field name="remark"/>
+            </tree>
+        </field>
+    </record>
+    <!--project type action-->
+    <record id="action_project_type" model="ir.actions.act_window">
+        <field name="name">Project Types</field>
+        <field name="res_model">panexlogi.project.type</field>
+        <field name="view_mode">tree,form</field>
     </record>
 </odoo>

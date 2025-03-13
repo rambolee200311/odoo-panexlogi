@@ -111,6 +111,8 @@ class WaybillClearInvoice(models.Model):
 
         # Create PaymentApplication
         for record in self:
+            if not record.payee.id:
+                raise UserError(_("Please select a Payee"))
             # Create PaymentApplication
             payment_application = self.env['panexlogi.finance.paymentapplication'].create({
                 'date': fields.Date.today(),

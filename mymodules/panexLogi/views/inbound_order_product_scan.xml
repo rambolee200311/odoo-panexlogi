@@ -32,8 +32,6 @@
                             <field name="palletdno"/>
                             <field name="sncode"/>
                             <field name="inbound_order_products_id"/>
-                            <field name="be_del"/>
-                            <field name="ori_pda_id"/>
                         </group>
                     </sheet>
                 </form>
@@ -58,8 +56,6 @@
                     <field name="palletdno"/>
                     <field name="sncode"/>
                     <field name="inbound_order_products_id"/>
-                    <field name="be_del"/>
-                    <field name="ori_pda_id"/>
                 </tree>
             </field>
         </record>

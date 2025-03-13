@@ -1,0 +1,36 @@
+/* File: static/src/css/spreadsheet.css */
+.o_list_view .o_list_table td {
+    border: 1px solid #dee2e6 !important;
+    vertical-align: middle;
+    padding: 8px !important;
+}
+
+.o_list_view .o_list_table th {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6 !important;
+    padding: 10px !important;
+}
+
+.o_list_view .o_selected_row td {
+    background-color: #e9f5ff !important;
+}
+
+.o_list_view .o_selected_row {
+    background-color: #e9f5ff !important;
+    transition: background-color 0.3s;
+}
+
+.paste-feedback {
+    position: absolute;
+    background: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    animation: fadeOut 2s forwards;
+    animation-delay: 1s;
+}
+
+@keyframes fadeOut {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}

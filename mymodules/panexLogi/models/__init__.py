@@ -48,3 +48,4 @@ from . import transportorder
 from . import transportinvoice
 from . import Payment
 from . import deliveryinvoice
+from . import warehouse_invoice

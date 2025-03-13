@@ -15,7 +15,7 @@ class Partner(models.Model):
     agency = fields.Boolean("Agency（代理）", default=False)
 
 
-class ProductTemplate(models.Model):
+class Product(models.Model):
     _inherit = 'product.template'
 
     code = fields.Char(string='Code')
