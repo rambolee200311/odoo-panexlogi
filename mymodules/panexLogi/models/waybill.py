@@ -33,7 +33,7 @@ class Waybill(models.Model):
     shipping = fields.Many2one('res.partner', string='Shipping Line', domain=[('shipline', '=', 'True')],
                                tracking=True)
     shipper = fields.Many2one('res.partner', string='Shipper/Exporter',
-                               tracking=True)
+                              tracking=True)
     consignee = fields.Many2one('res.partner', string='Consignee/Importer',
                                 tracking=True)
     pdffile = fields.Binary(string='File（原件）')
@@ -278,7 +278,8 @@ class Waybill(models.Model):
                 iRow = 0
                 for rec in record.details_ids:
                     args_list.append((0, 0, {
-                        'cntrno': rec.cntrno
+                        'cntrno': rec.cntrno,
+                        'uncode': rec.uncode,
                     }))
                     iRow += 1
 
@@ -291,8 +292,49 @@ class Waybill(models.Model):
                     'date': fields.Date.today(),
                     'state': 'new',
                     'transportorderdetailids': args_list,
+                    'adr': record.adr,
                 }
-                self.env['panexlogi.transport.order'].create(transport_order_vals)
+                try:
+                    # 创建运输单
+                    transport_order = self.env['panexlogi.transport.order'].create(transport_order_vals)
+                except Exception as e:
+                    raise UserError(f"Failed to create transport order: {e}")
+
+                # Send Odoo message
+                subject = 'Transport Order'
+                # Get base URL
+                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                # Construct URL to transport order
+                transport_order_url = "{}/web#id={}&model=panexlogi.transport.order&view_type=form".format(base_url,
+                                                                                                           transport_order.id)
+                transport_order_code = transport_order.billno
+                #content = 'Transport order: <a href="{}">{}</a> created successfully!'.format(transport_order_url,
+                #                                                                              transport_order.billno)
+
+                # HTML content with button styling
+                content = f'''
+                <p>Hello,</p>
+                <p>A new transport order has been created:</p>                                
+                <p>Click the button above to access the details.</p>
+                '''
+
+                # Get users in the Transport group
+                group = self.env['res.groups'].search([('name', '=', 'Transport')], limit=1)
+                users = self.env['res.users'].search([('groups_id', '=', group.id)])
+                # Get partner IDs from users
+                partner_ids = users.mapped("partner_id").ids
+                # Add Transport group users as followers
+                transport_order.message_subscribe(partner_ids=partner_ids)
+                # Send message
+                transport_order.message_post(
+                    body=content,
+                    subject=subject,
+                    message_type='notification',
+                    subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                    body_is_html=True,  # Render HTML in email
+                    force_send=True,
+                )
+
                 return {
                     'type': 'ir.actions.client',
                     'tag': 'display_notification',

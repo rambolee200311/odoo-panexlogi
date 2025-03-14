@@ -59,6 +59,7 @@ class TransportOrder(models.Model):
         tracking=True
     )
     arrived_date = fields.Date(string='Arrived Date')
+    adr = fields.Boolean(string='ADR')
 
     def action_confirm_order(self):
         for rec in self:
@@ -92,7 +93,9 @@ class TransportOrder(models.Model):
         times = fields.Date.today()
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.transport.order', times)
         values['state'] = 'new'
+
         return super(TransportOrder, self).create(values)
+
 
     # 发邮件给卡车公司
     def action_send_email(self):
@@ -188,6 +191,7 @@ class TransportOrderDetail(models.Model):
     _description = 'panexlogi.transport.order.detail'
 
     cntrno = fields.Char(string='Container NO')
+    uncode = fields.Char('UN CODE')
     coldate = fields.Date(string='Collection Date')
     warehouse = fields.Many2one('stock.warehouse', string='Unloaded Warehouse')
     warehouse_code = fields.Char(string='Warehouse Code', related='warehouse.code', readonly=True)

@@ -25,10 +25,10 @@ class DeliveryQuote(models.Model):
     load_address = fields.Char(string='Load Address', related='delivery_id.load_address', readonly=True)
     unload_address = fields.Char(string='Unload Address', related='delivery_id.unload_address', readonly=True)
 
-    charged = fields.Float('Charged', default=0)  # 收费
-    quote = fields.Float('Quote', default=0)  # 报价
-    additional_cost = fields.Float('Additional Cost', default=0)  # 额外费用
-    extra_cost = fields.Float('Extra Cost', default=0)  # 额外费用
+    charged = fields.Float('Charged', default=0, readonly=True)  # 收费
+    quote = fields.Float('Quote', default=0, readonly=True)  # 报价
+    additional_cost = fields.Float('Additional Cost', default=0, readonly=True)  # 额外费用
+    extra_cost = fields.Float('Extra Cost', default=0, readonly=True)  # 额外费用
     profit = fields.Float('Profit', default=0, readonly=True)  # 利润
 
     trucker = fields.Many2one('res.partner', string='Trucker', domain=[('truck', '=', 'True')])
@@ -131,6 +131,12 @@ class DeliveryQuote(models.Model):
     def on_unlink(self):
         if self.state != 'cancel':
             raise UserError(_("You can not delete approved or rejected quote, try to cancel it first"))
+
+    @api.onchange('deliverydetailids')
+    def _onchange_deliverydetailids(self):
+        self.quote = sum([line.quote for line in self.deliverydetailids])
+        self.additional_cost = sum([line.additional_cost for line in self.deliverydetailids])
+        self.extra_cost = sum([line.extra_cost for line in self.deliverydetailids])
 
 
 class DeliveryQuotDetail(models.Model):

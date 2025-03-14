@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="cntrno"/>
+                <field name="uncode"/>
                 <field name="cntrnum"/>
                 <field name="note"/>
 <!--                <field name="shipping"/>-->
@@ -19,6 +20,7 @@
         <field name="arch" type="xml">
             <tree string="Waybill_details_Tree">
                 <field name="cntrno"/>
+                <field name="uncode"/>
                 <field name="pallets"/>
                 <field name="cntrnum"/>
                 <field name="note"/>
@@ -39,6 +41,7 @@
                     </div>
                     <group>
                         <field name="cntrno"/>
+                        <field name="uncode"/>
                         <field name="pallets"/>
                         <field name="cntrnum"/>
                         <field name="note"/>

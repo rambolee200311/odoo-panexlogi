@@ -57,6 +57,7 @@ class Delivery(models.Model):
     deliverydetatilids = fields.One2many('panexlogi.delivery.detail', 'deliveryid', 'Delivery Detail')
     deliveryquoteids = fields.One2many('panexlogi.delivery.quote', 'delivery_id', 'Delivery Quote')
     deliverystatusids = fields.One2many('panexlogi.delivery.status', 'delivery_id', 'Delivery Status')
+    deliveryotherdocsids = fields.One2many('panexlogi.delivery.otherdocs', 'billno', 'Other Docs')
 
     pdffile = fields.Binary(string='POD File')
     pdffilename = fields.Char(string='POD File name')
@@ -117,7 +118,26 @@ class Delivery(models.Model):
         """
         times = fields.Date.today()
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.delivery', times)
-        return super(Delivery, self).create(values)
+        delivery_request = super(Delivery, self).create(values)
+        # Add followers after creation
+        # Get Transport group users via XML ID (replace with your actual XML ID)
+        transport_group = self.env['res.groups'].search([('name', '=', 'Transport')], limit=1)
+        users = self.env['res.users'].search([('groups_id', '=', transport_group.id)])
+        partner_ids = users.mapped('partner_id').ids
+        # Subscribe followers to the record
+        if partner_ids:
+            delivery_request.message_subscribe(partner_ids=partner_ids)
+        return delivery_request
+
+    def write(self, vals):
+        # Notify the creator when tracked fields change
+        quote_tracked_fields = {'deliveryquoteids', 'billno'}
+        if quote_tracked_fields.intersection(vals.keys()):
+            self._send_inform_quote_content()
+        status_tracked_fields = {'deliverystatusids', 'delivery_id'}
+        if status_tracked_fields.intersection(vals.keys()):
+            self._send_inform_status_content()
+        return super(Delivery, self).write(vals)
 
     # 跳转wizard视图
     def add_delivery_status(self):
@@ -135,6 +155,40 @@ class Delivery(models.Model):
         for r in self.deliverystatusids:
             extra_cost += r.extra_cost
         self.extra_cost = extra_cost
+
+    # automatically send Odoo messages when quote is created
+    def _send_inform_quote_content(self):
+        for record in self:
+            subject = 'Delivery Quote Submitted'
+            content = f'Delivery Quote has been submitted for {record.billno}.'
+            # Get the creator's partner ID
+            creator_partner = record.create_uid.partner_id
+            record.message_post(
+                body=content,
+                subject=subject,
+                partner_ids=[creator_partner.id],  # Notify only the creato
+                message_type='notification',
+                subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                body_is_html=True,  # Render HTML in email
+                force_send=True,
+            )
+
+    # automatically send Odoo messages when status is created
+    def _send_inform_status_content(self):
+        for record in self:
+            subject = 'Delivery Status Updated'
+            content = f'Delivery Status has been updated for {record.billno}.'
+            # Get the creator's partner ID
+            creator_partner = record.create_uid.partner_id
+            record.message_post(
+                body=content,
+                subject=subject,
+                partner_ids=[creator_partner.id],  # Notify only the creato
+                message_type='notification',
+                subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                body_is_html=True,  # Render HTML in email
+                force_send=True,
+            )
 
     # automatically send emails and Odoo messages
     def _send_inform_content(self):
@@ -222,6 +276,46 @@ class Delivery(models.Model):
                     email_layout_xmlid='mail.mail_notification_light',  # Force email layout
                     force_send=True,  # Send immediately, bypassing the queue
                 )
+    # 2025018 wangpeng pod reminder
+    @api.model
+    def _cron_check_pod_reminder(self):
+        """Check for overdue deliveries and send reminders."""
+        try:
+            deadline = fields.Datetime.now() - timedelta(days=14)
+            overdue_deliveries = self.search([
+                ('planned_for_unloading', '<=', deadline),
+                ('pdffile', '=', False),
+            ])
+            # template = self.env['mail.template'].search([('name', '=', 'Panex POD Reminder')], limit=1)
+            if overdue_deliveries:
+                # ✅ Fix: Do NOT return the list from send_mail()
+                #template.send_mail(overdue_deliveries.ids, force_send=True)
+                #_logger.info(f"Sent reminders for {len(overdue_deliveries)} deliveries.")
+                # Get users in the Finance group
+                group = self.env['res.groups'].search([('name', '=', 'Transport')], limit=1)
+                users = self.env['res.users'].search([('groups_id', '=', group.id)])
+                # Get partner IDs from users
+                partner_ids = users.mapped("partner_id").ids
+                # Send reminders one by one
+                for delivery in overdue_deliveries:
+                    message = (
+                        f"⚠️ <strong>POD Missing Reminder</strong><br/>"
+                        f"Delivery {delivery.billno} has no POD uploaded. "
+                        f"Planned unloading date was {delivery.planned_for_unloading}.<br/>"
+                        f"<i>This is an automated reminder.</i>"
+                    )
+                    delivery.message_post(
+                        subject="POD Missing Reminder",
+                        body=message,
+                        partner_ids=partner_ids,
+                        message_type='notification',
+                        subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                        body_is_html=True,  # Render HTML in email
+                        force_send=True,
+                    )
+        except Exception as e:
+            _logger.error(f"Error in POD reminder: {str(e)}")
+        return  # Explicitly return None
 
 
 class DeliveryDetail(models.Model):
@@ -316,3 +410,13 @@ class DeliveryStatusWizard(models.TransientModel):
         self.env['panexlogi.delivery'].sudo().search(domain)._get_extra_cost()
         self.env['panexlogi.delivery'].sudo().search(domain)._onchange_profit()
         return {'type': 'ir.actions.act_window_close'}
+
+
+class DeliveryOtherDocs(models.Model):
+    _name = 'panexlogi.delivery.otherdocs'
+    _description = 'panexlogi.delivery.otherdocs'
+
+    description = fields.Text(string='Description')
+    file = fields.Binary(string='File')
+    filename = fields.Char(string='File name')
+    billno = fields.Many2one('panexlogi.delivery', string='Delivery ID')

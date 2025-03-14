@@ -99,11 +99,25 @@ class DeliveryInvoice(models.Model):
         确认
         """
         if self.state == 'new':
-
             # check combination of truckco and inner ref is exist in delivery order,and write check_message ,check is false
             for record in self.deliveryinvoicedetailids:
-                domain = [('deliveryid.trucker', '=', self.truckco.id), ('cntrno', '=', record.inner_ref)]
-                if self.env['panexlogi.delivery.detail'].search_count(domain) == 0:
+                bcheck = False
+                inner_ref = record.inner_ref
+                parts = inner_ref.split('-')  # 例如 '123-abc' → ['123', 'abc']
+
+                # 构建动态条件
+                domain = [
+                    ('deliveryid.trucker', '=', self.truckco.id),
+                    '|',  # OR 连接 loading_ref 和 cntrno 的条件
+                    '|',  # OR 连接所有 parts 的条件
+                    *[('loading_ref', 'ilike', part) for part in parts],  # 检查 loading_ref 包含任意 part
+                    *[('cntrno', 'ilike', part) for part in parts],  # 检查 cntrno 包含任意 part
+                ]
+
+                if self.env['panexlogi.delivery.detail'].search_count(domain) > 0:
+                    bcheck = True
+
+                if not bcheck:
                     record.check = False
                     record.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
                     self.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'

@@ -11,9 +11,10 @@ class WaybillDetails(models.Model):
     _description = 'panexlogi.waybill.details'
     _inherit = ["mail.thread", "mail.activity.mixin"]
 
+    uncode = fields.Char('UN CODE')
     cntrno = fields.Char(string='Container No')
     cntrnum = fields.Integer(string='Contrainer Num', default=1)
-    pallets = fields.Float(string='Pallets',default=26)
+    pallets = fields.Float(string='Pallets', default=26)
     note = fields.Text(string='Note')
 
     waybill_billno = fields.Many2one('panexlogi.waybill')
@@ -29,3 +30,9 @@ class WaybillDetails(models.Model):
         string="State",
         tracking=True
     )
+    #check if waybill_billno.adr=ture then uncode is required
+    @api.constrains('uncode')
+    def _check_uncode(self):
+        for rec in self:
+            if rec.waybill_billno.adr and not rec.uncode:
+                raise UserError(_("UN Code is required!"))

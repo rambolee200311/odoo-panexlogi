@@ -106,6 +106,7 @@
                             <group>
                                 <field name="date"/>
                                 <field name="project" readonly="True"/>
+                                <field name="adr"/>
                             </group>
                             <group>
                                 <field name="waybill_billno" readonly="True"/>
@@ -129,6 +130,7 @@
                                 <field name="transportorderdetailids" readonly="state!='new'">
                                     <tree editable="bottom">
                                         <field name="cntrno"/>
+                                        <field name="uncode"/>
                                         <field name="remark"/>
                                         <field name="coldate"/>
                                         <field name="warehouse"/>

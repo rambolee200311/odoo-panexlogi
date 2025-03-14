@@ -210,6 +210,9 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Other Documents">
+                            <field name="deliveryotherdocsids"/>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
@@ -295,4 +298,36 @@
             </form>
         </field>
     </record>
+    <!-- otherdoc tree View -->
+        <record id="view_tree_delivery_otherdocs" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.otherdocs.tree</field>
+            <field name="model">panexlogi.delivery.otherdocs</field>
+            <field name="arch" type="xml">
+                <tree string="Other Documents">
+                    <field name="description"/>
+                    <field name="file"  filename="filename"/>
+                    <field name="filename" invisible="True"/>
+                    <!--<field name="waybill_billno"/>-->
+                </tree>
+            </field>
+        </record>
+
+        <!-- otherdoc form View -->
+        <record id="view_form_delivery_otherdocs" model="ir.ui.view">
+            <field name="name">panexlogi.delivery.otherdocs.form</field>
+            <field name="model">panexlogi.delivery.otherdocs</field>
+            <field name="arch" type="xml">
+                <form string="Other Documents">
+                    <sheet>
+                        <group>
+                            <field name="description"/>
+                            <field name="file"  filename="filename"/>
+                            <field name="filename" invisible="True"/>
+                            <field name="billno"  readonly="True"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
 </odoo>

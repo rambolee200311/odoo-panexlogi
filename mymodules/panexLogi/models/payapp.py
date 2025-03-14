@@ -253,11 +253,11 @@ class PaymentApplicationLine(models.Model):
 class ImportPaymentApplication(models.Model):
     _inherit = 'panexlogi.finance.paymentapplication'
 
-    waybill_billno = fields.Many2one('panexlogi.waybill')
+    waybill_billno = fields.Many2one('panexlogi.waybill', readonly=True)
 
 
 # 卡车付款申请
 class CartagePaymentApplicationLine(models.Model):
     _inherit = 'panexlogi.finance.paymentapplicationline'
 
-    cartagebillno = fields.Many2one('panexlogi.cartage')
+    cartagebillno = fields.Many2one('panexlogi.cartage', readonly=True)

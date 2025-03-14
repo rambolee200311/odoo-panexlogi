@@ -142,6 +142,38 @@ class WaybillShipInvoice(models.Model):
                         'project': record.project.id,
                     })
             record.state = 'apply'
+            # Send Odoo message
+            subject = 'Payment Application Created'
+            # Get base URL
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            # Construct URL to transport order
+            transport_order_url = "{}/web#id={}&model=panexlogi.finance.paymentapplication&view_type=form".format(base_url,
+                                                                                                       payment_application.id)
+            #content = 'Transport order: <a href="{}">{}</a> created successfully!'.format(transport_order_url,
+            #                                                                              payment_application.billno)
+            # HTML content with button styling
+            content = f'''
+                        <p>Hello,</p>
+                        <p>A new Payment application has been created:</p>                                
+                        <p>Click the button above to access the details.</p>
+                        '''
+            # Get users in the Finance group
+            group = self.env['res.groups'].search([('name', '=', 'Finance')], limit=1)
+            users = self.env['res.users'].search([('groups_id', '=', group.id)])
+            # Get partner IDs from users
+            partner_ids = users.mapped("partner_id").ids
+            # Add Transport group users as followers
+            payment_application.message_subscribe(partner_ids=partner_ids)
+            # Send message
+            payment_application.message_post(
+                body=content,
+                subject=subject,
+                message_type='notification',
+                subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                body_is_html=True,  # Render HTML in email
+                force_send=True,
+            )
+
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
