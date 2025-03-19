@@ -65,9 +65,16 @@ class Payment(models.Model):
     billno = fields.Char(string='Code', readonly=True)
     type = fields.Char(string='Type', readonly=True, default='Import')
     payee = fields.Many2one('res.partner', string='Payee（收款方）',
-                            required=True, tracking=True)
-    payee_bank = fields.Char(string='Bank（收款方银行）', tracking=True)
+                            required=True, tracking=True, readonly=True)
+    # payee_bank =fields.Char(string='Bank（收款方银行）', tracking=True)
     payee_account = fields.Char(string='Account（收款方账号）', tracking=True)
+    payee_account_partner = fields.Many2one('res.partner.bank', string='Account（收款方账号）', tracking=True,
+                                            domain="[('partner_id', '=', payee)]")
+    payee_account_number = fields.Char(string='IBAN（收款方账号IBAN）', related='payee_account_partner.acc_number',
+                                       readonly=True)
+    payee_bank_bic = fields.Char(string='Bank BIC（收款方银行BIC）', related='payee_account_partner.bank_bic',
+                                 readonly=True)
+
     payer = fields.Char(string='Payer（付款方）', tracking=True)
     payer_bank = fields.Char(string='Bank（付款方银行）', tracking=True)
     payer_account = fields.Char(string='Account（付款方账号）', tracking=True)
@@ -183,9 +190,7 @@ class Payment(models.Model):
     can_unlink = fields.Boolean(string='Can Unlink', compute='_compute_can_unlink', store=True)
 
 
-
-
-#付款单明细
+# 付款单明细
 class PaymentLine(models.Model):
     _name = 'panexlogi.finance.payment.line'
     _description = 'panexlogi.finance.payment.line'

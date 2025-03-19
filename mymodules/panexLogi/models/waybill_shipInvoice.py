@@ -171,9 +171,8 @@ class WaybillShipInvoice(models.Model):
                 message_type='notification',
                 subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
                 body_is_html=True,  # Render HTML in email
-                force_send=True,
             )
-
+            #force_send=True,
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',

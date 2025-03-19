@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 import pytz
-
+import logging
 from odoo import _, models, fields, api
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 # 提单
@@ -273,12 +275,16 @@ class Waybill(models.Model):
                     [('waybill_billno', '=', record.id), ('state', '!=', 'cancel')]):
                 raise UserError(_("Transport order already exists"))
 
+            if not record.details_ids:
+                raise UserError(_("Please add container details first!"))
+
             if record.details_ids:
                 args_list = []
                 iRow = 0
                 for rec in record.details_ids:
                     args_list.append((0, 0, {
                         'cntrno': rec.cntrno,
+                        'pallets': rec.pallets,
                         'uncode': rec.uncode,
                     }))
                     iRow += 1
@@ -293,12 +299,16 @@ class Waybill(models.Model):
                     'state': 'new',
                     'transportorderdetailids': args_list,
                     'adr': record.adr,
+
                 }
                 try:
                     # 创建运输单
                     transport_order = self.env['panexlogi.transport.order'].create(transport_order_vals)
                 except Exception as e:
                     raise UserError(f"Failed to create transport order: {e}")
+
+
+
 
                 # Send Odoo message
                 subject = 'Transport Order'
@@ -308,7 +318,7 @@ class Waybill(models.Model):
                 transport_order_url = "{}/web#id={}&model=panexlogi.transport.order&view_type=form".format(base_url,
                                                                                                            transport_order.id)
                 transport_order_code = transport_order.billno
-                #content = 'Transport order: <a href="{}">{}</a> created successfully!'.format(transport_order_url,
+                # content = 'Transport order: <a href="{}">{}</a> created successfully!'.format(transport_order_url,
                 #                                                                              transport_order.billno)
 
                 # HTML content with button styling
@@ -334,6 +344,7 @@ class Waybill(models.Model):
                     body_is_html=True,  # Render HTML in email
                     force_send=True,
                 )
+                #force_send=True,
 
                 return {
                     'type': 'ir.actions.client',
@@ -392,6 +403,50 @@ class Waybill(models.Model):
             rec.cargorelease_ids.unlink()
             rec.otherdocs_ids.unlink()
         return super(Waybill, self).unlink()
+
+    @api.model
+    def cron_check_eta_reminder(self):
+        """Check for eta."""
+        # Set a deadline of 7 days ago
+        deadline = fields.Date.today() - timedelta(days=7)
+        domain = [('eta', '<=', deadline),
+                  ('state', '!=', 'cancel'),
+                  ('cargorelease_ids', '=', False)]
+        waybills = self.search(domain)
+        try:
+            for record in waybills:
+                if record.eta and record.eta <= deadline:
+                    # Get the project group
+                    # project_group = record.project.group
+                    # users = self.env['res.users'].search([('groups_id', '=', project_group.id)])
+                    # users = self.env['res.users'].search([('name', '=', '163com-Demo')])
+                    # partner_ids = users.mapped("partner_id").ids
+                    # partner_ids=self.env['res.users'].search([('groups_id', '=', record.project.group.id)]).mapped("partner_id").ids,
+                    record.message_subscribe(
+                        partner_ids=self.env['res.users'].search([('groups_id', '=', record.project.group.id)]).mapped(
+                            "partner_id").ids)
+                    subject = 'ETA Reminder'
+                    content = (
+                        f"⚠️ <strong>ETA Reminder</strong><br/>"
+                        f"Please prepare the documents for releasing.<br/>"
+                        f"The ETA is {record.eta}'.<br/>"
+                        f"<i>This is an automated reminder.</i>")
+                    record.message_post(
+                        body=content,
+                        subject=subject,
+                        message_type='notification',
+                        subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                        body_is_html=True,  # Render HTML in email
+                        force_send=True,
+                    )
+        except Exception as e:
+            _logger.error(f"Error in ETA reminder: {str(e)}")
+        return  # Explicitly return None
+    # UI button for the current record
+    def button_check_eta_reminder(self):
+        """Called via the UI button for the current record."""
+        self.ensure_one()  # Ensure only one record is processed
+        self.cron_check_eta_reminder()  # Reuse the cron logic
 
 
 # 其他附件

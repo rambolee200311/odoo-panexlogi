@@ -183,9 +183,14 @@ class PaymentApplication(models.Model):
                 raise UserError("Please select the record which had not created payment.")
 
         # Create a new payment (you can customize this logic as needed)
+        panex_partner = self.env['res.partner.bank'].search([('partner_id', '=', payee.id)], limit=1)
+        # Initialize with empty strings to avoid KeyErrors
+        bankid = panex_partner.id if panex_partner else 0
+
         new_payment = self.env['panexlogi.finance.payment'].create({
             'type': 'payment',  # Example: Outbound payment
             'payee': payee.id,
+            'payee_account_partner': bankid,
             'pay_date': fields.Date.today(),
         })
         for application in selected_applications:

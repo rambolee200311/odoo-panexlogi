@@ -75,7 +75,7 @@
                 <field name="date"/>
                 <field name="project"/>
                 <field name="invno"/>
-                <field name="pdffile"/>
+                <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                 <field name="pdffilename" invisible="True"/>
                 <field name="state"/>
             </tree>
@@ -138,7 +138,7 @@
 <!--                        <field name="shipping_name"/>-->
                         <field name="date" readonly="state!='new'"/>
                         <field name="invno" readonly="state!='new'"/>
-                        <field name="pdffile" filename="pdffilename" readonly="state!='new'"/>
+                        <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                         <field name="pdffilename" invisible="True"/>
                     </group>
                     <!--<notebook>

@@ -39,7 +39,7 @@
                     <field name="date"/>
                     <field name="total_amount"/>
                     <field name="remark"/>
-                    <field name="pdffile" filename="pdffilename"/>
+                    <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                     <field name="pdffilename" invisible="True"/>
                 </tree>
             </field>
@@ -110,7 +110,7 @@
                                 <field name="invoice_date"/>
                                 <field name="due_date"/>
                                 <field name="remark"/>
-                                <field name="pdffile" filename="pdffilename"/>
+                                <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                                 <field name="pdffilename" invisible="True"/>
                             </group>
                         </group>
@@ -124,7 +124,7 @@
                                         <field name="fitem_name"/>
                                         <field name="amount"/>
                                         <field name="remark"/>
-                                        <field name="pdffile" filename="pdffilename"/>
+                                        <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                                         <field name="pdffilename" invisible="True"/>
                                     </tree>
                                 </field>
@@ -135,7 +135,7 @@
                                     <field name="pay_amount"/>
                                     <field name="pay_amount_usd"/>
                                     <field name="pay_remark"/>
-                                    <field name="pay_pdffile" filename="pay_pdffilename"/>
+                                    <field name="pay_pdffile" filename="pay_pdffilename" widget="binary_filename"/>
                                     <field name="pay_pdffilename" invisible="True"/>
                                 </group>
                             </page>

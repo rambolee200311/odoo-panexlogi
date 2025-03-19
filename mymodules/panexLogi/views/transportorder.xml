@@ -102,64 +102,68 @@
                                 <field name="billno"/>
                             </h2>
                         </div>
-                        <group string="Main" col="2">
+                        <group string="Main" col="2" >
                             <group>
-                                <field name="date"/>
+                                <field name="date" readonly="state!='new'"/>
+                                <field name="issue_date" readonly="state!='new'"/>
                                 <field name="project" readonly="True"/>
-                                <field name="adr"/>
+                                <field name="adr" readonly="state!='new'"/>
                             </group>
                             <group>
                                 <field name="waybill_billno" readonly="True"/>
-                                <field name="waybillno"/>
+                                <field name="waybillno" readonly="state!='new'"/>
                             </group>
                         </group>
                         <group col="2">
                             <group string="Truck" col="2">
-                                <field name="truckco"/>
-                                <field name="truckco_code"/>
-                                <field name="cargodesc"/>
+                                <field name="truckco" readonly="state!='new'"/>
+                                <field name="truckco_code" readonly="state!='new'"/>
+                                <field name="cargodesc" readonly="state!='new'"/>
                             </group>
                             <group col="2">
-                                <field name="special_instructions"/>
-                                <field name="additional_comments"/>
+                                <field name="special_instructions" readonly="state!='new'"/>
+                                <field name="additional_comments" readonly="state!='new'"/>
                                 <field name="remark"/>
                             </group>
                         </group>
                         <notebook>
                             <page string="Container NO">
                                 <field name="transportorderdetailids" readonly="state!='new'">
-                                    <tree editable="bottom">
-                                        <field name="cntrno"/>
-                                        <field name="uncode"/>
-                                        <field name="remark"/>
-                                        <field name="coldate"/>
-                                        <field name="warehouse"/>
-                                        <field name="warehouse_code"/>
-                                        <field name="unlolocation"/>
-                                        <field name="unlodate"/>
-                                        <field name="dropterminal"/>
-                                        <field name="dropterminal_code"/>
-                                        <field name="drop_off_planned_date"/>
-                                        <field name="state"/>
-                                        <field name="arrived_date"/>
-                                    </tree>
+                                    <!--<tree  readonly="state!='new'" >
+                                        <field name="cntrno" readonly="state!='new'"/>
+                                        <field name="pallets" readonly="state!='new'"/>
+                                        <field name="uncode" readonly="state!='new'"/>
+                                        <field name="remark" readonly="state!='new'"/>
+                                        <field name="coldate" readonly="state!='new'"/>
+                                        <field name="warehouse" readonly="state!='new'"/>
+                                        <field name="warehouse_code" readonly="state!='new'"/>
+                                        <field name="unlolocation" readonly="state!='new'"/>
+                                        <field name="unlodate" readonly="state!='new'"/>
+                                        <field name="dropterminal" readonly="state!='new'"/>
+                                        <field name="dropterminal_code" readonly="state!='new'"/>
+                                        <field name="drop_off_planned_date" readonly="state!='new'"/>
+                                        <field name="state" readonly="True"/>
+                                        <field name="arrived_date" readonly="True"/>
+                                        <field name="cmr_file" filename="cmr_filename" readonly="False"/>
+                                        <field name="cmr_filename" invisible="True"/>
+                                    </tree> -->
                                 </field>
                             </page>
                             <page string="Location">
                                 <group col="2">
                                     <group>
-                                        <field name="collterminal"/>
-                                        <field name="collterminal_code"/>
-                                        <field name="coldate"/>
-                                        <field name="warehouse"/>
-                                        <field name="warehouse_code"/>
+                                        <field name="collterminal" readonly="state!='new'"/>
+                                        <field name="collterminal_code" readonly="state!='new'"/>
+                                        <field name="coldate" readonly="state!='new'"/>
+                                        <field name="warehouse" readonly="state!='new'"/>
+                                        <field name="warehouse_code" readonly="state!='new'"/>
                                     </group>
                                     <group>
-                                        <field name="unlolocation"/>
-                                        <field name="unlodate"/>
-                                        <field name="dropterminal"/>
-                                        <field name="dropterminal_code"/>
-                                        <field name="drop_off_planned_date"/>
+                                        <field name="unlolocation" readonly="state!='new'"/>
+                                        <field name="unlodate" readonly="state!='new'"/>
+                                        <field name="dropterminal" readonly="state!='new'"/>
+                                        <field name="dropterminal_code" readonly="state!='new'"/>
+                                        <field name="drop_off_planned_date" readonly="state!='new'"/>
                                     </group>
                                 </group>
                             </page>
@@ -216,7 +220,7 @@
             <field name="arch" type="xml">
                 <tree string="Other Documents">
                     <field name="description"/>
-                    <field name="file"  filename="filename"/>
+                    <field name="file"  filename="filename" widget="binary_filename"/>
                     <field name="filename" invisible="True"/>
                     <!--<field name="waybill_billno"/>-->
                 </tree>
@@ -232,7 +236,7 @@
                     <sheet>
                         <group>
                             <field name="description"/>
-                            <field name="file"  filename="filename"/>
+                            <field name="file" filename="filename" widget="binary_filename"/>
                             <field name="filename" invisible="True"/>
                             <field name="billno"  readonly="True"/>
                         </group>
@@ -250,6 +254,8 @@
                         <field name="arrived_date"/>
                         <field name="billno" context="{'default_billno': active_id}" readonly="True"/>
                         <field name="cntrnos" widget="many2many_tags" context="{'default_billno': active_id}"/>
+                        <field name="cmr_file" filename="cmr_filename"/>
+                        <field name="cmr_filename" invisible="True"/>
                     </group>
                     <footer>
                         <button string="Apply" type="object" name="apply_changes" class="btn-primary"/>
@@ -265,6 +271,71 @@
             <field name="view_mode">form</field>
             <field name="target">new</field>
             <field name="context">{'active_id': active_id}</field>
+        </record>
+        <!-- transport order detail treee-->
+        <record id="transport_order_detail_tree_view" model="ir.ui.view">
+            <field name="name">panexlogi.transport.order.detail.tree</field>
+            <field name="model">panexlogi.transport.order.detail</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="cntrno" string="Container NO"/>
+                    <field name="pallets"/>
+                    <field name="uncode" string="UN Code"/>
+                    <field name="coldate" string="Collection Date"/>
+                    <field name="warehouse" string="Warehouse"/>
+                    <field name="unlolocation" string="Unload Location"/>
+                    <field name="unlodate" string="Unload Date"/>
+                    <field name="dropterminal" string="Drop-off Terminal"/>
+                    <field name="drop_off_planned_date"/>
+                    <field name="state" string="Status"/>
+                    <field name="cmr_file" filename="cmr_filename"
+                           string="CMR File"
+                           widget="binary_filename"/>
+                    <field name="cmr_filename" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        <!-- transport order detail form-->
+        <record id="transport_order_detail_form_view" model="ir.ui.view">
+            <field name="name">panexlogi.transport.order.detail.form</field>
+            <field name="model">panexlogi.transport.order.detail</field>
+            <field name="arch" type="xml">
+                <form>
+                    <head>
+                        <field name="state"  widget="statusbar" statusbar_visible="new,arrived"/>
+                    </head>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="cntrno"/>
+                                <field name="pallets"/>
+                                <field name="uncode"/>
+                                <field name="coldate"/>
+                                <field name="warehouse"/>
+                                <field name="warehouse_code" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="unlolocation"/>
+                                <field name="unlodate"/>
+                                <field name="dropterminal"/>
+                                <field name="dropterminal_code" readonly="1"/>
+                                <field name="drop_off_planned_date"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="special_instructions" widget="textarea"/>
+                            <field name="additional_comments" widget="textarea"/>
+                            <field name="remark" widget="textarea"/>
+                        </group>
+                        <group>
+                            <field name="cmr_file" filename="cmr_filename"
+                                   string="CMR File"
+                                   widget="binary_filename"/>
+                            <field name="arrived_date"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
         </record>
     </data>
 </odoo>

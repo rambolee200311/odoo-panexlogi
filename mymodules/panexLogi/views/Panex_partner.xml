@@ -7,18 +7,71 @@
           <field name="arch" type="xml">
             <notebook position="inside">
                 <page string="Panex_Options">
-                    <group>
-                        <field name="panex_code"/>
-                        <field name="shipline"/>
-                        <field name="project"/>
-                        <field name="receiver"/>
-                        <field name="truck"/>
-                        <field name="agency"/>
+                    <group col="2">
+                        <group col="2">
+                            <field name="panex_code"/>
+                            <field name="shipline"/>
+                            <field name="project"/>
+                        </group>
+                        <group col="2">
+                            <field name="receiver"/>
+                            <field name="truck"/>
+                            <field name="agency"/>
+                        </group>
                     </group>
                 </page>
             </notebook>
         </field>
       </record>
+    <!--panex partner bankinfo-->
+    <record id="partner_bankinfo_search_view" model="ir.ui.view">
+        <field name="name">panexlogi.partner.bankinfo.search</field>
+        <field name="model">panexlogi.partner.bankinfo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="odoo_name"/>
+                <field name="fi_name"/>
+                <field name="panex_kvknr"/>
+                <field name="panex_btwnummer"/>
+                <field name="iban"/>
+                <field name="bic"/>
+                <field name="error"/>
+                <field name="partner_id"/>
+            </search>
+        </field>
+    </record>
+    <record id="partner_bankinfo_tree_view" model="ir.ui.view">
+        <field name="name">panexlogi.partner.bankinfo.tree</field>
+        <field name="model">panexlogi.partner.bankinfo</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <header>
+                        <!-- Add a button to create a payment from selected records -->
+                        <button string="get Partner ID" type="object" name="get_partner_id" class="btn-primary"/>
+                        <button string="set Partner Name" type="object" name="set_partner_name" class="btn-primary"/>
+                        <button string="set Partner Bank" type="object" name="set_bank_account" class="btn-primary"/>
+                    </header>
+                <field name="odoo_name"/>
+                <field name="fi_name"/>
+                <field name="panex_kvknr"/>
+                <field name="panex_btwnummer"/>
+                <field name="iban"/>
+                <field name="bic"/>
+                <field name="error"/>
+                <field name="partner_id"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Window action to show partner bank info -->
+    <record id="action_partner_bankinfo" model="ir.actions.act_window">
+        <field name="name">Partner Bank Infos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.partner.bankinfo</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add a new bank info record</p>
+        </field>
+    </record>
     <!--</data>-->
      <record id="product_option_form" model="ir.ui.view">
         <field name="name">product.option.form</field>

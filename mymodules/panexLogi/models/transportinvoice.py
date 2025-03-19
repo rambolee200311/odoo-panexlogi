@@ -1,6 +1,10 @@
+from datetime import timedelta
 from odoo import _, models, fields, api, exceptions
 from odoo.exceptions import UserError
 import json
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class TransportInvoice(models.Model):
@@ -282,6 +286,56 @@ class TransportInvoice(models.Model):
         self.env['panexlogi.transport.invoice.detail'].search([('transportinvoiceid', 'in', self.ids)]).unlink()
         # 删除附件
         return super(TransportInvoice, self).unlink()
+
+    @api.model
+    def cron_check_transport_invoice_bl(self):
+        """Check for eta."""
+        # Set a deadline of 7 days ago
+        domain = [('state', '!=', 'cancel'),]
+        invoices = self.env['panexlogi.transport.invoice'].search(domain)
+        try:
+            for record in invoices:
+                # Fetch distinct waybillnos from invoice details
+                waybillnos = record.transportinvoicedetailids.mapped('waybillno')
+                distinct_waybillnos = list(set(waybillnos))
+
+                if distinct_waybillnos:
+                    # Check existing transport orders in bulk
+                    existing_waybills = self.env['panexlogi.transport.order'].search([
+                        ('waybill_billno.waybillno', 'in', distinct_waybillnos),
+                        ('state', '!=', 'cancel')
+                    ]).mapped('waybill_billno.waybillno')
+
+                    missing_waybills = list(set(distinct_waybillnos) - set(existing_waybills))
+
+                    if missing_waybills:
+                        billno_str = ', '.join(missing_waybills)
+                        subject = 'Transport Invoice Reminder'
+                        content = (
+                            f"⚠️ <strong>Transport Invoice Reminder</strong><br/>"
+                            f"Bill of Lading[{billno_str}] had been created Transport Invoices <br/>"
+                            f"need to create Waybill or Transport Order.<br/>"
+                            f"<i>This is an automated reminder.</i>")
+                        record.message_post(
+                            body=content,
+                            partner_ids=self.env['res.users'].search([('groups_id.name', '=', 'project')]).mapped(
+                                "partner_id").ids,
+                            subject=subject,
+                            message_type='notification',
+                            subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                            body_is_html=True,  # Render HTML in email
+                            force_send=True,
+                            )
+                        #force_send=True,
+        except Exception as e:
+            _logger.error(f"Error in ETA reminder: {str(e)}")
+        return  # Explicitly return None
+
+    # UI button for the current record
+    def button_check_transport_invoice_bl(self):
+        """Called via the UI button for the current record."""
+        self.ensure_one()  # Ensure only one record is processed
+        self.cron_check_transport_invoice_bl()  # Reuse the cron logic
 
 
 class TransportInvoiceDetail(models.Model):

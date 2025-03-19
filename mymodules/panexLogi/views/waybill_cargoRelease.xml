@@ -71,7 +71,7 @@
                 <field name="waybill_billno"/>
                 <field name="date"/>
                 <field name="project"/>
-                <field name="pdffile"/>
+                <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                 <field name="pdffilename" invisible="True"/>
                 <field name="state"/>
             </tree>
@@ -133,7 +133,7 @@
                         <field name="project" readonly="state!='new'"/>
 <!--                        <field name="shipping_name"/>-->
                         <field name="date"/>
-                        <field name="pdffile" filename="pdffilename" readonly="state!='new'"/>
+                        <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                         <field name="pdffilename" invisible="True"/>
                     </group>
                     <notebook>

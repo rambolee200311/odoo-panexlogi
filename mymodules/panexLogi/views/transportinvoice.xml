@@ -56,7 +56,7 @@
                             <button name="create_payment_application"
                                     type="object"
                                     string="Apply Payment"
-                                    class="oe_stat_button" icon="fa-money"/>
+                                    class="oe_stat_button" icon="fa-money"/>0
                         </div>
                         <div class="oe_title">
                             <h1>
@@ -68,17 +68,17 @@
                         </div>
                         <group col="2">
                             <group col="2">
-                                <field name="date"/>
-                                <field name="due_date"/>
-                                <field name="truckco"/>
-                                <field name="truckco_code"/>
-                                <field name="pdffile" filename="pdffilename"/>
+                                <field name="date" readonly="state!='new'"/>
+                                <field name="due_date" readonly="state!='new'"/>
+                                <field name="truckco" readonly="state!='new'"/>
+                                <field name="truckco_code" readonly="state!='new'"/>
+                                <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                                 <field name="pdffilename" invisible="True"/>
                             </group>
                             <group>
-                                <field name="invoiceno"/>
-                                <field name="amount"/>
-                                <field name="remark"/>
+                                <field name="invoiceno" readonly="state!='new'"/>
+                                <field name="amount" readonly="state!='new'"/>
+                                <field name="remark" readonly="state!='new'"/>
                                 <field name="check_message"/>
                             </group>
                         </group>
@@ -92,25 +92,25 @@
                         </group>
                         <notebook>
                             <page string="Details">
-                                <field name="transportinvoicedetailids" >
-                                <tree>
-                                    <field name="waybillno"/>
-                                    <field name="project"/>
-                                    <field name="cntrno"/>
-                                    <field name="collterminal_name"/>
-                                    <field name="dropterminal_name"/>
-                                    <field name="unlolocation"/>
-                                    <field name="unlodate"/>
-                                    <field name="unitprice"/>
-                                    <field name="surcharge"/>
-                                    <field name="adrcharge"/>
-                                    <field name="dieselcharge"/>
-                                    <field name="waithours"/>
-                                    <field name="extrahours"/>
-                                    <field name="remark"/>
-                                    <field name="check"/>
-                                    <field name="check_message"/>
-                                </tree>
+                                <field name="transportinvoicedetailids"  readonly="state!='new'">
+                                    <tree>
+                                        <field name="waybillno"/>
+                                        <field name="project"/>
+                                        <field name="cntrno"/>
+                                        <field name="collterminal_name"/>
+                                        <field name="dropterminal_name"/>
+                                        <field name="unlolocation"/>
+                                        <field name="unlodate"/>
+                                        <field name="unitprice"/>
+                                        <field name="surcharge"/>
+                                        <field name="adrcharge"/>
+                                        <field name="dieselcharge"/>
+                                        <field name="waithours"/>
+                                        <field name="extrahours"/>
+                                        <field name="remark"/>
+                                        <field name="check"/>
+                                        <field name="check_message"/>
+                                    </tree>
                                 <!--
                                 widget="x_spreadsheet"-->
                                 </field>
@@ -133,11 +133,15 @@
             <field name="arch" type="xml">
                 <tree string="Transport Invoices">
                     <field name="billno"/>
+                    <field name="invoiceno"/>
                     <field name="date"/>
                     <field name="due_date"/>
                     <field name="truckco"/>
                     <field name="amount"/>
                     <field name="state"/>
+                    <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
+                    <field name="pdffilename" invisible="True"/>
+                    <field name="remark"/>
                 </tree>
             </field>
         </record>
@@ -149,10 +153,12 @@
             <field name="arch" type="xml">
                 <search string="Transport Invoices">
                     <field name="billno"/>
+                    <field name="invoiceno"/>
                     <field name="date"/>
                     <field name="due_date"/>
                     <field name="truckco"/>
                     <field name="state"/>
+                     <field name="remark"/>
                 </search>
             </field>
         </record>

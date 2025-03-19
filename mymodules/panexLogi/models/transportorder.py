@@ -13,7 +13,8 @@ class TransportOrder(models.Model):
     _rec_name = 'billno'
 
     billno = fields.Char(string='BillNo', readonly=True)
-    date = fields.Date(string='Order Date', default=fields.Date.today)
+    date = fields.Date(string='Date', default=fields.Date.today)
+    issue_date = fields.Date(string='Order Date')
     project = fields.Many2one('panexlogi.project', string='Project', required=True)
     project_code = fields.Char(string='Project Code', related='project.project_code', readonly=True)
     waybill_billno = fields.Many2one('panexlogi.waybill', string='Waybill No inner')
@@ -66,6 +67,11 @@ class TransportOrder(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can confirm New Order"))
             else:
+                if not rec.issue_date:
+                    raise UserError(_("Order Date is required!"))
+                if not rec.truckco:
+                    raise UserError(_("Truck Co is required!"))
+
                 rec.state = 'confirm'
                 return True
 
@@ -95,7 +101,6 @@ class TransportOrder(models.Model):
         values['state'] = 'new'
 
         return super(TransportOrder, self).create(values)
-
 
     # 发邮件给卡车公司
     def action_send_email(self):
@@ -176,6 +181,10 @@ class TransportOrder(models.Model):
 
     # 维护到港实际日期 跳转wizard视图
     def add_actual_date(self):
+        if not self.id:
+            raise exceptions.ValidationError('Please save the record first.')
+        if self.state != 'confirm':
+            raise exceptions.ValidationError('Only confirmed orders can be modified to arrival.')
         return {
             'name': 'Actual Arrival Date',
             'type': 'ir.actions.act_window',
@@ -191,6 +200,7 @@ class TransportOrderDetail(models.Model):
     _description = 'panexlogi.transport.order.detail'
 
     cntrno = fields.Char(string='Container NO')
+    pallets = fields.Float(string='Pallets', default=26)
     uncode = fields.Char('UN CODE')
     coldate = fields.Date(string='Collection Date')
     warehouse = fields.Many2one('stock.warehouse', string='Unloaded Warehouse')
@@ -216,6 +226,8 @@ class TransportOrderDetail(models.Model):
         tracking=True
     )
     arrived_date = fields.Date(string='Arrived Date')
+    cmr_file = fields.Binary(string='CMR File')
+    cmr_filename = fields.Char(string='CMR File name')
 
 
 # 其他附件
@@ -239,6 +251,8 @@ class TransportOrderArrivedWizard(models.TransientModel):
                                , string='Container NOs'
                                , relation='transport_order_arrived_cntro_rel'
                                , domain="[('transport_order_id', '=', billno)]")
+    cmr_file = fields.Binary(string='CMR File')
+    cmr_filename = fields.Char(string='CMR File name')
     """
     @api.onchange('billno')
     def _onchange_billno(self):
@@ -253,6 +267,8 @@ class TransportOrderArrivedWizard(models.TransientModel):
             detail = self.billno.transportorderdetailids.filtered(lambda x: x.cntrno == cntrno.cntrno)
             detail.state = 'arrived'  # Example operation: update state to 'arrived'
             detail.arrived_date = self.arrived_date
+            detail.cmr_file = self.cmr_file
+            detail.cmr_filename = self.cmr_filename
         return {'type': 'ir.actions.act_window_close'}
 
 

@@ -65,13 +65,14 @@
                     <group col="2">
                         <group col="2" string="Payee">
                             <field name="payee"  readonly="state!='new'"/>
-                            <field name="payee_bank"  readonly="state!='new'"/>
-                            <field name="payee_account"  readonly="state!='new'"/>
+                            <field name="payee_account_partner"  readonly="state!='new'"/>
+                            <field name="payee_account_number"  readonly="state!='new'"/>
+                            <field name="payee_bank_bic"  readonly="state!='new'"/>
                         </group>
                         <group col="2" string="Payer">
                             <field name="payer"  readonly="state!='new'"/>
-                            <field name="payer_bank"  readonly="state!='new'"/>
                             <field name="payer_account"  readonly="state!='new'"/>
+                            <field name="payer_bank"  readonly="state!='new'"/>
                         </group>
                     </group>
                     <group col="2" string="Info">

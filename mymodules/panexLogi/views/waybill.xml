@@ -148,7 +148,7 @@
                 <field name="expref"/>
                 <field name="waybillno"/>
                 <field name="sevtype"/>
-                <field name="pdffile" filename="pdffilename"/>
+                <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                 <field name="pdffilename" invisible="True"/>
                 <field name="state"/>
             </tree>
@@ -212,7 +212,7 @@
                             <field name="shipper" readonly="state!='new'"/>
                             <field name="consignee" readonly="state!='new'"/>
                             <field name="sevtype" readonly="state!='new'"/>
-                            <field name="pdffile" filename="pdffilename" readonly="state!='new'"/>
+                            <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                             <field name="pdffilename" invisible="True"/>
                         </group>
                         <group string="Index">
@@ -257,47 +257,94 @@
                         <page  string="Clearance Invoice">
                             <field name="clearinvoice_ids" delete="0"/>
                         </page>
+                        <!--
                         <page  string="Warehousing Invoice">
                             <field name="customsduties_ids"/>
                         </page>
+                        -->
                         <page  string="Cargo Release">
                             <field name="cargorelease_ids"/>
                         </page>
                         <page string="Income">
-                            <group string="Main" col="8">
-                                <field name="entry_num"/>
-                                <field name="extra_num"/>
-                                <field name="pallets_sum"/>
+                            <group string="Main" col="3">
+                                <group col="2">
+                                     <field name="entry_num"/>
+                                </group>
+                                <group col="2">
+                                    <field name="entry_num"/>
+                                </group>
+                                <group col="2">
+                                    <field name="extra_num"/>
+                                </group>
+                                <group col="2">
+                                    <field name="pallets_sum"/>
+                                </group>
                             </group>
-                            <group string="Customs Clearance"  col="8">
-                                <field name="clearance_fee_budget_amount"/>
-                                <field name="clearance_fee_settle_amount"/>
-                                <field name="clearance_fee_invoice_amount"/>
+                            <group string="Customs Clearance"  col="3">
+                                <group col="2">
+                                     <field name="clearance_fee_budget_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="clearance_fee_settle_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="clearance_fee_invoice_amount"/>
+                                </group>
                             </group>
-                            <group string="Import Handling"  col="8">
-                                <field name="handling_fee_budget_amount"/>
-                                <field name="handling_fee_settle_amount"/>
-                                <field name="handling_fee_invoice_amount"/>
+                            <group string="Import Handling"  col="3">
+                                <group col="2">
+                                     <field name="handling_fee_budget_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="handling_fee_settle_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="handling_fee_invoice_amount"/>
+                                </group>
                             </group>
-                            <group string="Inbound Operating"  col="8">
-                                <field name="inbound_operating_fee_budget_amount"/>
-                                <field name="inbound_operating_fee_settle_amount"/>
-                                <field name="inbound_operating_fee_invoice_amount"/>
+                            <group string="Inbound Operating"  col="3">
+                                <group col="2">
+                                     <field name="inbound_operating_fee_budget_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="inbound_operating_fee_settle_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="inbound_operating_fee_invoice_amount"/>
+                                </group>
                             </group>
-                            <group string="Inbound Trucking"  col="8">
-                                <field name="inbound_trucking_fee_budget_amount"/>
-                                <field name="inbound_trucking_fee_settle_amount"/>
-                                <field name="inbound_trucking_fee_invoice_amount"/>
+                            <group string="Inbound Trucking"  col="3">
+                                <group col="2">
+                                     <field name="inbound_trucking_fee_budget_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="inbound_trucking_fee_settle_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="inbound_trucking_fee_invoice_amount"/>
+                                </group>
                             </group>
-                             <group string="Outbound Operating"  col="8">
-                                <field name="outbound_operating_fee_budget_amount"/>
-                                <field name="outbound_operating_fee_settle_amount"/>
-                                <field name="outbound_operating_fee_invoice_amount"/>
+                             <group string="Outbound Operating"  col="3">
+                                <group col="2">
+                                     <field name="outbound_operating_fee_budget_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="outbound_operating_fee_settle_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="outbound_operating_fee_invoice_amount"/>
+                                </group>
                             </group>
-                            <group string="Outbound Trucking"  col="8">
-                                <field name="outbound_trucking_fee_budget_amount"/>
-                                <field name="outbound_trucking_fee_settle_amount"/>
-                                <field name="outbound_trucking_fee_invoice_amount"/>
+                            <group string="Outbound Trucking"  col="3">
+                                <group col="2">
+                                     <field name="outbound_trucking_fee_budget_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="outbound_trucking_fee_settle_amount"/>
+                                </group>
+                                <group col="2">
+                                    <field name="outbound_trucking_fee_invoice_amount"/>
+                                </group>
                             </group>
                             <group string="Containers">
                                 <field name="cntr_note"/>

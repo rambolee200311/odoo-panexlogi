@@ -172,7 +172,7 @@ class Delivery(models.Model):
                 body_is_html=True,  # Render HTML in email
                 force_send=True,
             )
-
+            #force_send=True,
     # automatically send Odoo messages when status is created
     def _send_inform_status_content(self):
         for record in self:
@@ -189,7 +189,7 @@ class Delivery(models.Model):
                 body_is_html=True,  # Render HTML in email
                 force_send=True,
             )
-
+            #force_send=True,
     # automatically send emails and Odoo messages
     def _send_inform_content(self):
         automatically = True
@@ -292,7 +292,7 @@ class Delivery(models.Model):
                 #template.send_mail(overdue_deliveries.ids, force_send=True)
                 #_logger.info(f"Sent reminders for {len(overdue_deliveries)} deliveries.")
                 # Get users in the Finance group
-                group = self.env['res.groups'].search([('name', '=', 'Transport')], limit=1)
+                group = self.env['res.groups'].search([('name', '=', 'Delivery')], limit=1)
                 users = self.env['res.users'].search([('groups_id', '=', group.id)])
                 # Get partner IDs from users
                 partner_ids = users.mapped("partner_id").ids
@@ -313,6 +313,7 @@ class Delivery(models.Model):
                         body_is_html=True,  # Render HTML in email
                         force_send=True,
                     )
+                    #force_send=True,
         except Exception as e:
             _logger.error(f"Error in POD reminder: {str(e)}")
         return  # Explicitly return None

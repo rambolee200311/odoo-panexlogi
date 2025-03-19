@@ -89,10 +89,6 @@
                                         type="object"
                                         string="Tracking"
                                         class="oe_stat_button" icon="fa-building"/>
-                            <button name="send_delivery_emails"
-                                        type="object"
-                                        string="Inform"
-                                        class="oe_stat_button" icon="fa-envelope"/>
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -131,6 +127,14 @@
                         <group>
                             <field name="inform_receiver" widget="many2many_tags"/>
                             <field name="inform_email_to"/>
+                        </group>
+                        <group>
+                            <div class="oe_button_box" name="button_box">
+                                <button name="send_delivery_emails"
+                                                type="object"
+                                                string="Inform"
+                                                class="oe_stat_button" icon="fa-envelope"/>
+                            </div>
                         </group>
                     </group>
                     <notebook>

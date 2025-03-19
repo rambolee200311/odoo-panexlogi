@@ -81,7 +81,7 @@
                 <field name="project"/>
                 <field name="usdtotal"/>
                 <field name="eurtotal"/>
-                <field name="pdffile" filename="pdffilename"/>
+                <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                 <field name="pdffilename" invisible="True"/>
                 <field name="state"/>
             </tree>
@@ -159,7 +159,7 @@
                         <group col="2">
                             <field name="usdtotal" readonly="state!='new'"/>
                             <field name="eurtotal" readonly="state!='new'"/>
-                            <field name="pdffile" filename="pdffilename" readonly="state!='new'"/>
+                            <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                             <field name="pdffilename" invisible="True"/>
                         </group>
                     </group>
