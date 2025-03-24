@@ -34,22 +34,23 @@
                          <button name="action_confirm_order"
                                 type="object"
                                 string="Confirm"
-                                invisible="state == 'confirm' or state == 'cancel'"
+                                invisible="state == 'confirm' or state == 'cancel' or state == 'apply' or state == 'paid'"
                                 class="btn-danger"/>
                          <button name="action_unconfirm_order"
                                 type="object"
                                 string="Unconfirm"
-                                invisible="state == 'new' or state == 'cancel'"
+                                invisible="state == 'new' or state == 'cancel' or state == 'apply' or state == 'paid'"
                                 class="btn-primary"/>
                          <button name="action_cancel_order"
                                 type="object"
                                 string="Cancel"
-                                invisible="state == 'confirm' or state == 'cancel'"
+                                invisible="state == 'confirm' or state == 'cancel' or state == 'apply' or state == 'paid'"
                                 class="btn-warning"/>
                          <field
                                 name="state"
                                 widget="statusbar"
-                                statusbar_visible="new,confirm"/>
+                                statusbar_visible="new,confirm,apply,paid"/>
+                        <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -131,17 +132,17 @@
             <field name="name">transport.invoice.tree</field>
             <field name="model">panexlogi.transport.invoice</field>
             <field name="arch" type="xml">
-                <tree string="Transport Invoices">
+                <tree string="Transport Invoices" decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
                     <field name="billno"/>
                     <field name="invoiceno"/>
                     <field name="date"/>
                     <field name="due_date"/>
                     <field name="truckco"/>
                     <field name="amount"/>
-                    <field name="state"/>
                     <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                     <field name="pdffilename" invisible="True"/>
                     <field name="remark"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>

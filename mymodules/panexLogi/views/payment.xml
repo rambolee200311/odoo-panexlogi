@@ -22,7 +22,7 @@
         <field name="name">panexlogi.finance.payment.tree</field>
         <field name="model">panexlogi.finance.payment</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
                 <field name="billno"/>
                 <field name="payee"/>
                 <field name="pay_date"/>
@@ -44,8 +44,9 @@
                     <button name="action_cancel_order" type="object" string="Cancel" class="btn-secondary" invisible="state!='new'"/>
                     <button name="action_paid_order" type="object" string="Paid" class="btn-success" invisible="state!='confirm'"/>
                     <button name="action_unpaid_order" type="object" string="Unpaid" class="btn-warning" invisible="state!='paid'"/>
-                    <button name="action_renew_order" type="object" string="Renew" class="btn-info" invisible="state!='cancel'"/>
-                    <field name="state" widget="statusbar" statusbar_visible="new,confirm,paid,cancel"/>
+                    <button name="action_renew_order" type="object" string="Renew" class="btn-info" invisible="state!='cancel'" groups="panexLogi.groups_panex_logistic_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,confirm,paid"/>
+                    <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">

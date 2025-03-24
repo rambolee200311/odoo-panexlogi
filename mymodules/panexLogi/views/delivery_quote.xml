@@ -86,7 +86,7 @@
                         <notebook>
                             <page string="Details">
                                 <field name="deliverydetailids">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" create="false" delete="false">
                                         <field name="loading_ref"/>
                                         <field name="cntrno"/>
                                         <field name="quote"/>

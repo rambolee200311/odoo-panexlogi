@@ -90,7 +90,11 @@ class PaymentApplication(models.Model):
             if rec.state != 'confirm':
                 raise UserError(_("You only can unconfirm Confirmed Order"))
             if rec.payment_id:
-                raise UserError(_("You can't unconfirm paid application"))
+                payment = self.env['panexlogi.finance.payment'].search(
+                    [('id', '=', rec.payment_id.id), ('state', '!=', 'cancel')])
+                if payment:
+                    raise UserError(_("You can't unconfirm paid application"))
+            rec.payment_id = False
             rec.state = 'new'
             return True
 
@@ -152,8 +156,45 @@ class PaymentApplication(models.Model):
                 order.can_unlink = True
 
     can_unlink = fields.Boolean(string='Can Unlink', compute='_compute_can_unlink', store=True)
+    """
+            定时任务，每天更新状态为paid的付款申请
+    """
 
-    # select multi rows create a payment
+    def cron_update_state_paid(self):
+        for rec in self.search([('state', '=', 'confirm')]):
+            source = rec.type,
+            souce_code = rec.billno
+            domain = [('source', '=', source), ('source_code', '=', souce_code), ('payment_id.state', '=', 'paid')]
+            payment = self.env['panexlogi.finance.payment.line'].search(domain)
+            if payment:
+                rec.state = 'paid'
+                if rec.source == 'Shipping Invoice' and rec.type == 'import':
+                    shipinvoice = self.env['panexlogi.waybill.shipinvoice'].search(
+                        [('billno', '=', rec.source_Code),
+                         ('state', '=', 'apply')])
+                    if shipinvoice:
+                        shipinvoice.state = 'paid'
+                if rec.source == 'Clearance Invoice' and rec.type == 'import':
+                    clearanceinvoice = self.env['panexlogi.waybill.clearinvoice'].search(
+                        [('billno', '=', rec.source_Code)
+                            , ('state', '=', 'apply')])
+                    if clearanceinvoice:
+                        clearanceinvoice.state = 'paid'
+                if rec.source == 'Transport Invoice' and rec.type == 'trucking':
+                    transportinvoice = self.env['panexlogi.transport.invoice'].search(
+                        [('billno', '=', rec.source_Code),
+                         ('state', '=', 'apply')])
+                    if transportinvoice:
+                        transportinvoice.state = 'paid'
+                if rec.source == 'Delivery Invoice' and rec.type == 'trucking':
+                    deliveryinvoice = self.env['panexlogi.delivery.invoice'].search(
+                        [('billno', '=', rec.source_Code),
+                         ('state', '=', 'apply')])
+                    if deliveryinvoice:
+                        deliveryinvoice.state = 'paid'
+
+                        # select multi rows create a paymentcd
+
     def action_create_payment_from_selected(self):
         selected_applications = self.browse(self.env.context.get('active_ids'))
 
@@ -177,7 +218,7 @@ class PaymentApplication(models.Model):
             type = 'payment'
             source = application.type,
             souce_code = application.billno
-            domain = [('source', '=', source), ('source_code', '=', souce_code)]
+            domain = [('source', '=', source), ('source_code', '=', souce_code), ('payment_id.state', '!=', 'cancel')]
             payment = self.env['panexlogi.finance.payment.line'].search(domain)
             if payment:
                 raise UserError("Please select the record which had not created payment.")

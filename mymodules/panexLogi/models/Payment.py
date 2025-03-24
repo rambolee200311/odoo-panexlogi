@@ -134,7 +134,7 @@ class Payment(models.Model):
     def action_confirm_order(self):
         for rec in self:
             if rec.state != 'new':
-                raise UserError(_("You only can confirm New Order"))
+                raise UserError(_("You only can confirm New Payment"))
             else:
                 rec.state = 'confirm'
                 return True
@@ -142,7 +142,7 @@ class Payment(models.Model):
     def action_unconfirm_order(self):
         for rec in self:
             if rec.state != 'confirm':
-                raise UserError(_("You only can unconfirm Confirmed Order"))
+                raise UserError(_("You only can unconfirm Confirmed Payment"))
             else:
                 rec.state = 'new'
                 return True
@@ -150,31 +150,55 @@ class Payment(models.Model):
     def action_cancel_order(self):
         for rec in self:
             if rec.state != 'new':
-                raise UserError(_("You only can cancel New Order"))
+                raise UserError(_("You only can cancel New Payment"))
             else:
                 rec.state = 'cancel'
+                # CANCLE PAYMENT APPLICATION
+                for line in rec.paymentline_ids:
+                    paymentapplication = self.env['panexlogi.finance.paymentapplication'].search(
+                        [('payment_id', '=', rec.id), ('state', '=', 'apply')])
+                    if paymentapplication:
+                        for application in paymentapplication:
+                            if line.source == application.type and line.source_code == application.billno:
+                                application.payment_id = False
                 return True
 
     def action_paid_order(self):
         for rec in self:
             if rec.state != 'confirm':
-                raise UserError(_("You only can paid Confirm Order"))
+                raise UserError(_("You only can paid Confirm Payment"))
             else:
                 rec.state = 'paid'
+                # PAID PAYMENT APPLICATION
+                for line in rec.paymentline_ids:
+                    paymentapplication = self.env['panexlogi.finance.paymentapplication'].search(
+                        [('payment_id', '=', rec.id), ('state', '=', 'confirm')])
+                    if paymentapplication:
+                        for application in paymentapplication:
+                            if line.source == application.type and line.source_code == application.billno:
+                                application.state = 'paid'
                 return True
 
     def action_unpaid_order(self):
         for rec in self:
             if rec.state != 'paid':
-                raise UserError(_("You only can unpaid Paid Order"))
+                raise UserError(_("You only can unpaid Paid Payment"))
             else:
                 rec.state = 'confirm'
+                # UNPAID PAYMENT APPLICATION
+                for line in rec.paymentline_ids:
+                    paymentapplication = self.env['panexlogi.finance.paymentapplication'].search(
+                        [('payment_id', '=', rec.id), ('state', '=', 'paid')])
+                    if paymentapplication:
+                        for application in paymentapplication:
+                            if line.source == application.type and line.source_code == application.billno:
+                                application.state = 'confirm'
                 return True
 
     def action_renew_order(self):
         for rec in self:
             if rec.state != 'cancel':
-                raise UserError(_("You only can renew Concel Order"))
+                raise UserError(_("You only can renew Cancel Payment"))
             else:
                 rec.state = 'new'
                 return True

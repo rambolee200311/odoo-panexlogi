@@ -82,6 +82,7 @@
                             name="state"
                             widget="statusbar"
                             statusbar_visible="new,confirm"/>
+                     <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">

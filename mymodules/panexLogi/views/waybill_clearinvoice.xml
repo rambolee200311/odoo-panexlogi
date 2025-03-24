@@ -68,7 +68,7 @@
         <field name="name">panexlogi.waybill.clearinvoice.tree</field>
         <field name="model">panexlogi.waybill.clearinvoice</field>
         <field name="arch" type="xml">
-            <tree string="Clearance_invoce_Tree" decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'">
+            <tree string="Clearance_invoce_Tree" decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
                 <field name="billno"/>
                 <field name="waybill_billno"/>
                 <field name="invno"/>
@@ -108,27 +108,27 @@
                      <button name="action_confirm_order"
                             type="object"
                             string="Confirm"
-                            invisible="state == 'confirm' or state == 'cancel' or state == 'apply'"
+                            invisible="state == 'confirm' or state == 'cancel' or state == 'apply' or state == 'paid'"
                             class="btn-danger"/>
                      <button name="action_unconfirm_order"
                             type="object"
                             string="Unconfirm"
-                            invisible="state == 'new' or state == 'cancel' or state == 'apply'"
+                            invisible="state == 'new' or state == 'cancel' or state == 'apply' or state == 'paid'"
                             class="btn-primary"/>
                      <button name="action_cancel_order"
                             type="object"
                             string="Cancel"
-                            invisible="state == 'confirm' or state == 'cancel' or state == 'apply'"
+                            invisible="state == 'confirm' or state == 'cancel' or state == 'apply' or state == 'paid'"
                             class="btn-warning"/>
                      <button name="create_payment_application"
                             type="object"
                             string="Apply Pay"
-                            invisible="state == 'new' or state == 'cancel' or state == 'apply'"
+                            invisible="state == 'new' or state == 'cancel' or state == 'apply' or state == 'paid'"
                             class="btn-primary"/>
                      <field
                             name="state"
                             widget="statusbar"
-                            statusbar_visible="new,confirm,apply"/>
+                            statusbar_visible="new,confirm,apply,paid"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

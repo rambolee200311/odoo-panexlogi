@@ -36,6 +36,7 @@ class DeliveryInvoice(models.Model):
             ('confirm', 'Confirm'),
             ('apply', 'Apply Pay'),
             ('cancel', 'Cancel'),
+            ('paid', 'Paid'),
         ],
         default='new',
         string="Status",

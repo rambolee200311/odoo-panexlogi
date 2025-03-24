@@ -24,7 +24,7 @@
             <field name="name">panexlogi.finance.paymentapplication.tree.view</field>
             <field name="model">panexlogi.finance.paymentapplication</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
                     <header>
                         <!-- Add a button to create a payment from selected records -->
                         <button string="Create Payment" type="object" name="action_create_payment_from_selected" class="btn-primary"/>
@@ -41,6 +41,7 @@
                     <field name="remark"/>
                     <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                     <field name="pdffilename" invisible="True"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
@@ -61,6 +62,7 @@
                                 string="Unconfirm"
                                 invisible="state == 'new' or state == 'paid' or state == 'cancel'"
                                 class="btn-primary"/>
+                         <!--
                          <button name="action_paid_order"
                                 type="object"
                                 string="Paid"
@@ -71,6 +73,7 @@
                                 string="Unpaid"
                                 invisible="state == 'new' or state == 'confirm' or state == 'cancel'"
                                 class="btn-primary"/>
+                         -->
                          <button name="action_cancel_order"
                                 type="object"
                                 string="Cancel"
@@ -84,7 +87,8 @@
                          <field
                                 name="state"
                                 widget="statusbar"
-                                statusbar_visible="new,confirm,paid,cancel"/>
+                                statusbar_visible="new,confirm,paid"/>
+                        <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                     </header>
                     <sheet>
                         <div class="oe_title">

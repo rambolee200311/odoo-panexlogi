@@ -35,6 +35,7 @@ class WaybillClearInvoice(models.Model):
             ('confirm', 'Confirm'),
             ('cancel', 'Cancel'),
             ('apply', 'Apply Pay'),
+            ('paid', 'Paid'),
         ],
         default='new',
         string="State",

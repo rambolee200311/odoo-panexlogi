@@ -69,6 +69,7 @@
             <field name="model">panexlogi.delivery.detail</field>
             <field name="arch" type="xml">
                 <search string="Delivery Details">
+                    <field name="loading_ref"/>
                     <field name="adr"/>
                     <field name="qty"/>
                     <field name="package_size"/>

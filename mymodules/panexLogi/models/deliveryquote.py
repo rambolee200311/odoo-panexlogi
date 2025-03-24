@@ -26,10 +26,12 @@ class DeliveryQuote(models.Model):
     unload_address = fields.Char(string='Unload Address', related='delivery_id.unload_address', readonly=True)
 
     charged = fields.Float('Charged', default=0, readonly=True)  # 收费
-    quote = fields.Float('Quote', default=0, readonly=True)  # 报价
-    additional_cost = fields.Float('Additional Cost', default=0, readonly=True)  # 额外费用
-    extra_cost = fields.Float('Extra Cost', default=0, readonly=True)  # 额外费用
-    profit = fields.Float('Profit', default=0, readonly=True)  # 利润
+    # Change these fields to computed fields
+    quote = fields.Float('Quote', compute='_compute_quote', store=True, readonly=True)  # Add compute and store
+    additional_cost = fields.Float('Additional Cost', compute='_compute_additional_cost', store=True, readonly=True)
+    extra_cost = fields.Float('Extra Cost', compute='_compute_extra_cost', store=True, readonly=True)
+    profit = fields.Float('Profit', compute='_compute_profit', store=True,
+                          readonly=True)  # Optional if profit depends on these
 
     trucker = fields.Many2one('res.partner', string='Trucker', domain=[('truck', '=', 'True')])
     remark = fields.Text('Remark')
@@ -131,12 +133,34 @@ class DeliveryQuote(models.Model):
     def on_unlink(self):
         if self.state != 'cancel':
             raise UserError(_("You can not delete approved or rejected quote, try to cancel it first"))
-
+    """
     @api.onchange('deliverydetailids')
     def _onchange_deliverydetailids(self):
         self.quote = sum([line.quote for line in self.deliverydetailids])
         self.additional_cost = sum([line.additional_cost for line in self.deliverydetailids])
         self.extra_cost = sum([line.extra_cost for line in self.deliverydetailids])
+    """
+
+    @api.depends('deliverydetailids.quote')
+    def _compute_quote(self):
+        for record in self:
+            record.quote = sum(line.quote for line in record.deliverydetailids)
+
+    @api.depends('deliverydetailids.additional_cost')
+    def _compute_additional_cost(self):
+        for record in self:
+            record.additional_cost = sum(line.additional_cost for line in record.deliverydetailids)
+
+    @api.depends('deliverydetailids.extra_cost')
+    def _compute_extra_cost(self):
+        for record in self:
+            record.extra_cost = sum(line.extra_cost for line in record.deliverydetailids)
+
+    # Optional: Compute profit if needed
+    @api.depends('quote', 'additional_cost', 'extra_cost')
+    def _compute_profit(self):
+        for record in self:
+            record.profit = record.charged - (record.quote+record.additional_cost + record.extra_cost)
 
 
 class DeliveryQuotDetail(models.Model):
