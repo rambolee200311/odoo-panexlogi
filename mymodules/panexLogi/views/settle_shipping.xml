@@ -1,0 +1,138 @@
+<odoo>
+    <!-- Form View -->
+    <record id="view_settle_shipping_form" model="ir.ui.view">
+        <field name="name">settle.shipping.form</field>
+        <field name="model">panexlogi.settle.shipping</field>
+        <field name="arch" type="xml">
+            <form string="Settle Shipping">
+                <header>
+                    <button name="action_confirm_order"
+                            type="object"
+                            string="Confirm"
+                            invisible="state == 'confirm' or state == 'cancel'"
+                            class="btn-danger"/>
+                    <button name="action_unconfirm_order"
+                            type="object"
+                            string="Unconfirm"
+                            invisible="state == 'new' or state == 'cancel'"
+                            class="btn-primary"/>
+                    <button name="action_cancel_order"
+                            type="object"
+                            string="Cancel"
+                            invisible="state == 'confirm' or state == 'cancel'"
+                            class="btn-warning"/>
+                    <field
+                            name="state"
+                            widget="statusbar"
+                            statusbar_visible="new,confirm"/>
+                    <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            settle shippings
+                        </h1>
+                        <h2>
+                            <field name="billno"/>
+                        </h2>
+                    </div>
+                    <group col="2">
+                        <group col="2">
+                            <field name="period"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="project"/>
+                            <field name="remark"/>
+                            <div class="oe_button_box" name="button_box">
+                                <button name="get_shipping_detail"
+                                        type="object"
+                                        string="Get Shipping Detail"
+                                        confirm="Are you sure you want to delete and refresh the details?"
+                                        context="{'save_self': True}"
+                                        class="oe_stat_button" icon="fa-money"/>
+                            </div>
+                        </group>
+                        <group col="2">
+                            <field name="pdffile"/>
+                            <field name="pdffilename"/>
+                            <field name="total_amount" readonly="1"/>
+                            <field name="total_amount_usd" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <field name="settle_shipping_detail_ids">
+                                <tree editable="bottom">
+                                    <field name="invoice_id"/>
+                                    <field name="invoiceno"/>
+                                    <field name="waybill_id"/>
+                                    <field name="jobno"/>
+                                    <field name="waybillno"/>
+                                    <field name="Container"/>
+                                    <field name="shipping"/>
+                                    <field name="container_qty"/>
+                                    <field name="fitem"/>
+                                    <field name="amount"/>
+                                    <field name="amount_usd"/>
+                                    <field name="remark"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_settle_shipping_tree" model="ir.ui.view">
+        <field name="name">settle.shipping.tree</field>
+        <field name="model">panexlogi.settle.shipping</field>
+        <field name="arch" type="xml">
+            <tree string="Settle Shipping"
+                  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'"
+                  limit="50">
+                <field name="billno" optional="show"/>
+                <field name="period" optional="show"/>
+                <field name="start_date" optional="show"/>
+                <field name="end_date" optional="show"/>
+                <field name="project" optional="show"/>
+                <field name="state" optional="show"/>
+                <field name="total_amount" optional="show"/>
+                <field name="total_amount_usd" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_settle_shipping_search" model="ir.ui.view">
+        <field name="name">settle.shipping.search</field>
+        <field name="model">panexlogi.settle.shipping</field>
+        <field name="arch" type="xml">
+            <search string="Settle Shipping">
+                <field name="billno"/>
+                <field name="period"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="project"/>
+                <field name="state"/>
+                <field name="total_amount"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_settle_shipping" model="ir.actions.act_window">
+        <field name="name">Settle Shipping</field>
+        <field name="res_model">panexlogi.settle.shipping</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_settle_shipping_tree"/>
+        <field name="search_view_id" ref="view_settle_shipping_search"/>
+    </record>
+
+</odoo>

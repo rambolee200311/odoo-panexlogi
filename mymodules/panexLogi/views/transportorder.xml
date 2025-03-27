@@ -107,7 +107,7 @@
                             <group>
                                 <field name="date" readonly="state!='new'"/>
                                 <field name="issue_date" readonly="state!='new'"/>
-                                <field name="project" readonly="True"/>
+                                <field name="project"/>
                                 <field name="adr" readonly="state!='new'"/>
                             </group>
                             <group>
@@ -187,14 +187,28 @@
             <field name="name">transport.order.tree</field>
             <field name="model">panexlogi.transport.order</field>
             <field name="arch" type="xml">
-                <tree string="Transport Orders">
-                    <field name="billno"/>
-                    <field name="date"/>
+                <tree string="Transport_Orders"
+                      decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'"
+                    limit="50">
+                    <field name="billno" optional="show"/>
+                    <field name="date" optional="show"/>
+                    <field name="issue_date"/>
+                    <field name="waybill_billno" optional="show"/>
                     <field name="project"/>
-                    <field name="waybillno"/>
-                    <field name="truckco"/>
-                    <field name="cargodesc"/>
-                    <field name="state"/>
+                    <field name="waybillno" optional="show"/>
+                    <field name="truckco" optional="show"/>
+                    <field name="cargodesc" optional="show"/>
+                    <field name="state" optional="show"/>
+                    <field name="collterminal" optional="show"/>
+                    <field name="collterminal_code" optional="show"/>
+                    <field name="coldate" optional="show"/>
+                    <field name="warehouse" optional="show"/>
+                    <field name="warehouse_code" optional="show"/>
+                    <field name="unlolocation" optional="show"/>
+                    <field name="unlodate" optional="show"/>
+                    <field name="dropterminal" optional="show"/>
+                    <field name="dropterminal_code" optional="show"/>
+                    <field name="drop_off_planned_date" optional="show"/>
                 </tree>
             </field>
         </record>
@@ -207,10 +221,23 @@
                 <search string="Transport Orders">
                     <field name="billno"/>
                     <field name="date"/>
+                    <field name="issue_date"/>
+                    <field name="waybill_billno"/>
                     <field name="project"/>
                     <field name="waybillno"/>
                     <field name="truckco"/>
                     <field name="state"/>
+                    <field name="collterminal"/>
+                    <field name="collterminal_code"/>
+                    <field name="coldate"/>
+                    <field name="warehouse"/>
+                    <field name="warehouse_code"/>
+                    <field name="unlolocation"/>
+                    <field name="unlodate"/>
+                    <field name="dropterminal"/>
+                    <field name="dropterminal_code"/>
+                    <field name="drop_off_planned_date"/>
+                    <filter string="MyOrders" name="filter_myorders" domain="[('create_uid', '=', uid)]"  context="{'default_type': 'myorders'}"/>
                 </search>
             </field>
         </record>

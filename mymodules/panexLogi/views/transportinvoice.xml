@@ -81,6 +81,7 @@
                                 <field name="amount" readonly="state!='new'"/>
                                 <field name="remark" readonly="state!='new'"/>
                                 <field name="check_message"/>
+                                <field name="trucking_application" readonly="state!='new'"/>
                             </group>
                         </group>
                         <group col="2">
@@ -132,17 +133,19 @@
             <field name="name">transport.invoice.tree</field>
             <field name="model">panexlogi.transport.invoice</field>
             <field name="arch" type="xml">
-                <tree string="Transport Invoices" decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
-                    <field name="billno"/>
-                    <field name="invoiceno"/>
-                    <field name="date"/>
-                    <field name="due_date"/>
-                    <field name="truckco"/>
-                    <field name="amount"/>
-                    <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
-                    <field name="pdffilename" invisible="True"/>
-                    <field name="remark"/>
-                    <field name="state"/>
+                <tree string="Transport Invoices"
+                      decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'"
+                limit="50">
+                    <field name="billno" optional="show"/>
+                    <field name="invoiceno" optional="show"/>
+                    <field name="date" optional="show"/>
+                    <field name="due_date" optional="show"/>
+                    <field name="truckco" optional="show"/>
+                    <field name="amount" optional="show"/>
+                    <field name="pdffile" filename="pdffilename" widget="binary_filename" optional="show"/>
+                    <field name="pdffilename" invisible="True" optional="show"/>
+                    <field name="remark" optional="show"/>
+                    <field name="state" optional="show"/>
                 </tree>
             </field>
         </record>
@@ -158,12 +161,33 @@
                     <field name="date"/>
                     <field name="due_date"/>
                     <field name="truckco"/>
+                    <field name="amount"/>
                     <field name="state"/>
-                     <field name="remark"/>
+                    <field name="remark"/>
+                    <filter string="MyInvoices" name="filter_myinvoices" domain="[('create_uid', '=', uid)]"  context="{'default_type': 'myinvoices'}"/>
                 </search>
             </field>
         </record>
-
+         <!-- detail tree view-->
+        <record id="view_transport_invoice_detail_search" model="ir.ui.view">
+        <field name="name">transport.invoice.detail.search</field>
+            <field name="model">panexlogi.transport.invoice.detail</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="transportinvoiceid"/>
+                    <field name="waybillno"/>
+                    <field name="cntrno"/>
+                    <field name="collterminal_name"/>
+                    <field name="dropterminal_name"/>
+                    <field name="unlolocation"/>
+                    <field name="unitprice"/>
+                    <field name="surcharge"/>
+                    <field name="waithours"/>
+                    <field name="extrahours"/>
+                    <field name="remark"/>
+                </search>
+            </field>
+        </record>
         <!-- detail tree view-->
         <record id="view_transport_invoice_detail_tree" model="ir.ui.view">
         <field name="name">transport.invoice.detail.tree</field>

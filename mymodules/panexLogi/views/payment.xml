@@ -17,17 +17,41 @@
             </p>
         </field>
     </record>
+    <!-- Search View -->
+    <record id="view_payment_search" model="ir.ui.view">
+        <field name="name">panexlogi.finance.payment.search</field>
+        <field name="model">panexlogi.finance.payment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="billno"/>
+                <field name="payee"/>
+                <field name="payee_account_number"/>
+                <field name="payee_bank_bic"/>
+                <field name="payment_method"/>
+                <field name="pay_date"/>
+                <field name="pay_amount"/>
+                <field name="state"/>
+                <field name="pay_remark"/>
+            </search>
+        </field>
+    </record>
     <!-- Tree View -->
     <record id="view_payment_tree" model="ir.ui.view">
         <field name="name">panexlogi.finance.payment.tree</field>
         <field name="model">panexlogi.finance.payment</field>
         <field name="arch" type="xml">
-            <tree  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
-                <field name="billno"/>
-                <field name="payee"/>
-                <field name="pay_date"/>
-                <field name="pay_amount"/>
-                <field name="state"/>
+            <tree string="Payments"  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'" limit="50">
+                <field name="billno" optional="show"/>
+                <field name="payee" optional="show"/>
+                <field name="payee_account_number" optional="show"/>
+                <field name="payee_bank_bic" optional="show"/>
+                <field name="payment_method" optional="show"/>
+                <field name="pay_date" optional="show"/>
+                <field name="pay_amount" optional="show"/>
+                <field name="state" optional="show"/>
+                <field name="pay_remark"  optional="show"/>
+                <field name="pay_pdffile" filename="pay_pdffilename" widget="binary_filename"/>
+                <field name="pay_pdffilename" optional="show"/>
             </tree>
         </field>
     </record>
@@ -39,12 +63,13 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="action_confirm_order" type="object" string="Confirm" class="btn-primary" invisible="state!='new'"/>
-                    <button name="action_unconfirm_order" type="object" string="UnConfirm" class="btn-primary" invisible="state!='confirm'"/>
-                    <button name="action_cancel_order" type="object" string="Cancel" class="btn-secondary" invisible="state!='new'"/>
-                    <button name="action_paid_order" type="object" string="Paid" class="btn-success" invisible="state!='confirm'"/>
-                    <button name="action_unpaid_order" type="object" string="Unpaid" class="btn-warning" invisible="state!='paid'"/>
-                    <button name="action_renew_order" type="object" string="Renew" class="btn-info" invisible="state!='cancel'" groups="panexLogi.groups_panex_logistic_manager"/>
+                    <!-- groups="panexLogi.groups_panex_finance_manager"-->
+                    <button name="action_confirm_order" type="object" string="Confirm" class="btn-primary" invisible="state!='new'" groups="panexLogi.groups_panex_finance_manager"/>
+                    <button name="action_unconfirm_order" type="object" string="UnConfirm" class="btn-primary" invisible="state!='confirm'" groups="panexLogi.groups_panex_finance_manager"/>
+                    <button name="action_cancel_order" type="object" string="Cancel" class="btn-secondary" invisible="state!='new'" groups="panexLogi.groups_panex_finance_manager"/>
+                    <button name="action_paid_order" type="object" string="Paid" class="btn-success" invisible="state!='confirm'" groups="panexLogi.groups_panex_finance_manager"/>
+                    <button name="action_unpaid_order" type="object" string="Unpaid" class="btn-warning" invisible="state!='paid'" groups="panexLogi.groups_panex_finance_manager"/>
+                    <button name="action_renew_order" type="object" string="Renew" class="btn-info" invisible="state!='cancel'" groups="panexLogi.groups_panex_finance_manager"/>
                     <field name="state" widget="statusbar" statusbar_visible="new,confirm,paid"/>
                     <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                 </header>
@@ -85,13 +110,13 @@
                         </group>
                         <group col="2">
                             <field name="pay_remark"  readonly="state!='new'"/>
-                            <field name="pay_pdffile" filename="pay_pdffilename"/>
+                            <field name="pay_pdffile" filename="pay_pdffilename" widget="binary_filename"/>
                             <field name="pay_pdffilename" invisble="True"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Payment Lines">
-                            <field name="paymentline_ids" readonly="state!='new'">
+                            <field name="paymentline_ids" readonly="true">
                                 <tree editable="bottom">
                                     <field name="source"/>
                                     <field name="source_code"/>
@@ -117,17 +142,5 @@
         </field>
     </record>
 
-    <!-- Search View -->
-    <record id="view_payment_search" model="ir.ui.view">
-        <field name="name">panexlogi.finance.payment.search</field>
-        <field name="model">panexlogi.finance.payment</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="billno"/>
-                <field name="payee"/>
-                <field name="pay_date"/>
-                <field name="state"/>
-            </search>
-        </field>
-    </record>
+
 </odoo>

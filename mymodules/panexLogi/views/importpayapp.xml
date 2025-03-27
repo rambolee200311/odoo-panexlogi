@@ -1,7 +1,7 @@
 <odoo>
     <!--        Import Payment Application search-->
-    <record id="view_payment_application_search" model="ir.ui.view">
-        <field name="name">panexlogi.finance.paymentapplication.search</field>
+    <record id="view_waybill_payment_application_search" model="ir.ui.view">
+        <field name="name">panexlogi.finance.waybill.paymentapplication.search</field>
         <field name="model">panexlogi.finance.paymentapplication</field>
         <field name="arch" type="xml">
             <search>
@@ -16,7 +16,11 @@
                 <field name="total_amount"/>
                 <field name="total_amount_usd"/>
                 <field name="remark"/>
-                <filter string="Trucking" name="filter_trucking" domain="[('type', '=', 'import')]" context="{'default_type': 'import'}"/>
+                <field name="state"/>
+                <field name="source"/>
+                <field name="source_Code"/>
+                <filter string="Waybill" name="filter_waybill" domain="[('type', 'in', ['import', 'export', 'other'])]"  context="{'default_type': 'import'}"/>
+                <filter string="MyWaybill" name="filter_mywaybill" domain="[('type', 'in', ['import', 'export', 'other']),('create_uid', '=', uid)]"  context="{'default_type': 'mywaybill'}"/>
             </search>
         </field>
     </record>
@@ -25,25 +29,29 @@
             <field name="name">panexlogi.finance.paymentapplication.tree.view</field>
             <field name="model">panexlogi.finance.paymentapplication</field>
             <field name="arch" type="xml">
-                <tree decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
+                <tree string="Waybill_Application_Tree"
+                      decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'"
+                      limit="50">
                     <header>
                         <!-- Add a button to create a payment from selected records -->
                         <button string="Create Payment" type="object" name="action_create_payment_from_selected" class="btn-primary"/>
                     </header>
-                    <field name="billno"/>
-                    <field name="type"/>
-                    <field name="waybill_billno"/>
-                    <field name="payee"/>
-                    <field name="invoiceno"/>
-                    <field name="invoice_date"/>
-                    <field name="due_date"/>
-                    <field name="date"/>
-                    <field name="total_amount"/>
-                    <field name="total_amount_usd"/>
-                    <field name="remark"/>
-                    <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
-                    <field name="pdffilename" invisible="True"/>
-                     <field name="state"/>
+                    <field name="billno" optional="show"/>
+                    <field name="type" optional="show"/>
+                    <field name="waybill_billno" optional="show"/>
+                    <field name="payee" optional="show"/>
+                    <field name="invoiceno" optional="show"/>
+                    <field name="invoice_date" optional="show"/>
+                    <field name="due_date" optional="show"/>
+                    <field name="date" optional="show"/>
+                    <field name="total_amount" optional="show"/>
+                    <field name="total_amount_usd" optional="show"/>
+                    <field name="remark" optional="show"/>
+                    <field name="pdffile" filename="pdffilename" widget="binary_filename" optional="show"/>
+                    <field name="pdffilename" invisible="True" optional="show"/>
+                    <field name="source" optional="show"/>
+                    <field name="source_Code" optional="show"/>
+                    <field name="state" optional="show"/>
                 </tree>
             </field>
         </record>
@@ -90,7 +98,7 @@
                     <sheet>
                         <div class="oe_title">
                             <h1>
-                                Import Payment Application
+                                Waybill Payment Application
                             </h1>
                             <h2>
                                 <field name="billno"/>
@@ -106,6 +114,8 @@
                                 <field name="total_amount_usd" readonly="state!='new'"/>
                                 <field name="source"/>
                                 <field name="source_Code"/>
+                                <field name="shipinvoice_id" invisible="source!='Shipping Invoice'"/>
+                                <field name="clearinvoice_id" invisible="source!='Clearance Invoice'"/>
                             </group>
                             <group string="Other" col="2">
                                 <field name="invoiceno" readonly="state!='new'"/>
@@ -147,10 +157,11 @@
 
 <!--        Import Payment Application action-->
         <record id="import_payapp_action" model="ir.actions.act_window">
-            <field name="name">Import Payment App</field>
+            <field name="name">Waybill Application</field>
             <field name="res_model">panexlogi.finance.paymentapplication</field>
             <field name="context">{'default_type':'import'}</field>
-            <field name="domain">[('type','=','import')]</field>
+            <field name="search_view_id" ref="view_waybill_payment_application_search"/> <!-- Set default search view -->
+            <field name="domain">[('type','in',['import','export','other'])]</field>
             <field name="view_mode">tree,form</field>
             <field name="view_ids" eval="[(5,0,0),
                                       (0,0,{'view_mode': 'tree','view_id': ref('import_payment_application_tree_view')}),

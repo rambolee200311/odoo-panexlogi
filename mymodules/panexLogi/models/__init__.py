@@ -49,3 +49,5 @@ from . import transportinvoice
 from . import Payment
 from . import deliveryinvoice
 from . import warehouse_invoice
+from . import settle_shipping
+from . import settle_clearance

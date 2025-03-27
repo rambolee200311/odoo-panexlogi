@@ -112,7 +112,7 @@
                             <field name="inner_ref" readonly="state!='new'"/>
                         </group>
                         <group>
-                            <field name="pdffile" filename="pdffilename"/>
+                            <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                             <field name="pdffilename" invisible="True"/>
                             <field name="notes"/>
                         </group>
@@ -256,13 +256,11 @@
                     <field name="delivery_type"/>
                     <field name="loading_conditon"/>
                     <field name="unloading_conditon"/>
-                    <field name="quote"/>
-                    <field name="charged"/>
-                    <field name="profit"/>
                     <field name="trucker"/>
                     <field name="planned_for_loading"/>
                     <field name="planned_for_unloading"/>
-                </search>
+                    <filter string="MyRequest" name="filter_myrequest" domain="[('create_uid', '=', uid)]"  context="{'default_type': 'myrequest'}"/>
+            </search>
             </field>
         </record>
     <!--Tree(List) View-->
@@ -270,16 +268,36 @@
         <field name="name">delivery.tree</field>
         <field name="model">panexlogi.delivery</field>
         <field name="arch" type="xml">
-            <tree create="true" delete="false">
+            <tree string="Delivery_Request" 
+                  create="true" delete="false"
+                  decoration-success="state=='confirm'" decoration-info="state=='new'" decoration-danger="state=='cancel'"
+                  limit="50">
                 <field name="billno"/>
-                <field name="date"/>
-                <field name="project"/>
-                <field name="load_address" string="load_address"/>
-                <field name="unload_address" string="unload_address"/>
-                <field name="trucker"/>
-                <field name="planned_for_loading"/>
-                <field name="planned_for_unloading"/>
-                <field name="notes"/>
+                <field name="date" optional="show"/>
+                <field name="project" optional="show"/>
+                <field name="loading_ref" optional="show"/>
+                <field name="consignee_ref" optional="show"/>
+                <field name="load_address" optional="show" string="load_address"/>
+                <field name="load_company_name" optional="show"/>
+                <field name="load_contact_phone" optional="show"/>
+                <field name="load_postcode" optional="show"/>
+                <field name="load_country" optional="show"/>
+                <field name="load_country_code" optional="show"/>
+                <field name="load_address_timeslot" optional="show"/>
+                <field name="unload_address" optional="show" string="unload_address"/>
+                <field name="unload_company_name" optional="show"/>
+                <field name="unload_contact_phone" optional="show"/>
+                <field name="unload_postcode" optional="show"/>
+                <field name="unload_country" optional="show"/>
+                <field name="unload_country_code" optional="show"/>
+                <field name="unload_address_timeslot" optional="show"/>
+                <field name="delivery_type" optional="show"/>
+                <field name="loading_conditon" optional="show" string="load_condition"/>
+                <field name="unloading_conditon" optional="show" string="unload_condition"/>
+                <field name="trucker" optional="show"/>
+                <field name="planned_for_loading" optional="show" string="load_plan"/>
+                <field name="planned_for_unloading" optional="show" string="unload_plan"/>
+                <field name="state" optional="show"/>
             </tree>
         </field>
     </record>
@@ -310,7 +328,7 @@
             <field name="arch" type="xml">
                 <tree string="Other Documents">
                     <field name="description"/>
-                    <field name="file"  filename="filename"/>
+                    <field name="file"  filename="filename" widget="binary_filename"/>
                     <field name="filename" invisible="True"/>
                     <!--<field name="waybill_billno"/>-->
                 </tree>
@@ -326,7 +344,7 @@
                     <sheet>
                         <group>
                             <field name="description"/>
-                            <field name="file"  filename="filename"/>
+                            <field name="file"  filename="filename" widget="binary_filename"/>
                             <field name="filename" invisible="True"/>
                             <field name="billno"  readonly="True"/>
                         </group>

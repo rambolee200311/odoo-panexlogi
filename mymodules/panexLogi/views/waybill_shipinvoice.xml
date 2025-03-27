@@ -131,7 +131,8 @@
                      <field
                             name="state"
                             widget="statusbar"
-                            statusbar_visible="new,confirm,apply, paid"/>
+                            statusbar_visible="new,confirm,apply,paid"/>
+                     <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -155,6 +156,7 @@
                             <field name="date" readonly="state!='new'"/>
                             <field name="due_date" readonly="state!='new'"/>
                             <field name="invno" readonly="state!='new'"/>
+                            <field name="waybill_application" readonly="state!='new'"/>
                         </group>
                         <group col="2">
                             <field name="usdtotal" readonly="state!='new'"/>

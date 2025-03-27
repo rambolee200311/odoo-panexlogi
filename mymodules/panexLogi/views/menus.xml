@@ -23,7 +23,7 @@
 
         <menuitem id="panex_logi_menu" name="Panex" sequence="10"/>
 
-        <menuitem id="import_logi_menu" name="Import" parent="panex_logi_menu" sequence="100" />
+        <menuitem id="import_logi_menu" name="Waybills" parent="panex_logi_menu" sequence="100" />
         <menuitem id="waybill_menu" name="Waybill" parent="import_logi_menu" sequence="101" action="waybill_action"/>
         <!--
         <menuitem id="waybill_arrivnotice_menu" name="Arrival Notice" parent="import_logi_menu" sequence="101" action="waybill_arrivnotice_action"/>
@@ -53,18 +53,15 @@
         <menuitem id="delivery_invoice_menu" name="Invoice" parent="delivery_logi_menu"  sequence="203" action="action_delivery_invoice"/>
         <menuitem id="delivery_invoice_detail_menu" name="Invoice Details" parent="delivery_logi_menu"  sequence="204" action="action_delivery_invoice_detail"/>
 
-        <menuitem id="outlay_menu" name="Outlay" parent="panex_logi_menu" sequence="300" />
-        <menuitem id="import_payment_application_menu" name="Import Pay APP" parent="outlay_menu" sequence="301" action="import_payapp_action"/>
-        <menuitem id="cartage_payment_application_menu" name="Trucking Pay APP" parent="outlay_menu" sequence="302" action="cartage_payapp_action"/>
+        <menuitem id="outlay_menu" name="Payments" parent="panex_logi_menu" sequence="300" />
+        <menuitem id="import_payment_application_menu" name="Waybill Application" parent="outlay_menu" sequence="301" action="import_payapp_action"/>
+        <menuitem id="cartage_payment_application_menu" name="Trucking Application" parent="outlay_menu" sequence="302" action="cartage_payapp_action"/>
         <menuitem id="finance_payment_menu" name="Payment" parent="outlay_menu" sequence="309" action="action_finance_payment" />
 
-        <menuitem id="income_menu" name="Income" parent="panex_logi_menu" sequence="400" />
-        <menuitem id="income_settle_bill_menu" name="Bill of Settlement" parent="income_menu" sequence="401" action="settle_bill_action"/>
-        <menuitem id="income_settle_bill_clearance_menu" name="Customs Clearance" parent="income_menu" sequence="402" action="settle_bill_clearance_action"/>
-        <menuitem id="income_settle_bill_handling_menu" name="Import Handling" parent="income_menu" sequence="403" action="settle_bill_handling_action"/>
-        <menuitem id="income_settle_bill_inbound_menu" name="Inbound Operating" parent="income_menu" sequence="404" action="settle_bill_inbound_action"/>
-        <menuitem id="income_settle_bill_outbound_menu" name="Outbound Operating" parent="income_menu" sequence="405" action="settle_bill_outbound_action"/>
-        <menuitem id="income_settle_bill_delivery_menu" name="Outbound Delivery" parent="income_menu" sequence="406" action="settle_bill_delivery_action"/>
+        <menuitem id="settle_menu" name="Settle" parent="panex_logi_menu" sequence="400" />
+        <menuitem id="settle_shipping_menu" name="Settle Shipping" parent="settle_menu" sequence="401" action="action_settle_shipping"/>
+        <menuitem id="settle_clearance_menu" name="Settle Clearance" parent="settle_menu" sequence="402" action="action_settle_clearance"/>
+
 
         <menuitem id="wms_menu" name="WMS" parent="panex_logi_menu" sequence="500" />
         <menuitem id="inbound_menu" name="Inbound" parent="wms_menu" sequence="501" />
@@ -93,6 +90,7 @@
 	    <menuitem id="panex_paymentmethod_menu" name="Payment Method" parent="configuration_menu" sequence="909" action="action_payment_method"/>
 	    <menuitem id="panex_project_type_menu" name="Project Type" parent="configuration_menu" sequence="910" action="action_project_type"/>
         <menuitem id="menu_partner_bankinfo"  name="Partner BankInfos"   parent="configuration_menu" sequence="911" action="action_partner_bankinfo"/>
+        <menuitem id="menu_accounting_periods" name="Accounting Periods" parent="configuration_menu" sequence="912" action="action_period_tree"/>
         <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->
 

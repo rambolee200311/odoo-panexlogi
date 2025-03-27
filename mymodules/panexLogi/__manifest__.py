@@ -25,7 +25,7 @@
     # always loaded
     'data': [
         'security/panexlogi_security.xml',
-        'security/ir.model.access.csv',
+        #'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
         'views/waybill.xml',
@@ -76,8 +76,11 @@
         'views/transportorder.xml',
         'views/transportinvoice.xml',
         'views/payment_method.xml',
+        'views/period.xml',
         'views/payment.xml',
         'views/warehouse_invoice.xml',
+        'views/settle_shipping.xml',
+        'views/settle_clearance.xml',
         'data/ir_cron_data.xml',
         'views/sequence.xml',
         'report/report.xml',

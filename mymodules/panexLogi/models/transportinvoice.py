@@ -48,6 +48,7 @@ class TransportInvoice(models.Model):
 
     allow_notunique = fields.Boolean(string='Allow Not Unique', default=False)
     reason_notunique = fields.Text(string='Reason Not Unique')
+    trucking_application = fields.Many2one('panexlogi.finance.paymentapplication', 'Trucking Application')
 
     @api.depends('transportinvoicedetailids')
     def _compute_transportinvoicedetail_json(self):
@@ -144,6 +145,10 @@ class TransportInvoice(models.Model):
                         else:
                             detail.check = True
                             detail.check_message = ''
+                    if waybillno == 'Stock Transfer':
+                        detail.check = True
+                        detail.check_message = ''
+
             # final check
             for detail in rec.transportinvoicedetailids:
                 if not detail.check:
@@ -200,6 +205,7 @@ class TransportInvoice(models.Model):
                 'invoiceno': record.invoiceno,
                 'invoice_date': record.date,
                 'due_date': record.due_date,
+                'trasportinvoice_id': record.id
             })
             # Unit price= INT
             for records in record.transportinvoicedetailids:
@@ -250,6 +256,7 @@ class TransportInvoice(models.Model):
                     })
             # 修改状态
             record.state = 'apply'
+            record.trucking_application = payment_application.id
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -292,7 +299,7 @@ class TransportInvoice(models.Model):
     def cron_check_transport_invoice_bl(self):
         """Check for eta."""
         # Set a deadline of 7 days ago
-        domain = [('state', '!=', 'cancel'),]
+        domain = [('state', '!=', 'cancel'), ]
         invoices = self.env['panexlogi.transport.invoice'].search(domain)
         try:
             for record in invoices:
@@ -326,8 +333,8 @@ class TransportInvoice(models.Model):
                             subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
                             body_is_html=True,  # Render HTML in email
                             force_send=True,
-                            )
-                        #force_send=True,
+                        )
+                        # force_send=True,
         except Exception as e:
             _logger.error(f"Error in ETA reminder: {str(e)}")
         return  # Explicitly return None

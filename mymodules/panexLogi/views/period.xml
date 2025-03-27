@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_period_generate_wizard_form" model="ir.ui.view">
+        <field name="name">period.generate.wizard.form</field>
+        <field name="model">panexlogi.period.generate.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="year"
+                               widget="integer"
+                               placeholder="Enter year (e.g. 2024)"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_generate"
+                            type="object"
+                            string="Generate"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Define the ACTION first -->
+    <record id="action_period_generate_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Accounting Periods</field>
+        <field name="res_model">panexlogi.period.generate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_panexlogi_periods"/>
+        <field name="binding_type">action</field>
+    </record>
+    <!-- Tree View -->
+    <record id="view_period_tree" model="ir.ui.view">
+        <field name="name">period.tree</field>
+        <field name="model">panexlogi.periods</field>
+        <field name="arch" type="xml">
+            <tree>
+                <header>
+                    <button name="%(action_period_generate_wizard)d"
+                        type="action"
+                        string="Generate Periods"
+                        class="btn-primary"/>
+                    <!--<button name="generate_periods" type="object"
+                            string="Generate Periods"
+                            class="btn-primary"/>-->
+                </header>
+                <field name="year" widget="char" optional="show"/>
+                <field name="month" optional="show"/>
+                <field name="month_name" optional="show"/>
+                <field name="code" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Define period tree action -->
+    <record id="action_period_tree" model="ir.actions.act_window">
+        <field name="name">Periods</field>
+        <field name="res_model">panexlogi.periods</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_period_tree"/>
+    </record>
+</odoo>

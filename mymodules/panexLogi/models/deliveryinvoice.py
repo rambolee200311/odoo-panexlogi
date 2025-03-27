@@ -286,7 +286,7 @@ class DeliveryInvoiceDetail(models.Model):
     check_message = fields.Text(string='Check Message')
 
     # chcek inner ref is unique,and state is not cancel
-
+    """      
     @api.constrains('inner_ref')
     def _check_inner_ref(self):
         for record in self:
@@ -294,3 +294,4 @@ class DeliveryInvoiceDetail(models.Model):
                 domain = [('inner_ref', '=', record.inner_ref), ('deleveryinvoiceid.state', '!=', 'cancel')]
                 if self.search_count(domain) > 1:
                     raise exceptions.ValidationError(_('The inner ref must be unique!'))
+    """

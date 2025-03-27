@@ -41,7 +41,16 @@ class WaybillClearInvoice(models.Model):
         string="State",
         tracking=True
     )
+    waybill_application = fields.Many2one('panexlogi.finance.paymentapplication', 'Waybill Application')
     waybillclearinvoicedetail_ids = fields.One2many('panexlogi.waybill.clearinvoice.detail', 'clearinvoiceinvoiceid')
+
+    poa = fields.Float(string='POA', tracking=True)
+    t1 = fields.Float(string='T1', tracking=True)
+    vdn = fields.Float(string='VAT defer notification', tracking=True)
+    imd = fields.Float(string='Import declaration', tracking=True)
+    exa = fields.Float(string='Extra article', tracking=True)
+    lfr = fields.Float(string='LFR', tracking=True)
+
     @api.model
     def create(self, values):
         """
@@ -96,28 +105,51 @@ class WaybillClearInvoice(models.Model):
 
     # Create PaymentApplication
     def create_payment_application(self):
-        # check if state is confirm
-        if self.state != 'confirm':
-            raise UserError(_("You can only create Payment Application for a confirmed Clearance Invoice"))
-        # Check if PaymentApplication already exists
-        domain = [
-            ('source', '=', 'Clearance Invoice')
-            , ('source_Code', '=', self.billno)
-            , ('state', '!=', 'cancel')
-            , ('type', '=', 'import')]
-
-        existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain)
-        if existing_records:
-            raise UserError(_('Payment Application already exists for this Clearance Invoice'))
-
         # Create PaymentApplication
         for record in self:
+            # check if state is confirm
+            if record.state != 'confirm':
+                raise UserError(_("You can only create Payment Application for a confirmed Clearance Invoice"))
+            # Check if PaymentApplication already exists
+            direction = record.waybill_billno.direction
+            domain1 = [
+                ('source', '=', 'Clearance Invoice')
+                , ('source_Code', '=', record.billno)
+                , ('state', '!=', 'cancel')
+                , ('type', '=', direction)
+            ]
+            existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain1)
+            if existing_records:
+                existing_billnos = ", ".join(existing_records.mapped('billno'))
+                raise UserError(_
+                                ("Payment Application [%(billno)s] already exists for this Clearance Invoice '%(suorce)s'") %
+                                {
+                                    'billno': existing_billnos, 'suorce': record.billno
+                                })
+            # check if invoiceno is duplicate
+            domain2 = [
+                ('source', '=', 'Clearance Invoice')
+                , ('waybill_billno', '=', record.waybill_billno.id)
+                , ('invoiceno', '=', record.invno)
+                , ('state', '!=', 'cancel')
+                , ('type', '=', direction)]
+            existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain2)
+            if existing_records:
+                existing_billnos = ", ".join(existing_records.mapped('billno'))
+                raise UserError(_(
+                    "Invoice No '%(invno)s' is already used in Payment Application(s) [%(billnos)s] for Waybill '%(waybill)s'."
+                ) % {
+                                    'invno': record.invno,
+                                    'billnos': existing_billnos,
+                                    'waybill': record.waybill_billno.waybillno
+                                })
+            # check if payee is selected
             if not record.payee.id:
                 raise UserError(_("Please select a Payee"))
             # Create PaymentApplication
             payment_application = self.env['panexlogi.finance.paymentapplication'].create({
                 'date': fields.Date.today(),
-                'type': 'import',
+                'type': direction,
                 'source': 'Clearance Invoice',
                 'payee': record.payee.id,
                 'source_Code': record.billno,
@@ -127,6 +159,7 @@ class WaybillClearInvoice(models.Model):
                 'invoice_date': record.date,
                 'due_date': record.due_date,
                 'waybill_billno': record.waybill_billno.id,
+                'clearinvoice_id': record.id
             })
             for records in record.waybillclearinvoicedetail_ids:
                 # Create PaymentApplicationLine
@@ -140,6 +173,7 @@ class WaybillClearInvoice(models.Model):
                         'project': record.project.id,
                     })
             record.state = 'apply'
+            record.waybill_application = payment_application.id
             # Send Odoo message
             subject = 'Payment Application Created'
             # Get base URL
@@ -171,7 +205,7 @@ class WaybillClearInvoice(models.Model):
                 subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
                 body_is_html=True,  # Render HTML in email
             )
-            #force_send=True,
+            # force_send=True,
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -196,6 +230,24 @@ class WaybillClearInvoice(models.Model):
             if existing_records:
                 raise UserError(_('You cannot delete a Clearance Invoice that has a Payment Application.'))
         return super(WaybillClearInvoice, self).unlink()
+
+    # check invno unique in each waybill
+    @api.constrains('invno', 'waybill_billno')
+    def _check_invno(self):
+        for r in self:
+            # when not unique, raise error
+            domain = [('invno', '=', r.invno)
+                , ('id', '!=', r.id)
+                , ('waybill_billno', '=', r.waybill_billno.id)
+                , ('state', '!=', 'cancel')]
+            if self.search_count(domain) > 0:
+                raise UserError(_(
+                    "Invoice No '%(invno)s' must be unique within Waybill '%(waybill)s'."
+                ) % {
+                                    'invno': r.invno,
+                                    'waybill': r.waybill_billno.waybillno
+                                })
+
 
 class WaybillClearInvoiceDetail(models.Model):
     _name = 'panexlogi.waybill.clearinvoice.detail'

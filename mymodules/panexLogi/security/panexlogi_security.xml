@@ -9,16 +9,22 @@
         <field name="users" eval="[(4, ref('base.user_admin'))]"/>
         <!--为用户组添加管理员用户 -->
     </record>
+    <record id="groups_panex_finance_manager" model="res.groups">
+        <field name="name">Finance_manager</field>
+        <field name="category_id" ref="category_panexlogi"/>
+        <field name="users" eval="[(4, ref('base.default_user'))]"/>
+        <!--为用户组添加管理员用户 -->
+    </record>
+
     <record id="groups_panex_logistic_user1" model="res.groups">
         <field name="name">Staff1</field>
         <field name="category_id" ref="category_panexlogi"/>
         <field name="users" eval="[(4, ref('base.default_user'))]"/>
-        <!--为用户组添加管理员用户 -->
     </record>
     <record id="groups_panex_logistic_user2" model="res.groups">
         <field name="name">Staff2</field>
         <field name="category_id" ref="category_panexlogi"/>
         <field name="users" eval="[(4, ref('base.default_user'))]"/>
-        <!--为用户组添加管理员用户 -->
     </record>
+
 </odoo>

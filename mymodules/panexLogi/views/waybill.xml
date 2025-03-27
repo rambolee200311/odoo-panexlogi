@@ -5,6 +5,7 @@
         <field name="model">panexlogi.waybill</field>
         <field name="arch" type="xml">
             <search>
+                <field name="direction"/>
                 <field name="project"/>
                 <field name="project_type"/>
                 <field name="billno"/>
@@ -132,25 +133,26 @@
         <field name="name">waybill.tree</field>
         <field name="model">panexlogi.waybill</field>
         <field name="arch" type="xml">
-            <tree string="Seawaybill_Tree"  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'"
-            limit="20">
-                <field name="project"/>
-                <field name="project_type"/>
-                <field name="billno"/>
-                <field name="eta"/>
-                <field name="ata"/>
-                <!--<field name="first_arrivnotice_date" string="EDate"/>-->
-                <field name="adr"/>
-                <field name="shipping"/>
-                <field name="shipper"/>
-                <field name="consignee"/>
-                <field name="docno"/>
-                <field name="expref"/>
-                <field name="waybillno"/>
-                <field name="sevtype"/>
-                <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
-                <field name="pdffilename" invisible="True"/>
-                <field name="state"/>
+            <tree string="Waybill_Tree"
+                  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='cancel'"
+                  limit="50">
+                <field name="project" optional="show"/>
+                <field name="project_type" optional="hide"/>
+                <field name="billno" optional="hide"/>
+                <field name="eta"  optional="hide"/>
+                <field name="ata" optional="hide"/>
+                <field name="direction" optional="show"/>
+                <field name="adr" optional="show"/>
+                <field name="shipping" optional="hide"/>
+                <field name="shipper" optional="hide"/>
+                <field name="consignee" optional="hide"/>
+                <field name="docno" optional="hide"/>
+                <field name="expref" optional="hide"/>
+                <field name="waybillno" optional="show"/>
+                <field name="sevtype" optional="hide"/>
+                <field name="pdffile" filename="pdffilename" widget="binary_filename" optional="hide"/>
+                <field name="pdffilename" invisible="True" optional="hide"/>
+                <field name="state" optional="hide"/>
             </tree>
         </field>
      </record>
@@ -180,6 +182,7 @@
                             name="state"
                             widget="statusbar"
                             statusbar_visible="new,confirm"/>
+                     <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -206,6 +209,7 @@
                     </div>
                     <group col="2">
                         <group string="General">
+                            <field name="direction" readonly="state!='new'"/>
                             <field name="project" readonly="state!='new'"/>
                             <field name="project_type" readonly="state!='new'"/>
                             <field name="shipping" readonly="state!='new'"/>

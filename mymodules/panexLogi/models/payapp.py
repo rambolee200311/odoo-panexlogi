@@ -1,5 +1,9 @@
+import logging
+
 from odoo import _, models, fields, api, exceptions
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 # 付款申请
@@ -46,6 +50,9 @@ class PaymentApplication(models.Model):
     pay_pdffile = fields.Binary(string='Pay File（原件）')
     pay_pdffilename = fields.Char(string='Pay File name')
     payment_id = fields.Many2one('panexlogi.finance.payment', string='Payment')
+    shipinvoice_id = fields.Many2one('panexlogi.waybill.shipinvoice', 'Invoice ID')
+    clearinvoice_id = fields.Many2one('panexlogi.waybill.clearinvoice', 'Invoice ID')
+    trasportinvoice_id = fields.Many2one('panexlogi.transport.invoice', 'Invoice ID')
 
     @api.model
     def create(self, values):
@@ -57,6 +64,34 @@ class PaymentApplication(models.Model):
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.finance.paymentapplication', times)
         values['state'] = 'new'
         return super(PaymentApplication, self).create(values)
+
+    # monitor state change
+    def write(self, vals):
+        previous_states = {}
+        # 捕获变更前的状态
+        if 'state' in vals:
+            previous_states = {rec.id: rec.state for rec in self}
+
+        # 执行原始写入操作
+        result = super(PaymentApplication, self).write(vals)
+
+        # 状态变更后逻辑
+        if 'state' in vals:
+            for record in self:
+                previous_state = previous_states.get(record.id, '')
+                new_state = vals.get('state', '')
+
+                # 仅在状态从 'confirm' 变更时触发
+                if previous_state == 'confirm' and new_state != 'confirm':
+                    record.message_post(
+                        subject='Payment State Change',
+                        body=f"state : '{previous_state}' --> '{new_state}'",
+                        message_type='notification',
+                        subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                        body_is_html=True,  # Render HTML in email
+                        force_send=True,
+                    )
+        return result
 
     """
     confirm paid 状态下不可删除
@@ -106,19 +141,40 @@ class PaymentApplication(models.Model):
                 raise UserError(_("You can't cancel paid application"))
 
             # change shipping invoice state
-            if rec.source == 'Shipping Invoice' and rec.type == 'import':
+            if rec.source == 'Shipping Invoice':
                 shipinvoice = self.env['panexlogi.waybill.shipinvoice'].search([('billno', '=', rec.source_Code)])
                 if shipinvoice:
                     shipinvoice.state = 'confirm'
                 else:
                     raise exceptions.ValidationError('Can not find the Shipping Invoice')
             # change clearance invoice state
-            if rec.source == 'Clearance Invoice' and rec.type == 'import':
+            if rec.source == 'Clearance Invoice':
                 clearanceinvoice = self.env['panexlogi.waybill.clearinvoice'].search([('billno', '=', rec.source_Code)])
                 if clearanceinvoice:
                     clearanceinvoice.state = 'confirm'
                 else:
                     raise exceptions.ValidationError('Can not find the Clearance Invoice')
+            # change transport invoice state
+            if rec.source == 'Transport Invoice':
+                transportinvoice = self.env['panexlogi.transport.invoice'].search([('billno', '=', rec.source_Code)])
+                if transportinvoice:
+                    transportinvoice.state = 'confirm'
+                else:
+                    raise exceptions.ValidationError('Can not find the Transport Invoice')
+            # change delivery invoice state
+            if rec.source == 'Delivery Invoice':
+                deliveryinvoice = self.env['panexlogi.delivery.invoice'].search([('billno', '=', rec.source_Code)])
+                if deliveryinvoice:
+                    deliveryinvoice.state = 'confirm'
+                else:
+                    raise exceptions.ValidationError('Can not find the Delivery Invoice')
+            # change warehouse invoice state
+            if rec.source == 'Warehouse Invoice':
+                warehouseinvoice = self.env['panexlogi.warehouse.invoice'].search([('billno', '=', rec.source_Code)])
+                if warehouseinvoice:
+                    warehouseinvoice.state = 'confirm'
+                else:
+                    raise exceptions.ValidationError('Can not find the Warehouse Invoice')
 
             rec.state = 'cancel'
             return True
@@ -161,40 +217,60 @@ class PaymentApplication(models.Model):
     """
 
     def cron_update_state_paid(self):
-        for rec in self.search([('state', '=', 'confirm')]):
-            source = rec.type,
-            souce_code = rec.billno
-            domain = [('source', '=', source), ('source_code', '=', souce_code), ('payment_id.state', '=', 'paid')]
-            payment = self.env['panexlogi.finance.payment.line'].search(domain)
-            if payment:
-                rec.state = 'paid'
-                if rec.source == 'Shipping Invoice' and rec.type == 'import':
-                    shipinvoice = self.env['panexlogi.waybill.shipinvoice'].search(
-                        [('billno', '=', rec.source_Code),
-                         ('state', '=', 'apply')])
-                    if shipinvoice:
-                        shipinvoice.state = 'paid'
-                if rec.source == 'Clearance Invoice' and rec.type == 'import':
-                    clearanceinvoice = self.env['panexlogi.waybill.clearinvoice'].search(
-                        [('billno', '=', rec.source_Code)
-                            , ('state', '=', 'apply')])
-                    if clearanceinvoice:
-                        clearanceinvoice.state = 'paid'
-                if rec.source == 'Transport Invoice' and rec.type == 'trucking':
-                    transportinvoice = self.env['panexlogi.transport.invoice'].search(
-                        [('billno', '=', rec.source_Code),
-                         ('state', '=', 'apply')])
-                    if transportinvoice:
-                        transportinvoice.state = 'paid'
-                if rec.source == 'Delivery Invoice' and rec.type == 'trucking':
-                    deliveryinvoice = self.env['panexlogi.delivery.invoice'].search(
-                        [('billno', '=', rec.source_Code),
-                         ('state', '=', 'apply')])
-                    if deliveryinvoice:
-                        deliveryinvoice.state = 'paid'
+        try:
+            for rec in self.search([('state', '=', 'confirm')]):
+                source = rec.type,
+                souce_code = rec.billno
 
-                        # select multi rows create a paymentcd
+                domain = [('source', '=', source), ('source_code', '=', souce_code), ('payment_id.state', '=', 'paid')]
+                payment = self.env['panexlogi.finance.payment.line'].search(domain)
+                if payment:
+                    state_time = fields.Datetime.now()
+                    payapp_billno = rec.billno
+                    _logger.info("%s : cron_update_state_paid started at: %s", payapp_billno, state_time)
+                    rec.state = 'paid'
+                    if rec.source == 'Shipping Invoice' and rec.type == 'import':
+                        shipinvoice = self.env['panexlogi.waybill.shipinvoice'].search(
+                            [('billno', '=', rec.source_Code),
+                             ('state', '=', 'apply')])
+                        if shipinvoice:
+                            shipinvoice.state = 'paid'
+                    if rec.source == 'Clearance Invoice' and rec.type == 'import':
+                        clearanceinvoice = self.env['panexlogi.waybill.clearinvoice'].search(
+                            [('billno', '=', rec.source_Code)
+                                , ('state', '=', 'apply')])
+                        if clearanceinvoice:
+                            clearanceinvoice.state = 'paid'
+                    if rec.source == 'Transport Invoice' and rec.type == 'trucking':
+                        transportinvoice = self.env['panexlogi.transport.invoice'].search(
+                            [('billno', '=', rec.source_Code),
+                             ('state', '=', 'apply')])
+                        if transportinvoice:
+                            transportinvoice.state = 'paid'
+                    if rec.source == 'Delivery Invoice' and rec.type == 'trucking':
+                        deliveryinvoice = self.env['panexlogi.delivery.invoice'].search(
+                            [('billno', '=', rec.source_Code),
+                             ('state', '=', 'apply')])
+                        if deliveryinvoice:
+                            deliveryinvoice.state = 'paid'
+                    # send message to administrator
+                    end_time = fields.Datetime.now()
+                    _logger.info("%s : cron_update_state_paid ended at: %s", payapp_billno, end_time)
+                    rec.message_post(
+                        body='Update state to paid, start time: %s, end time: %s, payapp_billno: %s'
+                             % (state_time, end_time, payapp_billno),
+                        partner_ids=self.env['res.users'].search([('groups_id.name', '=', 'Administrator')]).mapped(
+                            "partner_id").ids,
+                        subject='Update state to paid',
+                        message_type='notification',
+                        subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                        body_is_html=True,  # Render HTML in email
+                        force_send=True, )
+        except Exception as e:
+            _logger.error(f"Error in cron_update_state_paid: {str(e)}")
+        return  # Explicitly return None
 
+    # select multi rows create a paymentcd
     def action_create_payment_from_selected(self):
         selected_applications = self.browse(self.env.context.get('active_ids'))
 

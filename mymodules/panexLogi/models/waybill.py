@@ -15,6 +15,8 @@ class Waybill(models.Model):
     _rec_name = 'billno'
 
     billno = fields.Char(string='BillNo', readonly=True)
+    direction = fields.Selection([('import', 'Import'), ('export', 'Export'), ('other', 'Other')], string='Direction',
+                                 default='import')
 
     docno = fields.Char(string='Document No（文件号）', required=False)
     expref = fields.Char(string='Export Refrences', required=False)
@@ -307,9 +309,6 @@ class Waybill(models.Model):
                 except Exception as e:
                     raise UserError(f"Failed to create transport order: {e}")
 
-
-
-
                 # Send Odoo message
                 subject = 'Transport Order'
                 # Get base URL
@@ -344,7 +343,7 @@ class Waybill(models.Model):
                     body_is_html=True,  # Render HTML in email
                     force_send=True,
                 )
-                #force_send=True,
+                # force_send=True,
 
                 return {
                     'type': 'ir.actions.client',
@@ -442,6 +441,7 @@ class Waybill(models.Model):
         except Exception as e:
             _logger.error(f"Error in ETA reminder: {str(e)}")
         return  # Explicitly return None
+
     # UI button for the current record
     def button_check_eta_reminder(self):
         """Called via the UI button for the current record."""

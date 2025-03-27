@@ -1,7 +1,7 @@
 <odoo>
     <!--        Cartage Payment Application search-->
-    <record id="view_payment_application_search" model="ir.ui.view">
-        <field name="name">panexlogi.finance.paymentapplication.search</field>
+    <record id="view_trucking_payment_application_search" model="ir.ui.view">
+        <field name="name">panexlogi.finance.trucking.paymentapplication.search</field>
         <field name="model">panexlogi.finance.paymentapplication</field>
         <field name="arch" type="xml">
             <search>
@@ -15,7 +15,10 @@
                 <field name="date"/>
                 <field name="payee"/>
                 <field name="total_amount"/>
+                <field name="remark"/>
+                <field name="state"/>
                 <filter string="Trucking" name="filter_trucking" domain="[('type', '=', 'trucking')]" context="{'default_type': 'trucking'}"/>
+                <filter string="MyTrucking" name="filter_mytrucking" domain="[('type', '=', 'trucking'),('create_uid', '=', uid)]" context="{'default_type': 'mytrucking'}"/>
             </search>
         </field>
     </record>
@@ -24,24 +27,26 @@
             <field name="name">panexlogi.finance.paymentapplication.tree.view</field>
             <field name="model">panexlogi.finance.paymentapplication</field>
             <field name="arch" type="xml">
-                <tree decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'">
+                <tree string="Trucking_Application_Tree"
+                      decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'"
+                    limit="50">
                     <header>
                         <!-- Add a button to create a payment from selected records -->
                         <button string="Create Payment" type="object" name="action_create_payment_from_selected" class="btn-primary"/>
                     </header>
-                    <field name="billno"/>
-                    <field name="source"/>
-                    <field name="source_Code"/>
-                    <field name="invoiceno"/>
-                    <field name="invoice_date"/>
-                    <field name="due_date"/>
-                    <field name="payee"/>
-                    <field name="date"/>
-                    <field name="total_amount"/>
-                    <field name="remark"/>
-                    <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
-                    <field name="pdffilename" invisible="True"/>
-                    <field name="state"/>
+                    <field name="billno" optional="show"/>
+                    <field name="source" optional="show"/>
+                    <field name="source_Code" optional="show"/>
+                    <field name="invoiceno" optional="show"/>
+                    <field name="invoice_date" optional="show"/>
+                    <field name="due_date" optional="show"/>
+                    <field name="payee" optional="show"/>
+                    <field name="date" optional="show"/>
+                    <field name="total_amount" optional="show"/>
+                    <field name="remark" optional="show"/>
+                    <field name="pdffile" filename="pdffilename" widget="binary_filename" optional="show"/>
+                    <field name="pdffilename" invisible="True" optional="show"/>
+                    <field name="state" optional="show"/>
                 </tree>
             </field>
         </record>
@@ -108,6 +113,7 @@
                                 <field name="total_amount"/>
                                 <field name="source"/>
                                 <field name="source_Code"/>
+                                <field name="trasportinvoice_id" invisible="source!='Transport Invoice'"/>
                             </group>
                             <group string="Other">
                                 <field name="invoiceno"/>
@@ -174,8 +180,9 @@
 
 <!--        cartage Payment Application action-->
         <record id="cartage_payapp_action" model="ir.actions.act_window">
-            <field name="name">Trucking Payment App</field>
+            <field name="name">Trucking Application</field>
             <field name="res_model">panexlogi.finance.paymentapplication</field>
+            <field name="search_view_id" ref="view_trucking_payment_application_search"/> <!-- Set default search view -->
             <field name="context">{'default_type':'trucking'}</field>
             <field name="domain">[('type','=','trucking')]</field>
             <field name="view_mode">tree,form</field>

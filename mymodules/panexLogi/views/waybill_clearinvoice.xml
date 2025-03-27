@@ -129,6 +129,7 @@
                             name="state"
                             widget="statusbar"
                             statusbar_visible="new,confirm,apply,paid"/>
+                      <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -146,12 +147,19 @@
                             <field name="date" readonly="state!='new'"/>
                             <field name="due_date" readonly="state!='new'"/>
                             <field name="invno" readonly="state!='new'"/>
+                            <field name="waybill_application" readonly="state!='new'"/>
                         </group>
                         <group col="2">
                             <field name="usdtotal" readonly="state!='new'"/>
                             <field name="eurtotal" readonly="state!='new'"/>
                             <field name="pdffile" filename="pdffilename" widget="binary_filename"/>
                             <field name="pdffilename" invisible="True"/>
+                            <field name="poa"/>
+                            <field name="t1"/>
+                            <field name="vdn"/>
+                            <field name="imd"/>
+                            <field name="exa"/>
+                            <field name="lfr"/>
                         </group>
                     </group>
                     <notebook>

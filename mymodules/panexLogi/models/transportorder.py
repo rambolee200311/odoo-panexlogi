@@ -16,7 +16,7 @@ class TransportOrder(models.Model):
     date = fields.Date(string='Date', default=fields.Date.today)
     issue_date = fields.Date(string='Order Date')
     project = fields.Many2one('panexlogi.project', string='Project', required=True)
-    project_code = fields.Char(string='Project Code', related='project.project_code', readonly=True)
+    project_code = fields.Char(string='Project Code', related='project.project_code')
     waybill_billno = fields.Many2one('panexlogi.waybill', string='Waybill No inner')
     waybillno = fields.Char(string='Waybill No', related='waybill_billno.waybillno', readonly=True)
 
