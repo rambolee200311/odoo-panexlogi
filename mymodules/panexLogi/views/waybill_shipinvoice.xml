@@ -101,7 +101,7 @@
             </calendar>
         </field>
     </record>
-<!--    arrival notice form-->
+<!--    Shipping Invoice form-->
     <record id="panexlogi_waybill_shipinvoice_form" model="ir.ui.view">
         <field name="name">panexlogi.waybill.shipinvoice.form</field>
         <field name="model">panexlogi.waybill.shipinvoice</field>
