@@ -20,10 +20,10 @@ class WaybillClearInvoice(models.Model):
                            tracking=True)
     desc = fields.Char(string='Description(费用名称)', tracking=True)
     usdtotal = fields.Float(string='Total_of_USD', store=True,
-                            tracking=True, compute='_compute_total_usd')
+                            tracking=True, compute='_compute_total')
     eurtotal = fields.Float(string='Total_of_EUR', store=True,
-                            tracking=True, compute='_compute_total_eur')
-    pdffile = fields.Binary(string='File（原件）', tracking=True)
+                            tracking=True, compute='_compute_total')
+    pdffile = fields.Binary(string='File（原件）')
     pdffilename = fields.Char(string='File name')
     waybill_billno = fields.Many2one('panexlogi.waybill')
 
@@ -44,12 +44,12 @@ class WaybillClearInvoice(models.Model):
     waybill_application = fields.Many2one('panexlogi.finance.paymentapplication', 'Waybill Application')
     waybillclearinvoicedetail_ids = fields.One2many('panexlogi.waybill.clearinvoice.detail', 'clearinvoiceinvoiceid')
 
-    poa = fields.Float(string='POA', tracking=True)
-    t1 = fields.Float(string='T1', tracking=True)
-    vdn = fields.Float(string='VAT defer notification', tracking=True)
-    imd = fields.Float(string='Import declaration', tracking=True)
-    exa = fields.Float(string='Extra article', tracking=True)
-    lfr = fields.Float(string='LFR', tracking=True)
+    poa = fields.Float(string='POA', readonly=True, tracking=True, compute='_compute_total')
+    t1 = fields.Float(string='T1', readonly=True, tracking=True, compute='_compute_total')
+    vdn = fields.Float(string='VAT defer notification', readonly=True, tracking=True, compute='_compute_total')
+    imd = fields.Float(string='Import declaration', readonly=True, tracking=True, compute='_compute_total')
+    exa = fields.Float(string='Extra article', readonly=True, tracking=True, compute='_compute_total')
+    lfr = fields.Float(string='LFR', readonly=True, tracking=True, compute='_compute_total')
 
     @api.model
     def create(self, values):
@@ -89,19 +89,26 @@ class WaybillClearInvoice(models.Model):
                 rec.state = 'cancel'
                 return True
 
-    @api.depends('waybillclearinvoicedetail_ids.amount')
-    def _compute_total_eur(self):
+    @api.depends('waybillclearinvoicedetail_ids')
+    def _compute_total(self):
         for rec in self:
             rec.eurtotal = 0
+            rec.usdtotal = 0
+            rec.poa = 0
+            rec.t1 = 0
+            rec.vdn = 0
+            rec.imd = 0
+            rec.exa = 0
+            rec.lfr = 0
             if rec.waybillclearinvoicedetail_ids:
                 rec.eurtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount'))
-
-    @api.depends('waybillclearinvoicedetail_ids.amount_usd')
-    def _compute_total_usd(self):
-        for rec in self:
-            rec.usdtotal = 0
-            if rec.waybillclearinvoicedetail_ids:
                 rec.usdtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount_usd'))
+                rec.poa = sum(rec.waybillclearinvoicedetail_ids.mapped('poa'))
+                rec.t1 = sum(rec.waybillclearinvoicedetail_ids.mapped('t1'))
+                rec.vdn = sum(rec.waybillclearinvoicedetail_ids.mapped('vdn'))
+                rec.imd = sum(rec.waybillclearinvoicedetail_ids.mapped('imd'))
+                rec.exa = sum(rec.waybillclearinvoicedetail_ids.mapped('exa'))
+                rec.lfr = sum(rec.waybillclearinvoicedetail_ids.mapped('lfr'))
 
     # Create PaymentApplication
     def create_payment_application(self):
@@ -253,9 +260,16 @@ class WaybillClearInvoiceDetail(models.Model):
     _name = 'panexlogi.waybill.clearinvoice.detail'
     _description = 'panexlogi.waybill.clearinvoice.detail'
 
+    clearance_type = fields.Many2one('panexlogi.clearance.type', string='Clearance Type')
     fitem = fields.Many2one('panexlogi.fitems', string='Item(费用项目)', tracking=True)
     fitem_name = fields.Char(string='Item Name(费用项目名称)', related='fitem.name', readonly=True)
     amount = fields.Float(string='Amount（欧元金额）', tracking=True)
     amount_usd = fields.Float(string='Amount（美元金额）', tracking=True)
+    poa = fields.Float(string='POA', tracking=True)
+    t1 = fields.Float(string='T1', tracking=True)
+    vdn = fields.Float(string='VAT defer notification', tracking=True)
+    imd = fields.Float(string='Import declaration', tracking=True)
+    exa = fields.Float(string='Extra article', tracking=True)
+    lfr = fields.Float(string='LFR', tracking=True)
     remark = fields.Text(string='Remark', tracking=True)
     clearinvoiceinvoiceid = fields.Many2one('panexlogi.waybill.clearinvoice', tracking=True)

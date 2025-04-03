@@ -48,10 +48,11 @@
         <menuitem id="menu_transport_invoice_detail" name="Invoice Details" parent="menu_transport" action="action_transport_invoice_detail" sequence="154"/>
 
         <menuitem id="delivery_logi_menu" name="Delivery" parent="panex_logi_menu" sequence="200" />
-        <menuitem id="delivery_order_menu" name="Requests" parent="delivery_logi_menu" sequence="201" action="delivery_request_action"/>
+        <menuitem id="delivery_request_menu" name="Requests" parent="delivery_logi_menu" sequence="201" action="delivery_request_action"/>
         <menuitem id="delivery_quote_menu" name="Quotes" parent="delivery_logi_menu"  sequence="202" action="delivery_quote_action"/>
-        <menuitem id="delivery_invoice_menu" name="Invoice" parent="delivery_logi_menu"  sequence="203" action="action_delivery_invoice"/>
-        <menuitem id="delivery_invoice_detail_menu" name="Invoice Details" parent="delivery_logi_menu"  sequence="204" action="action_delivery_invoice_detail"/>
+        <menuitem id="delivery_order_menu" name="Order" parent="delivery_logi_menu"  sequence="203" action="delivery_order_action"/>
+        <menuitem id="delivery_invoice_menu" name="Invoice" parent="delivery_logi_menu"  sequence="204" action="action_delivery_invoice"/>
+        <menuitem id="delivery_invoice_detail_menu" name="Invoice Details" parent="delivery_logi_menu"  sequence="205" action="action_delivery_invoice_detail"/>
 
         <menuitem id="outlay_menu" name="Payments" parent="panex_logi_menu" sequence="300" />
         <menuitem id="import_payment_application_menu" name="Waybill Application" parent="outlay_menu" sequence="301" action="import_payapp_action"/>
@@ -91,6 +92,8 @@
 	    <menuitem id="panex_project_type_menu" name="Project Type" parent="configuration_menu" sequence="910" action="action_project_type"/>
         <menuitem id="menu_partner_bankinfo"  name="Partner BankInfos"   parent="configuration_menu" sequence="911" action="action_partner_bankinfo"/>
         <menuitem id="menu_accounting_periods" name="Accounting Periods" parent="configuration_menu" sequence="912" action="action_period_tree"/>
+        <menuitem id="menu_clearance_type" name="Clearance Types" sequence="913" parent="configuration_menu" action="action_clearance_type"/>
+
         <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->
 

@@ -28,10 +28,12 @@
                 <field name="payee_account_number"/>
                 <field name="payee_bank_bic"/>
                 <field name="payment_method"/>
-                <field name="pay_date"/>
+                <field name="pay_date" string="Payment Date"/>
                 <field name="pay_amount"/>
                 <field name="state"/>
                 <field name="pay_remark"/>
+                <field name="projects"/>
+                <field name="invoicenos"/>
             </search>
         </field>
     </record>
@@ -42,6 +44,8 @@
         <field name="arch" type="xml">
             <tree string="Payments"  decoration-success="state=='confirm'" decoration-info="state=='new'"  decoration-danger="state=='paid'" limit="50">
                 <field name="billno" optional="show"/>
+                <field name="projects" optional="show"/>
+                <field name="invoicenos" optional="show"/>
                 <field name="payee" optional="show"/>
                 <field name="payee_account_number" optional="show"/>
                 <field name="payee_bank_bic" optional="show"/>

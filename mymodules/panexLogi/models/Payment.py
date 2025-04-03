@@ -94,6 +94,18 @@ class Payment(models.Model):
         ('cancel', 'Cancel')
     ], string='State', default='new')
     paymentline_ids = fields.One2many('panexlogi.finance.payment.line', 'payment_id')
+    projects = fields.Char(string='Projects', compute='_compute_projects', store=True)
+    invoicenos = fields.Char(string='Invoice Nos', compute='_compute_projects', store=True)
+    # shows distinct panexlogi.finance.payment.line.project.name,
+    @api.depends('paymentline_ids.project')
+    def _compute_projects(self):
+        for rec in self:
+            project_names = rec.paymentline_ids.mapped('project.project_name')
+            invoicenos = rec.paymentline_ids.mapped('invoiceno')
+            distinct_project_names = list(set(project_names))
+            distinct_invoicenos = list(set(invoicenos))
+            rec.projects = ', '.join(distinct_project_names)
+            rec.invoicenos = ', '.join(distinct_invoicenos)
 
     @api.model
     def create(self, values):

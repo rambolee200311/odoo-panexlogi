@@ -19,7 +19,7 @@ class UserError(Exception):
     """Generic error managed by the client.
 
     Typically when the user tries to do something that has no sense given the current
-    state of a record. Semantically comparable to the generic 400 HTTP status codes.
+    state of a rec.deliveryid. Semantically comparable to the generic 400 HTTP status codes.
     """
 
     def __init__(self, message):
@@ -97,7 +97,7 @@ class MissingError(UserError):
 
     .. admonition:: Example
 
-        When you try to write on a deleted record.
+        When you try to write on a deleted rec.deliveryid.
     """
 
 

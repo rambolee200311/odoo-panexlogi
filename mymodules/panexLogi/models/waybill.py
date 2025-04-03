@@ -72,6 +72,9 @@ class Waybill(models.Model):
     pallets_sum = fields.Float(string="Pallets Sum")
     cntr_note = fields.Text(string="Note")
 
+    # List of container numbers and reference numbers
+    cntrno_list = fields.Char(string='Container Numbers', compute='_compute_cntrno_list', store=True)
+
     # 货柜明细
     details_ids = fields.One2many('panexlogi.waybill.details', 'waybill_billno', string='Details')
     # 装箱清单
@@ -123,6 +126,8 @@ class Waybill(models.Model):
     terminal_a = fields.Many2one('panexlogi.terminal', string='Terminal of Arrival', tracking=True)
     eta_remark = fields.Text(string='ETA Remark')
     transport_order = fields.One2many('panexlogi.transport.order', 'waybill_billno', string='Transport Order')
+
+
 
     # Autofill project_type when project is selected
     @api.onchange('project')
@@ -402,6 +407,12 @@ class Waybill(models.Model):
             rec.cargorelease_ids.unlink()
             rec.otherdocs_ids.unlink()
         return super(Waybill, self).unlink()
+
+    @api.depends('details_ids')
+    def _compute_cntrno_list(self):
+        for record in self:
+            cntrnos = [cntrno for cntrno in record.details_ids.mapped('cntrno') if cntrno]
+            record.cntrno_list = ', '.join(cntrnos)
 
     @api.model
     def cron_check_eta_reminder(self):

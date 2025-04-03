@@ -8,6 +8,7 @@
                 <field name="billno"/>
                 <field name="product_id"/>
                 <field name="batch"/>
+                <field name="sn"/>
                 <field name="interpono"/>
                 <field name="powerperpc"/>
                 <field name="pcs"/>
@@ -35,6 +36,7 @@
                     <field name="billno"/>
                     <field name="product_id"/>
                     <field name="batch"/>
+                    <field name="sn"/>
                     <field name="interpono"/>
                     <field name="powerperpc"/>
                     <field name="pcs"/>
@@ -64,6 +66,7 @@
                     <field name="billno"/>
                     <field name="product_id"/>
                     <field name="batch"/>
+                    <field name="sn"/>
                     <field name="interpono"/>
                     <field name="powerperpc"/>
                     <field name="pcs"/>

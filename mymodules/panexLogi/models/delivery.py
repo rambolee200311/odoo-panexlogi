@@ -69,11 +69,14 @@ class Delivery(models.Model):
                                        domain=[('user_ids', '!=', False), ('email', '!=', False)])
     inform_email_to = fields.Char(compute='_compute_email_to', string="Email To", store=True)
 
+    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
+
     color = fields.Integer()
     state = fields.Selection(
         selection=[
             ('new', 'New'),
             ('confirm', 'Confirm'),
+            ('order', 'Order'),
             ('cancel', 'Cancel'),
         ],
         default='new',
@@ -81,6 +84,18 @@ class Delivery(models.Model):
         tracking=True
     )
     adr = fields.Boolean(string='ADR')
+
+    # List of container numbers and reference numbers
+    cntrno_list = fields.Char(string='Container Numbers', compute='_compute_cntrno_list', store=True)
+    ref_list = fields.Char(string='Reference Numbers', compute='_compute_cntrno_list', store=True)
+
+    @api.depends('deliverydetatilids')
+    def _compute_cntrno_list(self):
+        for record in self:
+            cntrnos = [cntrno for cntrno in record.deliverydetatilids.mapped('cntrno') if cntrno]
+            refs = [ref for ref in record.deliverydetatilids.mapped('loading_ref') if ref]
+            record.cntrno_list = ', '.join(cntrnos)
+            record.ref_list = ', '.join(refs)
 
     def action_confirm_order(self):
         for rec in self:
@@ -172,7 +187,8 @@ class Delivery(models.Model):
                 body_is_html=True,  # Render HTML in email
                 force_send=True,
             )
-            #force_send=True,
+            # force_send=True,
+
     # automatically send Odoo messages when status is created
     def _send_inform_status_content(self):
         for record in self:
@@ -189,7 +205,8 @@ class Delivery(models.Model):
                 body_is_html=True,  # Render HTML in email
                 force_send=True,
             )
-            #force_send=True,
+            # force_send=True,
+
     # automatically send emails and Odoo messages
     def _send_inform_content(self):
         automatically = True
@@ -276,6 +293,7 @@ class Delivery(models.Model):
                     email_layout_xmlid='mail.mail_notification_light',  # Force email layout
                     force_send=True,  # Send immediately, bypassing the queue
                 )
+
     # 2025018 wangpeng pod reminder
     @api.model
     def _cron_check_pod_reminder(self):
@@ -289,8 +307,8 @@ class Delivery(models.Model):
             # template = self.env['mail.template'].search([('name', '=', 'Panex POD Reminder')], limit=1)
             if overdue_deliveries:
                 # ✅ Fix: Do NOT return the list from send_mail()
-                #template.send_mail(overdue_deliveries.ids, force_send=True)
-                #_logger.info(f"Sent reminders for {len(overdue_deliveries)} deliveries.")
+                # template.send_mail(overdue_deliveries.ids, force_send=True)
+                # _logger.info(f"Sent reminders for {len(overdue_deliveries)} deliveries.")
                 # Get users in the Finance group
                 group = self.env['res.groups'].search([('name', '=', 'Delivery')], limit=1)
                 users = self.env['res.users'].search([('groups_id', '=', group.id)])
@@ -313,10 +331,75 @@ class Delivery(models.Model):
                         body_is_html=True,  # Render HTML in email
                         force_send=True,
                     )
-                    #force_send=True,
+                    # force_send=True,
         except Exception as e:
             _logger.error(f"Error in POD reminder: {str(e)}")
         return  # Explicitly return None
+
+    # create delivery order
+    def action_create_delivery_order(self):
+        return {
+            'name': _('Create Delivery Orders'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'panexlogi.delivery.detail.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_delivery_id': self.id,
+                'form_view_ref': 'panexLogi.view_delivery_detail_wizard_form'
+            }
+        }
+
+    @api.model
+    def _create_single_delivery_order(self, rec):
+        try:
+            delivery_order_vals = {
+                'delivery_detail_id': rec.id,
+                'delivery_id': rec.deliveryid.id,
+                'project': rec.deliveryid.project.id,
+                'truckco': rec.deliveryid.trucker.id,
+                'delivery_type': rec.deliveryid.delivery_type.id,
+                'loading_ref': rec.loading_ref,
+                'unloading_ref': rec.deliveryid.consignee_ref,
+                'loading_conditon': rec.deliveryid.loading_conditon.id,
+                'unloading_conditon': rec.deliveryid.unloading_conditon.id,
+                'planned_for_loading': rec.deliveryid.planned_for_loading,
+                'planned_for_unloading': rec.deliveryid.planned_for_unloading,
+                'load_address': rec.deliveryid.load_address,
+                'load_company_name': rec.deliveryid.load_company_name,
+                'load_contact_phone': rec.deliveryid.load_contact_phone,
+                'load_postcode': rec.deliveryid.load_postcode,
+                'load_country': rec.deliveryid.load_country.id,
+                'load_country_code': rec.deliveryid.load_country_code,
+                'load_address_timeslot': rec.deliveryid.load_address_timeslot,
+                'unload_address': rec.deliveryid.unload_address,
+                'unload_company_name': rec.deliveryid.unload_company_name,
+                'unload_contact_phone': rec.deliveryid.unload_contact_phone,
+                'unload_postcode': rec.deliveryid.unload_postcode,
+                'unload_country': rec.deliveryid.unload_country.id,
+                'unload_country_code': rec.deliveryid.unload_country_code,
+                'unload_address_timeslot': rec.deliveryid.unload_address_timeslot,
+                'cntrno': rec.cntrno,
+                'product': rec.product.id,
+                'qty': rec.qty,
+                'package_type': rec.package_type.id,
+                'package_size': rec.package_size,
+                'weight_per_unit': rec.weight_per_unit,
+                'gross_weight': rec.gross_weight,
+                'uncode': rec.uncode,
+                'class_no': rec.class_no,
+                'adr': rec.adr,
+                'remark': rec.remark,
+                'quote': rec.quote,
+            }
+            delivery_order = self.env['panexlogi.delivery.order'].create(delivery_order_vals)
+            rec.write({
+                'state': 'order',
+                'delivery_order_id': delivery_order.id
+            })
+
+        except Exception as e:
+            raise UserError(_("Error creating delivery order: %s") % str(e))
 
 
 class DeliveryDetail(models.Model):
@@ -342,12 +425,41 @@ class DeliveryDetail(models.Model):
     quote = fields.Float('Quote', default=0)  # 报价
     additional_cost = fields.Float('Additional Cost', default=0)  # 额外费用
     extra_cost = fields.Float('Extra Cost', default=0)  # 额外费用
+    state = fields.Selection(
+        selection=[
+            ('new', 'New'),
+            ('approve', 'Approve'),
+            ('reject', 'Reject'),
+            ('cancel', 'Cancel'),
+            ('order', 'Order'),
+        ],
+        default='new',
+        string="State",
+        tracking=True
+    )
+    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
 
+    # check is adr then uncode is required
     @api.constrains('adr', 'uncode')
     def _check_uncode_required(self):
         for record in self:
             if record.adr and not record.uncode:
                 raise ValidationError(_("UN CODE is required when ADR is true."))
+
+    # check that either loading_ref or cntrno is required
+    @api.constrains('loading_ref', 'cntrno')
+    def _check_loading_ref_or_cntrno(self):
+        for record in self:
+            if not record.loading_ref and not record.cntrno:
+                raise ValidationError(_("Either Loading Ref or Container No is required."))
+
+    def cancel_delivery_detail(self):
+        for rec in self:
+            if rec.delivery_order_id:
+                raise UserError(_("This record is linked to a delivery order and cannot be canceled."))
+            else:
+                rec.state = 'cancel'
+                return True
 
 
 class DeliveryStatus(models.Model):
@@ -360,20 +472,6 @@ class DeliveryStatus(models.Model):
     extra_cost = fields.Float('Extra Cost', default=0)
     status = fields.Char('Status', tracking=True)
     description = fields.Text('Description')
-
-
-'''
-    @api.onchange('extra_cost')
-    def _get_proft(self):
-        for r in self:
-            if r._origin.extra_cost:
-                r.delivery_id.extra_cost += r.extra_cost-r._origin.extra_cost
-            else:
-                r.delivery_id.extra_cost += r.extra_cost
-
-            r.delivery_id._onchange_profit()
-
-'''
 
 
 class DeliveryStatusWizard(models.TransientModel):
@@ -421,3 +519,41 @@ class DeliveryOtherDocs(models.Model):
     file = fields.Binary(string='File')
     filename = fields.Char(string='File name')
     billno = fields.Many2one('panexlogi.delivery', string='Delivery ID')
+
+
+# Add this after DeliveryDetail class
+class DeliveryDetailWizard(models.TransientModel):
+    _name = 'panexlogi.delivery.detail.wizard'
+    _description = 'Delivery Detail Selection Wizard'
+
+    delivery_id = fields.Many2one(
+        'panexlogi.delivery',
+        string='Delivery',
+        required=True,
+        default=lambda self: self.env.context.get('active_id')
+    )
+
+    detail_ids = fields.Many2many(
+        'panexlogi.delivery.detail',
+        string='Select Details',
+        domain="""[
+            ('deliveryid', '=', delivery_id),
+            ('state', '=', 'approve'),
+            ('delivery_order_id', '=', False)
+        ]"""
+    )
+
+    def action_create_orders(self):
+        if not self.detail_ids:
+            raise UserError(_("Please select at least one detail record to process."))
+
+        Delivery = self.env['panexlogi.delivery']
+        for detail in self.detail_ids:
+            Delivery._create_single_delivery_order(detail)
+
+        # Update main delivery state if all details processed
+        main_delivery = self.delivery_id
+        if all(d.state == 'order' for d in main_delivery.deliverydetatilids):
+            main_delivery.state = 'order'
+
+        return {'type': 'ir.actions.act_window_close'}

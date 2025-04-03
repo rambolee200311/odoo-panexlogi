@@ -162,6 +162,90 @@ class WarehouseInvoice(models.Model):
             }
         }
 
+    # split the waybill into containers
+    def split_waybill(self):
+        # check if waybillno is already in the warehouse invoice
+        try:
+            for rec in self:
+                for record in rec.warehouseinvoicedetailids:
+                    if record.waybillno and not record.cntrno:
+                        cntrno_qty = 0
+                        domain = [('waybill_billno.waybillno', '=', record.waybillno),
+                                  ('waybill_billno.state', 'in', ['new', 'confirm'])]
+                        waybill_details = self.env['panexlogi.waybill.details'].search(domain)
+                        if waybill_details:
+                            cntrno_qty = len(set(waybill_details.mapped('cntrno')))
+
+                        # split the waybill into containers,delete the waybill details
+                        if cntrno_qty >= 1:
+                            # Calculate the total of the first 6 parts
+                            amount_per_cntr = round(record.amount / cntrno_qty, 2)
+                            amount_per_cntr_usd = round(record.amount_usd / cntrno_qty, 2)
+                            vat_per_cntr = round(record.vat / cntrno_qty, 2)
+                            vat_per_cntr_usd = round(record.vat_usd, 2)
+                            # Calculate the total of the first 6 parts
+                            total_amount_first_6 = amount_per_cntr * (cntrno_qty - 1)
+                            total_amount_usd_first_6 = amount_per_cntr_usd * (cntrno_qty - 1)
+                            total_vat_first_6 = vat_per_cntr * (cntrno_qty - 1)
+                            total_vat_usd_first_6 = vat_per_cntr_usd * (cntrno_qty - 1)
+                            # Calculate the remainder for the last part
+                            amount_last_part = record.amount - total_amount_first_6
+                            amount_usd_last_part = record.amount_usd - total_amount_usd_first_6
+                            vat_last_part = record.vat - total_vat_first_6
+                            vat_usd_last_part = record.vat_usd - total_vat_usd_first_6
+                            sequence = 1
+                            for waybill_detail in waybill_details:
+                                if sequence < cntrno_qty:
+                                    amount = amount_per_cntr
+                                    amount_usd = amount_per_cntr_usd
+                                    vat = vat_per_cntr
+                                    vat_usd = vat_per_cntr_usd
+                                else:
+                                    amount = amount_last_part
+                                    amount_usd = amount_usd_last_part
+                                    vat = vat_last_part
+                                    vat_usd = vat_usd_last_part
+                                # write the amount to the warehouse invoice detail
+                                if sequence == 1:
+                                    record.amount = amount
+                                    record.amount_usd = amount_usd
+                                    record.vat = vat
+                                    record.vat_usd = vat_usd
+                                    record.cntrno = waybill_detail.cntrno
+                                    record.cntrnum = 1
+                                    record.pallets = waybill_detail.pallets
+                                    record.pcs = waybill_detail.pcs
+                                    record.remark = record.remark
+                                else:
+                                    # create a new warehouse invoice detail
+                                    self.env['panexlogi.warehouse.invoice.detail'].create({
+                                    'fitem': record.fitem.id,
+                                    'amount': amount,
+                                    'amount_usd': amount_usd,
+                                    'vat': vat,
+                                    'vat_usd': vat_usd,
+                                    'project': record.project.id,
+                                    'waybillno': record.waybillno,
+                                    'cntrno': waybill_detail.cntrno,
+                                    'cntrnum': 1,
+                                    'pallets': waybill_detail.pallets,
+                                    'pcs': waybill_detail.pcs,
+                                    'remark': record.remark,
+                                    'warehouseinvoiceid': rec.id,
+                                })
+                                # record.to_delete = True
+                                sequence += 1
+            # Unlink all warehouseinvoicedetailids where to_delete is True
+            # details_to_delete = rec.warehouseinvoicedetailids.filtered(lambda d: d.to_delete)
+            # details_to_delete.unlink()
+            return True
+        except Exception as e:
+            raise UserError(_('An error occurred while splitting waybill: %s') % str(e))
+
+
+
+
+
 
 # 外包仓库发票明细
 class WarehouseInvoiceDetail(models.Model):
@@ -183,3 +267,4 @@ class WarehouseInvoiceDetail(models.Model):
     remark = fields.Text(string='Remark', tracking=True)
     warehouseinvoiceid = fields.Many2one('panexlogi.warehouse.invoice', string='Warehouse invoice')
     be_bonded = fields.Boolean(string='Be Bonded')
+    to_delete = fields.Boolean(string='To Delete',default=False)

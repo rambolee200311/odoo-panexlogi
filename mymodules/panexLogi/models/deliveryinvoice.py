@@ -99,40 +99,46 @@ class DeliveryInvoice(models.Model):
         """
         确认
         """
-        if self.state == 'new':
-            # check combination of truckco and inner ref is exist in delivery order,and write check_message ,check is false
-            for record in self.deliveryinvoicedetailids:
-                bcheck = False
-                inner_ref = record.inner_ref
-                parts = inner_ref.split('-')  # 例如 '123-abc' → ['123', 'abc']
+        for rec in self:
+            if rec.state == 'new':
+                # check combination of truckco and inner ref is exist in delivery order,and write check_message ,check is false
 
-                # 构建动态条件
-                domain = [
-                    ('deliveryid.trucker', '=', self.truckco.id),
-                    '|',  # OR 连接 loading_ref 和 cntrno 的条件
-                    '|',  # OR 连接所有 parts 的条件
-                    *[('loading_ref', 'ilike', part) for part in parts],  # 检查 loading_ref 包含任意 part
-                    *[('cntrno', 'ilike', part) for part in parts],  # 检查 cntrno 包含任意 part
-                ]
+                for record in rec.deliveryinvoicedetailids:
+                    bcheck = False
+                    inner_ref = record.inner_ref
+                    parts = inner_ref.split('-')  # 例如 '123-abc' → ['123', 'abc']
 
-                if self.env['panexlogi.delivery.detail'].search_count(domain) > 0:
-                    bcheck = True
+                    # 构建动态条件
+                    domain = [('deliveryid.trucker', '=', rec.truckco.id), ('deliveryid.state', '!=', 'cancel')]
+                    if len(parts) > 1:
+                        domain += ['|'] * (len(parts) - 1)
+                        domain += [('|', ('loading_ref', 'ilike', part), ('cntrno', 'ilike', part)) for part in parts]
+                    else:
+                        domain += ['|', ('loading_ref', 'ilike', parts[0]), ('cntrno', 'ilike', parts[0])]
 
-                if not bcheck:
-                    record.check = False
-                    record.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
-                    self.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
-                    raise exceptions.ValidationError(
-                        _('The combination of truck company and inner ref is not exist in delivery order!'))
-                else:
-                    record.check = True
-                    record.check_message = ''
+                    if self.env['panexlogi.delivery.detail'].search_count(domain) > 0:
+                        bcheck = True
 
-            self.check_message = ''
-            self.state = 'confirm'
+                    if not bcheck:
+                        record.check = False
+                        record.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
+                    else:
+                        record.check = True
+                        record.check_message = ''
 
-        else:
-            raise UserError(_('The status of the current Invoice is not new!'))
+                valid = True
+                for record in rec.deliveryinvoicedetailids:
+                    if not record.check:
+                        valid = False
+                        rec.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
+                        raise exceptions.ValidationError(
+                            _('The combination of truck company and inner ref is not exist in delivery order!'))
+                        break
+                if valid:
+                    rec.check_message = ''
+                    rec.state = 'confirm'
+            else:
+                raise UserError(_('The status of the current Invoice is not new!'))
 
     def action_received_order(self):
         """

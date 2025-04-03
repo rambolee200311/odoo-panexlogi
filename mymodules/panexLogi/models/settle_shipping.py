@@ -3,6 +3,8 @@ from odoo.exceptions import UserError
 import xlsxwriter
 import base64
 from io import BytesIO
+from odoo.exceptions import ValidationError
+import re
 
 
 # settle shipping
@@ -13,9 +15,14 @@ class SettleShipping(models.Model):
     _rec_name = 'billno'
 
     billno = fields.Char(string='Bill No')
-    period = fields.Many2one('panexlogi.periods', string='Period', required=True)
+    # period = fields.Many2one('panexlogi.periods', string='Period', required=True)
+    period = fields.Char(string='Period', required=True
+                         ,
+                         help='The period must be in the format YYYYMM and start with 20 (e.g., 202501, 202502, 202618).')
     start_date = fields.Date(string='Start Date', required=True)
     end_date = fields.Date(string='End Date', required=True)
+    date_type = fields.Selection(selection=[('issue', 'Issue Date'), ('due', 'Due Date'), ('pay', 'Pay Date')],
+                                 string='Date Type', default='issue')
     project = fields.Many2one('panexlogi.project', string='Project', required=True)
     remark = fields.Text(string='Remark')
     state = fields.Selection(
@@ -34,6 +41,7 @@ class SettleShipping(models.Model):
     total_amount_usd = fields.Float(string='Total Amount USD', compute='get_total_amount', store=True)
     settle_shipping_detail_ids = fields.One2many('panexlogi.settle.shipping.detail', 'settle_shipping_id')
     settle_shipping_output_ids = fields.One2many('panexlogi.settle.shipping.output', 'settle_clearance_id')
+
     @api.model
     def create(self, values):
         """
@@ -84,8 +92,9 @@ class SettleShipping(models.Model):
             else:
                 rec.state = 'new'
                 return True
-
+    ""
     # check the combination of project,period is unique
+    """
     @api.constrains('project', 'period')
     def _check_project_period(self):
         for rec in self:
@@ -95,6 +104,7 @@ class SettleShipping(models.Model):
                 , ('id', '!=', rec.id)]
             if self.env['panexlogi.settle.shipping'].search_count(domain) > 0:
                 raise exceptions.ValidationError(_('The Project and Period must be unique!!'))
+    """
 
     # 计算总金额
     @api.depends('settle_shipping_detail_ids.amount', 'settle_shipping_detail_ids.amount_usd')
@@ -108,15 +118,15 @@ class SettleShipping(models.Model):
             rec.total_amount = total_amount
             rec.total_amount_usd = total_amount_usd
 
-    # get shipping invoice detail
+    # user choose different date type to get shipping invoice detail
     def get_shipping_detail(self):
         for rec in self:
             # 条件: project=project, state in confirm,apply,paid, date>=start_date, date<=end_date
             domain = [('waybill_billno.project', '=', rec.project.id),
-                      ('state', 'in', ['confirm', 'apply', 'paid']),
-                      '&',
-                      ('date', '>=', rec.start_date),  # ShipInvoice's date
-                      ('date', '<=', rec.end_date)]
+                      ('state', 'in', ['confirm', 'apply', 'paid']), ]
+            # '&',
+            # ('date', '>=', rec.start_date),  # ShipInvoice's date
+            # ('date', '<=', rec.end_date)]
             shipping_invoices = self.env['panexlogi.waybill.shipinvoice'].search(domain)
             if shipping_invoices:
                 # user confirm to unlink all the details
@@ -126,21 +136,51 @@ class SettleShipping(models.Model):
                 for invoice in shipping_invoices:
                     cntrnos = ','.join([str(x) for x in invoice.waybill_billno.details_ids.mapped('cntrno')])
                     cntrqty = len(invoice.waybill_billno.details_ids.mapped('cntrno'))
-                    for line_detail in invoice.waybillshipinvoicedetail_ids:
-                        settle_shipping_detail.append((0, 0, {
-                            'jobno': invoice.waybill_billno.docno,
-                            'invoice_id': invoice.id,
-                            'invoiceno': invoice.invno,
-                            'waybill_id': invoice.waybill_billno.id,
-                            'waybillno': invoice.waybill_billno.waybillno,
-                            'Container': cntrnos,
-                            'shipping': invoice.waybill_billno.shipping.id,
-                            'container_qty': cntrqty,
-                            'fitem': line_detail.fitem.id,
-                            'amount': line_detail.amount,
-                            'amount_usd': line_detail.amount_usd,
-                            'remark': line_detail.remark,
-                        }))
+                    # get paymentapplication
+                    paymentapplication = self.env['panexlogi.finance.paymentapplication'].search([
+                        ('source', '=', 'Shipping Invoice')
+                        , ('state', 'in', ['confirm', 'apply', 'paid'])
+                        , '|', ('invoiceno', '=', invoice.invno), ('shipinvoice_id', '=', invoice.id)]
+                        , limit=1)
+                    payment_id = 0
+                    pay_date = False
+                    if paymentapplication:
+                        if paymentapplication.payment_id:
+                            payment = self.env['panexlogi.finance.payment'].search(
+                                [('id', '=', paymentapplication.payment_id.id), ('state', '=', 'paid')], limit=1)
+                            if payment:
+                                payment_id = payment.id
+                                pay_date = payment.pay_date
+                    # check date return bcheck
+                    bcheck = False
+                    if rec.date_type == 'issue':
+                        if invoice.date >= rec.start_date and invoice.date <= rec.end_date:
+                            bcheck = True
+                    elif rec.date_type == 'due':
+                        if invoice.due_date >= rec.start_date and invoice.due_date <= rec.end_date:
+                            bcheck = True
+                    elif rec.date_type == 'pay':
+                        if pay_date:
+                            if (pay_date >= rec.start_date and pay_date <= rec.end_date):
+                                bcheck = True
+
+                    if bcheck:
+                        for line_detail in invoice.waybillshipinvoicedetail_ids:
+                            settle_shipping_detail.append((0, 0, {
+                                'jobno': invoice.waybill_billno.docno,
+                                'invoice_id': invoice.id,
+                                # 'invoiceno': invoice.invno,
+                                'payment_id': payment_id,
+                                'waybill_id': invoice.waybill_billno.id,
+                                'waybillno': invoice.waybill_billno.waybillno,
+                                'Container': cntrnos,
+                                'shipping': invoice.waybill_billno.shipping.id,
+                                'container_qty': cntrqty,
+                                'fitem': line_detail.fitem.id,
+                                'amount': line_detail.amount,
+                                'amount_usd': line_detail.amount_usd,
+                                'remark': line_detail.remark,
+                            }))
                 rec.settle_shipping_detail_ids = settle_shipping_detail
 
     # print to excel
@@ -171,7 +211,7 @@ class SettleShipping(models.Model):
                 worksheet.write(row, 0, detail.invoice_id.billno, border_format)
                 worksheet.write(row, 1, detail.invoiceno, border_format)
                 worksheet.write(row, 2, detail.waybill_id.billno, border_format)
-                worksheet.write(row, 3, detail.jobno, border_format)
+                worksheet.write(row, 3, detail.jobno if detail.jobno else '', border_format)
                 worksheet.write(row, 4, detail.waybillno, border_format)
                 worksheet.write(row, 5, detail.Container, border_format)
                 worksheet.write(row, 6, detail.container_qty, border_format)
@@ -179,7 +219,7 @@ class SettleShipping(models.Model):
                 worksheet.write(row, 8, detail.fitem.name, border_format)
                 worksheet.write(row, 9, detail.amount, border_format)
                 worksheet.write(row, 10, detail.amount_usd, border_format)
-                worksheet.write(row, 11, detail.remark, border_format)
+                worksheet.write(row, 11, detail.remark if detail.remark else '', border_format)
                 row += 1
 
             workbook.close()
@@ -222,15 +262,24 @@ class SettleShipping(models.Model):
             }
         }
 
+    @api.constrains('period')
+    def _check_period_format(self):
+        pattern = re.compile(r'^20\d{4}$')
+        for rec in self:
+            if not pattern.match(rec.period):
+                raise ValidationError(_("The period must be in the format YYYYMM (e.g., 202501, 202502, 202618)."))
+
+    """
     @api.constrains('project', 'period')
     def _check_project_period(self):
         for rec in self:
             domain = [('project', '=', rec.project.id)
-                , ('period', '=', rec.period.id)
+                , ('period', '=', rec.period)
                 , ('state', '!=', 'cancel')
                 , ('id', '!=', rec.id)]
             if self.search_count(domain) > 0:
                 raise exceptions.ValidationError(_('The Project and Period must be unique!!'))
+    """
 
 
 class SettleShippingDetail(models.Model):
@@ -245,15 +294,23 @@ class SettleShippingDetail(models.Model):
         store=True
     )
     jobno = fields.Char(string='Job No')
-    invoice_id = fields.Many2one('panexlogi.waybill.shipinvoice', string='Invoice ID')
-                                 #,domain=[('state', 'in', ['confirm', 'apply', 'paid']),('waybill_billno.project', '=', project_id.id)])
-    invoiceno = fields.Char(string='Invoice No')
-    waybill_id = fields.Many2one('panexlogi.waybill', string='Waybill ID')
-    waybillno = fields.Char(string='BL No')
-    Container = fields.Char(string='Container')
-    shipping = fields.Many2one('res.partner', string='Shipping Line')
-    container_qty = fields.Char(string='Container Quantity')
-    fitem = fields.Many2one('panexlogi.fitems', string='Item(费用项目)', tracking=True)
+    invoice_id = fields.Many2one('panexlogi.waybill.shipinvoice', string='Invoice ID'
+                                 , help='Link to Shipping Invoice.')
+    # ,domain=[('state', 'in', ['confirm', 'apply', 'paid']),('waybill_billno.project', '=', project_id.id)])
+    invoiceno = fields.Char(string='Invoice No', related='invoice_id.invno', readonly=True)
+    invoice_date = fields.Date(string='Issue Date', related='invoice_id.date', readonly=True)
+    due_date = fields.Date(string='Due Date', related='invoice_id.due_date', readonly=True)
+    payment_id = fields.Many2one('panexlogi.finance.payment', string='Payment ID', readonly=True
+                                 , help='Link to Payment.')
+    pay_date = fields.Date(string='Pay Date', related='payment_id.pay_date', readonly=True)
+    waybill_id = fields.Many2one('panexlogi.waybill', string='Waybill ID', readonly=True
+                                 , help='Link to Waybill.')
+    waybillno = fields.Char(string='BL No', related='waybill_id.waybillno', readonly=True)
+    Container = fields.Char(string='Container'
+                            , help='All of containers.', readonly=True)
+    shipping = fields.Many2one('res.partner', string='Shipping Line', readonly=True)
+    container_qty = fields.Char(string='Container Quantity', readonly=True)
+    fitem = fields.Many2one('panexlogi.fitems', string='Item(费用项目)', readonly=True)
     fitem_name = fields.Char(string='Item Name(费用项目名称)', related='fitem.name', readonly=True)
     amount = fields.Float(string='Amount（欧元金额）', tracking=True)
     amount_usd = fields.Float(string='Amount（美元金额）', tracking=True)
@@ -282,6 +339,8 @@ class SettleShippingDetail(models.Model):
                 if self.search_count(domain) > 0:
                     raise exceptions.ValidationError(_('The Invoice ID must be unique!!'))
     """
+
+
 class SettleShippingOutput(models.Model):
     _name = 'panexlogi.settle.shipping.output'
     _description = 'panexlogi.settle.shipping.output'

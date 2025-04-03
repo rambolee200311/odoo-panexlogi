@@ -14,6 +14,7 @@ class WaybillPackList(models.Model):
     batch = fields.Char(string='Batch')
     interpono = fields.Char(string='Inter-Company PO Number')
     product_id = fields.Many2one('product.product', string='Product Type')
+    sn = fields.Char(string='Serial Number')
     powerperpc = fields.Integer(string='Power Per Piece')
     pcs = fields.Float(string='Pcs', required=True)
     pallets = fields.Float(string='Pallets', required=True)

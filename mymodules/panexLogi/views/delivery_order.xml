@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Delivery Order Action -->
+    <record id="delivery_order_action" model="ir.actions.act_window">
+        <field name="name">Delivery Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.delivery.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first delivery order!
+            </p>
+        </field>
+    </record>
+
+    <!-- Delivery Order Tree View -->
+    <record id="view_delivery_order_tree" model="ir.ui.view">
+        <field name="name">delivery.order.tree</field>
+        <field name="model">panexlogi.delivery.order</field>
+        <field name="arch" type="xml">
+            <tree string="Delivery Orders">
+                <field name="billno" optional="show"/>
+                <field name="date" optional="show"/>
+                <field name="project" optional="show"/>
+                <field name="truckco" optional="show"/>
+                <field name="quote" optional="show"/>
+                <field name="load_address" optional="show"/>
+                <field name="load_company_name" optional="show"/>
+                <field name="load_contact_phone" optional="show"/>
+                <field name="load_postcode" optional="show"/>
+                <field name="load_country" optional="show"/>
+                <field name="load_country_code" optional="show"/>
+                <field name="load_address_timeslot" optional="show"/>
+                <field name="unload_address" optional="show"/>
+                <field name="unload_company_name" optional="show"/>
+                <field name="unload_contact_phone" optional="show"/>
+                <field name="unload_postcode" optional="show"/>
+                <field name="unload_country" optional="show"/>
+                <field name="unload_country_code" optional="show"/>
+                <field name="unload_address_timeslot" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Delivery Order Form View -->
+    <record id="view_delivery_order_form" model="ir.ui.view">
+        <field name="name">delivery.order.form</field>
+        <field name="model">panexlogi.delivery.order</field>
+        <field name="arch" type="xml">
+            <form string="Delivery Order">
+                <header>
+                    <button name="action_confirm_order"
+                        type="object"
+                        string="Confirm"
+                        invisible="state == 'confirm' or state == 'cancel'"
+                        class="btn-danger"/>
+                    <button name="action_unconfirm_order"
+                        type="object"
+                        string="Unconfirm"
+                        invisible="state == 'new' or state == 'cancel'"
+                        class="btn-primary"/>
+                    <button name="action_cancel_order"
+                        type="object"
+                        string="Cancel"
+                        invisible="state == 'confirm' or state == 'cancel'"
+                        class="btn-warning"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,confirm"/>
+                    <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_print_delivery_order"
+                            type="object"
+                            string="Print"
+                            class="oe_stat_button" icon="fa-print"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            Delivery Order
+                        </h1>
+                        <h2>
+                            <field name="billno"/>
+                        </h2>
+                    </div>
+                     <group col="2">
+                        <group string="Loading" col="2">
+                            <field name="date" readonly="state!='new'"/>
+                            <field name="project" readonly="state!='new'"/>
+                            <field name="truckco" readonly="state!='new'"/>
+                            <!--<field name="amount" readonly="1"/>
+                            <field name="state" readonly="1"/>-->
+                            <field name="delivery_type" readonly="state!='new'"/>
+                            <field name="delivery_id"/>
+                            <field name="delivery_detail_id"/>
+                        </group>
+                        <group string="Info" col="2">
+                            <field name="order_remark" />
+                            <field name="pod_file" filename="pod_filename" widget="binary" readonly="state!='new'"/>
+                            <field name="pod_filename" readonly="state!='new'"/>
+                            <field name="order_file" filename="order_filename" widget="binary" readonly="state!='new'"/>
+                            <field name="order_filename" readonly="state!='new'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Address">
+                            <group col="2">
+                                <group string="Loading">
+                                    <field name="loading_ref" readonly="state!='new'"/>
+                                    <field name="loading_conditon" readonly="state!='new'"/>
+                                    <field name="planned_for_loading" readonly="state!='new'"/>
+                                    <field name="load_address" readonly="state!='new'"/>
+                                    <field name="load_company_name" readonly="state!='new'"/>
+                                    <field name="load_contact_phone" readonly="state!='new'"/>
+                                    <field name="load_postcode" readonly="state!='new'"/>
+                                    <field name="load_country" readonly="state!='new'"/>
+                                    <field name="load_country_code" readonly="state!='new'"/>
+                                    <field name="load_address_timeslot" readonly="state!='new'"/>
+                                    <field name="load_remark"/>
+                                </group>
+                                <group string="Unloading">
+                                    <field name="unloading_ref" readonly="state!='new'"/>
+                                    <field name="unloading_conditon" readonly="state!='new'"/>
+                                    <field name="planned_for_unloading" readonly="state!='new'"/>
+                                    <field name="unload_address" readonly="state!='new'"/>
+                                    <field name="unload_company_name" readonly="state!='new'"/>
+                                    <field name="unload_contact_phone" readonly="state!='new'"/>
+                                    <field name="unload_postcode" readonly="state!='new'"/>
+                                    <field name="unload_country" readonly="state!='new'"/>
+                                    <field name="unload_country_code" readonly="state!='new'"/>
+                                    <field name="unload_address_timeslot" readonly="state!='new'"/>
+                                    <field name="unload_remark"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Good Info">
+                            <group col="2">
+                                <group col="2">
+                                    <field name="cntrno" readonly="state!='new'"/>
+                                    <field name="product" readonly="state!='new'"/>
+                                    <field name="product_name" readonly="state!='new'"/>
+                                    <field name="qty" readonly="state!='new'"/>
+                                    <field name="package_type" readonly="state!='new'"/>
+                                    <field name="package_size" readonly="state!='new'"/>
+                                    <field name="weight_per_unit" readonly="state!='new'"/>
+                                    <field name="gross_weight" readonly="state!='new'"/>
+                                </group>
+                                <group col="2">
+                                    <field name="uncode" readonly="state!='new'"/>
+                                    <field name="class_no" readonly="state!='new'"/>
+                                    <field name="adr" readonly="state!='new'"/>
+                                    <field name="remark" readonly="state!='new'"/>
+                                    <field name="quote" readonly="state!='new'"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="activity_ids" widget="mail_activity" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Delivery Order Search View -->
+    <record id="view_delivery_order_search" model="ir.ui.view">
+        <field name="name">delivery.order.search</field>
+        <field name="model">panexlogi.delivery.order</field>
+        <field name="arch" type="xml">
+            <search string="Delivery Orders">
+                <field name="billno"/>
+                <field name="date"/>
+                <field name="project"/>
+                <field name="truckco"/>
+                <field name="quote"/>
+                <field name="state"/>
+                <field name="load_address"/>
+                <field name="load_company_name"/>
+                <field name="load_contact_phone"/>
+                <field name="load_postcode"/>
+                <field name="load_country"/>
+                <field name="load_country_code"/>
+                <field name="load_address_timeslot"/>
+                <field name="unload_address"/>
+                <field name="unload_company_name"/>
+                <field name="unload_contact_phone"/>
+                <field name="unload_postcode"/>
+                <field name="unload_country"/>
+                <field name="unload_country_code"/>
+                <field name="unload_address_timeslot"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

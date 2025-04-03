@@ -81,10 +81,13 @@
         'views/warehouse_invoice.xml',
         'views/settle_shipping.xml',
         'views/settle_clearance.xml',
+        'views/clearance_type.xml',
+        'views/delivery_order.xml',
         'data/ir_cron_data.xml',
         'views/sequence.xml',
         'report/report.xml',
         'views/menus.xml',
+        #'views/template_delivery_order.xml',
 
     ],
     # only loaded in demonstration mode

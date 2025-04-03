@@ -166,11 +166,18 @@
                         <page string="Lines">
                             <field name="waybillclearinvoicedetail_ids" readonly="state!='new'">
                                 <tree string="Lines" editable="bottom">
+                                    <field name="clearance_type"/>
                                     <field name="fitem"/>
                                     <field name="fitem_name"/>
                                     <field name="amount"/>
                                     <field name="amount_usd"/>
                                     <field name="remark"/>
+                                    <field name="poa"/>
+                                    <field name="t1"/>
+                                    <field name="vdn"/>
+                                    <field name="imd"/>
+                                    <field name="exa"/>
+                                    <field name="lfr"/>
                                 </tree>
                             </field>
                         </page>

@@ -279,7 +279,7 @@
             <field name="number_increment">1</field>
             <!--<field name="company_id" eval="False"/>-->
         </record>
-         <record id="seq_settle_shipping" model="ir.sequence">
+        <record id="seq_settle_shipping" model="ir.sequence">
             <field name="name">Settle Shipping 序列号</field>
             <field name="code">seq.settle.shipping</field>
             <field name="prefix">SS%(year)s%(month)s%(day)s</field>
@@ -292,6 +292,24 @@
             <field name="name">Settle clearance 序列号</field>
             <field name="code">seq.settle.clearance</field>
             <field name="prefix">SC%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_delivery_order" model="ir.sequence">
+            <field name="name">Delivery Order 序列号</field>
+            <field name="code">seq.delivery.order</field>
+            <field name="prefix">DO%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <!--<field name="company_id" eval="False"/>-->
+        </record>
+        <record id="seq_delivery_order_line" model="ir.sequence">
+            <field name="name">Settle clearance Line 序列号</field>
+            <field name="code">seq.delivery.order.line</field>
+            <field name="prefix">DOL%(year)s%(month)s%(day)s</field>
             <field name="padding">4</field>
             <field name="number_next">1</field>
             <field name="number_increment">1</field>

@@ -49,6 +49,7 @@
                             <field name="period"  readonly="state!='new'"/>
                             <field name="start_date" readonly="state!='new'"/>
                             <field name="end_date" readonly="state!='new'"/>
+                            <field name="date_type" readonly="state!='new'"/>
                             <field name="project" readonly="state!='new'"/>
                             <field name="remark" readonly="state!='new'"/>
                         </group>
@@ -65,13 +66,18 @@
                                 <tree editable="bottom">
                                     <field name="invoice_id"/>
                                     <field name="invoiceno"/>
+                                    <field name="invoice_date"/>
+                                    <field name="due_date"/>
+                                    <field name="payment_id"/>
+                                    <field name="pay_date"/>
                                     <field name="waybill_id"/>
                                     <field name="jobno"/>
                                     <field name="waybillno"/>
                                     <field name="Container"/>
                                     <field name="container_qty"/>
-                                    <!--<field name="fitem"/>
-                                    <field name="fitem_name"/>-->
+                                    <field name="clearance_type"/>
+                                    <field name="fitem"/>
+                                    <field name="fitem_name"/>
                                     <field name="poa"/>
                                     <field name="t1"/>
                                     <field name="vdn"/>
@@ -140,7 +146,23 @@
             </search>
         </field>
     </record>
-
+    <!--Output Form View -->
+    <record id="view_settle_clearance_output_form" model="ir.ui.view">
+        <field name="name">settle.clearance.output.form</field>
+        <field name="model">panexlogi.settle.clearance.output</field>
+        <field name="arch" type="xml">
+            <form string="Settle Clearance Output">
+                <sheet>
+                    <group>
+                        <field name="settle_clearance_id"/>
+                        <field name="description"/>
+                        <field name="excel_file" filename="excel_filename" widget="binary"/>
+                        <field name="excel_filename"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
     <!-- Action -->
     <record id="action_settle_clearance" model="ir.actions.act_window">
         <field name="name">Settle Clearance</field>
@@ -148,5 +170,99 @@
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_settle_clearance_tree"/>
         <field name="search_view_id" ref="view_settle_clearance_search"/>
+    </record>
+    <!-- Reset Clearance Wizard -->
+    <record id="view_settle_clearance_reset_wizard_form" model="ir.ui.view">
+        <field name="name">panexlogi.settle.clearance.reset.wizard.form</field>
+        <field name="model">panexlogi.settle.clearance.reset.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reset Clearance">
+                <div class="o_container">
+                    <group class="bg-white p-4 rounded border col-12">
+                        <!--
+                        <div class="text-center mb-4">
+                            <h2 class="text-primary"><strong>Reset Clearance</strong></h2>
+                        </div>
+                        -->
+                        <field name="settle_clearance_id" invisible="1"/>
+                        <label for="settle_clearance_id"/>
+                        <!-- 内容区 -->
+                        <div class="col-12 px-5 mb-4">  <!-- 增加水平padding -->
+                            <div style="font-size: 16px; color: #6c757d; line-height: 1.5; text-align: center">
+                                Do you want to reset POA, T1... value to zero in Clearance Invoices?
+                            </div>
+                        </div>
+                        <footer class="d-flex justify-content-center gap-3 mt-4">
+                            <button string="OK"
+                                    type="object"
+                                    name="action_reset_poa"
+                                    class="btn-primary font-weight-bold"
+                                    icon="fa-check"
+                                    default_focus="1"/>
+                            <button string="Don't Reset"
+                                    type="object"
+                                    name="action_dont_reset_poa"
+                                    class="btn-secondary"/>
+                            <button string="Cancel"
+                                    type="object"
+                                    name="action_cancel"
+                                    icon="fa-times"
+                                    class="btn-secondary"/>
+                        </footer>
+                    </group>
+                </div>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_settle_clearance_reset_wizard" model="ir.actions.act_window">
+        <field name="name">Reset Clearance</field>
+        <field name="res_model">panexlogi.settle.clearance.reset.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_settle_clearance_reset_wizard_form"/>
+    </record>
+    <!-- Update Clearance Wizard -->
+    <record id="view_settle_clearance_update_wizard_form" model="ir.ui.view">
+        <field name="name">panexlogi.settle.clearance.update.wizard.form</field>
+        <field name="model">panexlogi.settle.clearance.update.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Update Clearance">
+                <div class="o_container">
+                    <group class="bg-white p-4 rounded border col-12">
+                        <!--
+                        <div class="text-center mb-4">
+                            <h2 class="text-primary"><strong>Update Clearance</strong></h2>
+                        </div>
+                        -->
+                        <field name="settle_clearance_id" invisible="1"/>
+                        <label for="settle_clearance_id"/>
+                        <!-- 内容区 -->
+                        <div class="col-12 px-5 mb-4">  <!-- 增加水平padding -->
+                            <div style="font-size: 16px; color: #6c757d; line-height: 1.5; text-align: center">
+                                Do you want to update the POA, T1... value in Clearance Invoice?
+                            </div>
+                        </div>
+                        <footer class="d-flex justify-content-center gap-3 mt-4">
+                            <button string="OK"
+                                    type="object"
+                                    name="action_confirm"
+                                    class="btn-primary font-weight-bold"
+                                    icon="fa-check"
+                                    default_focus="1"/>
+                            <button string="Don't Update"
+                                    type="object"
+                                    name="action_not_confirm"
+                                    class="btn-secondary"/>
+                            <button string="Cancel"
+                                    type="object"
+                                    name="action_cancel"
+                                    icon="fa-times"
+                                    class="btn-secondary"/>
+                        </footer>
+                    </group>
+                </div>
+            </form>
+        </field>
     </record>
 </odoo>

@@ -22,7 +22,7 @@ class TransportInvoice(models.Model):
     fitem_name = fields.Char(string='Charge Item Name', related='fitem.name', readonly=True)
 
     invoiceno = fields.Char(string='Invoice No')
-    amount = fields.Float(string='Amount')
+    amount = fields.Float(string='Amount', compute='_onchange_amount', store=True)
     remark = fields.Text(string='Remark')
     check_message = fields.Text(string='Check Message')
     state = fields.Selection(
@@ -269,12 +269,7 @@ class TransportInvoice(models.Model):
         }
 
     # Auto calculate amount
-    @api.onchange('transportinvoicedetailids.unitprice',
-                  'transportinvoicedetailids.surcharge',
-                  'transportinvoicedetailids.waithours',
-                  'transportinvoicedetailids.extrahours',
-                  'transportinvoicedetailids.adrcharge',
-                  'transportinvoicedetailids.dieselcharge')
+    @api.depends('transportinvoicedetailids')
     def _onchange_amount(self):
         for record in self:
             record.amount = 0

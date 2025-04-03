@@ -33,10 +33,29 @@ class DeliveryQuote(models.Model):
     profit = fields.Float('Profit', compute='_compute_profit', store=True,
                           readonly=True)  # Optional if profit depends on these
 
-    trucker = fields.Many2one('res.partner', string='Trucker', domain=[('truck', '=', 'True')])
+    trucker = fields.Many2one('res.partner', string='Trucker', domain=[('truck', '=', 'True')], required=True,
+                              tracking=True)
     remark = fields.Text('Remark')
 
     deliverydetailids = fields.One2many('panexlogi.delivery.quote.detail', 'delivery_quote_id', 'Delivery Quote Detail')
+
+    loading_refs = fields.Char(string='Loading Ref', compute='_compute_loading_refs', store=True)
+    cntrnos = fields.Char('Cantainer No', compute='_compute_loading_refs', store=True)
+
+
+    @api.depends('deliverydetailids.loading_ref', 'deliverydetailids.cntrno')
+    def _compute_loading_refs(self):
+        for record in self:
+            loading_refs = []
+            cntrnos = []
+            for line in record.deliverydetailids:
+                if line.loading_ref:
+                    loading_refs.append(line.loading_ref)
+                if line.cntrno:
+                    cntrnos.append(line.cntrno)
+            record.loading_refs = ', '.join(loading_refs)
+            record.cntrnos = ', '.join(cntrnos)
+
     '''
     # Computed field to fetch related delivery details
     deliverydetailids = fields.One2many(
@@ -50,7 +69,6 @@ class DeliveryQuote(models.Model):
             # Fetch delivery details linked to the same delivery record
             quote.deliverydetailids = quote.delivery_id.deliverydetatilids
     '''
-
 
     state = fields.Selection(
         selection=[
@@ -102,6 +120,7 @@ class DeliveryQuote(models.Model):
                 'deliveryid': rec.deliveryid.id,
                 'adr': rec.adr,
                 'remark': rec.remark,
+                'deliverydetailid': rec.id,
             }))
         self.deliverydetailids = lines
 
@@ -114,16 +133,23 @@ class DeliveryQuote(models.Model):
                 rec.delivery_id.trucker = rec.trucker
                 rec.delivery_id.additional_cost = rec.additional_cost
                 rec.delivery_id._onchange_profit()
+
+                for rec_detail in rec.deliverydetailids:
+                    rec_detail.deliverydetailid.quote = rec_detail.quote
+                    rec_detail.deliverydetailid.state = 'approve'
                 rec.state = 'approve'
                 return True
+
     def action_reject_order(self):
         for rec in self:
             if rec.state != 'new':
                 raise UserError(_("You only can reject New quote"))
             else:
+                for rec_detail in rec.deliverydetailids:
+                    rec_detail.deliverydetailid.quote = 0
+                    rec_detail.deliverydetailid.state = 'reject'
                 rec.state = 'reject'
                 return True
-
 
     def action_cancel_order(self):
         for rec in self:
@@ -133,6 +159,7 @@ class DeliveryQuote(models.Model):
     def on_unlink(self):
         if self.state != 'cancel':
             raise UserError(_("You can not delete approved or rejected quote, try to cancel it first"))
+
     """
     @api.onchange('deliverydetailids')
     def _onchange_deliverydetailids(self):
@@ -160,7 +187,7 @@ class DeliveryQuote(models.Model):
     @api.depends('quote', 'additional_cost', 'extra_cost')
     def _compute_profit(self):
         for record in self:
-            record.profit = record.charged - (record.quote+record.additional_cost + record.extra_cost)
+            record.profit = record.charged - (record.quote + record.additional_cost + record.extra_cost)
 
 
 class DeliveryQuotDetail(models.Model):
@@ -171,7 +198,7 @@ class DeliveryQuotDetail(models.Model):
 
     loading_ref = fields.Char(string='Loading Ref')
     cntrno = fields.Char('Cantainer No')
-    quote = fields.Float('Quote', default=0)  # 报价
+    quote = fields.Float('Quote', default=0, tracking=True)  # 报价
     additional_cost = fields.Float('Additional Cost', default=0)  # 额外费用
     extra_cost = fields.Float('Extra Cost', default=0)  # 额外费用
     product = fields.Many2one('product.product', 'Product')
@@ -184,6 +211,7 @@ class DeliveryQuotDetail(models.Model):
     uncode = fields.Char('UN CODE')
     class_no = fields.Char('Class')
     deliveryid = fields.Many2one('panexlogi.delivery', 'Delivery ID')
+    deliverydetailid = fields.Many2one('panexlogi.delivery.detail', 'Delivery Detail ID')
     # 2025018 wangpeng 是否是ADR goods. 点是的话，就必须要填Uncode。 点选否的话，就不用必填UN code.
     adr = fields.Boolean(string='ADR')
     remark = fields.Text('Remark')

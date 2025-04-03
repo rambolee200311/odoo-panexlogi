@@ -33,12 +33,13 @@
                         <button name="action_cancel_order"
                                 type="object"
                                 string="Cancel"
-                                invisible="state == 'cancel' or state=='new'"
+                                invisible="state == 'cancel' or state=='approve' or state=='reject'"
                                 class="btn-warning"/>
                         <field
                                 name="state"
                                 widget="statusbar"
-                                statusbar_visible="new,approve,reject,cancel"/>
+                                statusbar_visible="new,approve,reject"/>
+                        <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                     </header>
                     <sheet>
                         <div class="oe_title">
@@ -79,13 +80,13 @@
                             </group>
                         </group>
                         <group col="2" string="Truck">
-                            <field name="trucker"/>
+                            <field name="trucker" readonly="state!='new'"/>
                             <field name="remark"/>
                             <!--<field name="state"/>-->
                         </group>
                         <notebook>
                             <page string="Details">
-                                <field name="deliverydetailids">
+                                <field name="deliverydetailids" readonly="state!='new'">
                                     <tree editable="bottom" create="false" delete="false">
                                         <field name="loading_ref"/>
                                         <field name="cntrno"/>
@@ -102,12 +103,13 @@
                                         <field name="uncode"/>
                                         <field name="class_no"/>
                                         <field name="remark"/>
+                                        <field name="deliveryid"/>
+                                        <field name="deliverydetailid"/>
                                     </tree>
                                 </field>
                             </page>
                         </notebook>
                     </sheet>
-
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" />
                         <field name="activity_ids" widget="mail_activity" />
@@ -123,13 +125,15 @@
             <field name="model">panexlogi.delivery.quote</field>
             <field name="arch" type="xml">
                 <tree string="Delivery Quotes">
-                    <field name="delivery_id"/>
-                    <field name="date"/>
-                    <field name="quote"/>
-                    <field name="charged"/>
-                    <field name="profit"/>
-                    <field name="trucker"/>
-                    <field name="state"/>
+                    <field name="delivery_id" optional="show"/>
+                    <field name="date" optional="show"/>
+                    <field name="quote" optional="show"/>
+                    <field name="charged" optional="show"/>
+                    <field name="profit" optional="show"/>
+                    <field name="trucker" optional="show"/>
+                    <field name="state" optional="show" />
+                    <field name="loading_refs" optional="show"/>
+                    <field name="cntrnos" optional="show"/>
                 </tree>
             </field>
         </record>

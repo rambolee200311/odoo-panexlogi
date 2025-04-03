@@ -11,6 +11,7 @@
                 <field name="billno"/>
                 <field name="eta"/>
                 <field name="ata"/>
+                <field name="cntrno_list"/>
                 <field name="shipping"/>
                 <field name="shipper"/>
                 <field name="consignee"/>
@@ -97,14 +98,14 @@
                                 Shipper（船公司）:
                                 <field name="shipping"/>
                                 <br/>
-                                Date（提单日期）:
-                                <field name="date"/>
+                                ETA（预计到港日期）:
+                                <field name="eta"/>
                                  <br/>
-                                Shipper（发货方）:
-                                <field name="shipper"/>
+                                ADR（危险品）:
+                                <field name="adr"/>
                                 <br/>
-                                Consignee（收货方）:
-                                <field name="consignee"/>
+                                Containers（柜号）:
+                                <field name="cntrno_list"/>
                             </div>
                         </div>
                     </t>
@@ -120,10 +121,13 @@
         <field name="model">panexlogi.waybill</field>
         <field name="arch" type="xml">
             <calendar string="Waybill"
-                      date_start="date" date_stop="date"
+                      date_start="eta" date_stop="eta"
                       color="color" mode="month">
-                <field name="billno"/>
                 <field name="waybillno"/>
+                <field name="adr"/>
+                <field name="billno"/>
+                <field name="eta"/>
+                <field name="cntrno_list"/>
             </calendar>
         </field>
     </record>
@@ -143,6 +147,7 @@
                 <field name="ata" optional="hide"/>
                 <field name="direction" optional="show"/>
                 <field name="adr" optional="show"/>
+                <field name="cntrno_list" optional="show"/>
                 <field name="shipping" optional="hide"/>
                 <field name="shipper" optional="hide"/>
                 <field name="consignee" optional="hide"/>
@@ -226,6 +231,7 @@
                             <field name="date" readonly="state!='new'"/>
                             <field name="week" readonly="state!='new'"/>
                             <field name="adr" readonly="state!='new'"/>
+                            <field name="cntrno_list" readonly="1"/>
                             <field name="remark"/>
                         </group>
                     </group>

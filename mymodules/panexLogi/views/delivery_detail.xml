@@ -21,20 +21,36 @@
             <field name="model">panexlogi.delivery.detail</field>
             <field name="arch" type="xml">
                 <form string="Delivery Detail">
+                    <header>
+                        <button name="cancel_delivery_detail"
+                            type="object"
+                            string="Cancel"
+                            invisible="state == 'cancel' or deliveryid.state=='order'"
+                            confirm="Are you sure you want to cancel this delivery detail?"
+                            class="btn-warning"/>
+                        <field
+                            name="state"
+                            widget="statusbar"
+                            statusbar_visible="new,approve,reject,cancel"/>
+                        <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                    </header>
                     <sheet>
                         <group>
+                            <field name="deliveryid" readonly="1"/>
                             <field name="loading_ref"/>
                             <field name="cntrno"/>
                             <field name="product"/>
                             <field name="product_name"/>
                             <field name="adr"/>
-                             <field name="uncode"/>
+                            <field name="uncode"/>
                             <field name="qty"/>
                             <field name="package_size"/>
                             <field name="weight_per_unit"/>
                             <field name="gross_weight"/>
                             <field name="class_no"/>
                             <field name="remark"/>
+                            <field name="quote" readonly="1"/>
+                            <field name="delivery_order_id" readonly="1"/>
                         </group>
                     </sheet>
                 </form>
@@ -59,6 +75,9 @@
                     <field name="gross_weight"/>
                     <field name="class_no"/>
                     <field name="remark"/>
+                    <field name="quote" readonly="1"/>
+                    <field name="state" readonly="1"/>
+                    <field name="delivery_order_id" readonly="1"/>
                 </tree>
             </field>
         </record>

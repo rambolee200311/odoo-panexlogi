@@ -170,7 +170,9 @@ class BaseModel(models.AbstractModel):
         # order by name). Model order being id DESC (aka: first insert -> last
         # displayed) insert should be done by descending sequence then descending
         # name.
-        fields_track_info.sort(key=lambda item: (item[1], item[0]), reverse=True)
+        #fields_track_info.sort(key=lambda item: (item[1], item[0]), reverse=True)
+        # Ensure all items are strings for comparison
+        fields_track_info.sort(key=lambda item: (str(item[1]), str(item[0])), reverse=True)
         return fields_track_info
 
     def _mail_track_get_field_sequence(self, fname):

@@ -51,3 +51,5 @@ from . import deliveryinvoice
 from . import warehouse_invoice
 from . import settle_shipping
 from . import settle_clearance
+from . import clearance_type
+from . import deliveryorder
