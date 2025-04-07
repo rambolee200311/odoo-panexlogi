@@ -24,6 +24,9 @@
                 <field name="pallets"/>
                 <field name="cntrnum"/>
                 <field name="note"/>
+                <field name="truck_type"/>
+                <field name="warehouse"/>
+               <field name="delivery_address"/>
             </tree>
         </field>
     </record>
@@ -45,7 +48,41 @@
                         <field name="pallets"/>
                         <field name="cntrnum"/>
                         <field name="note"/>
+                        <field name="truck_type"/>
                     </group>
+                    <notebook>
+                        <page string="Inboud">
+                            <group col="2">
+                                <group col="2" readonly="truck_type != 'inbound'">
+                                    <field name="warehouse"/>
+                                    <field name="warehouse_address_street"/>
+                                    <field name="warehouse_address_city"/>
+                                    <field name="warehouse_address_state"/>
+                                    <field name="warehouse_address_country"/>
+                                </group>
+                                <group col="2" readonly="truck_type != 'inbound'">
+                                    <field name="warehouse_address_zip"/>
+                                    <field name="warehouse_phone"/>
+                                    <field name="warehouse_mobile"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Delivery">
+                            <group col="2">
+                                <group col="2" readonly="truck_type != 'delivery'">
+                                    <field name="delivery_type"/>
+                                    <field name="delivery_address"/>
+                                    <field name="delivery_company_name"/>
+                                </group>
+                                <group col="2" readonly="truck_type != 'delivery'">
+                                    <field name="delivery_contact_phone"/>
+                                    <field name="delivery_postcode"/>
+                                    <field name="delivery_country"/>
+                                    <field name="delivery_address_timeslot"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers" />

@@ -50,7 +50,7 @@ class WaybillClearInvoice(models.Model):
     imd = fields.Float(string='Import declaration', readonly=True, tracking=True, compute='_compute_total')
     exa = fields.Float(string='Extra article', readonly=True, tracking=True, compute='_compute_total')
     lfr = fields.Float(string='LFR', readonly=True, tracking=True, compute='_compute_total')
-
+    expa = fields.Float(string='Export',readonly=True,  tracking=True, compute='_compute_total')
     @api.model
     def create(self, values):
         """
@@ -100,6 +100,7 @@ class WaybillClearInvoice(models.Model):
             rec.imd = 0
             rec.exa = 0
             rec.lfr = 0
+            rec.expa = 0
             if rec.waybillclearinvoicedetail_ids:
                 rec.eurtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount'))
                 rec.usdtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount_usd'))
@@ -109,6 +110,7 @@ class WaybillClearInvoice(models.Model):
                 rec.imd = sum(rec.waybillclearinvoicedetail_ids.mapped('imd'))
                 rec.exa = sum(rec.waybillclearinvoicedetail_ids.mapped('exa'))
                 rec.lfr = sum(rec.waybillclearinvoicedetail_ids.mapped('lfr'))
+                rec.expa = sum(rec.waybillclearinvoicedetail_ids.mapped('expa'))
 
     # Create PaymentApplication
     def create_payment_application(self):
@@ -272,4 +274,5 @@ class WaybillClearInvoiceDetail(models.Model):
     exa = fields.Float(string='Extra article', tracking=True)
     lfr = fields.Float(string='LFR', tracking=True)
     remark = fields.Text(string='Remark', tracking=True)
+    expa = fields.Float(string='Export', tracking=True)
     clearinvoiceinvoiceid = fields.Many2one('panexlogi.waybill.clearinvoice', tracking=True)

@@ -160,6 +160,7 @@
                             <field name="imd"/>
                             <field name="exa"/>
                             <field name="lfr"/>
+                            <field name="expa"/>
                         </group>
                     </group>
                     <notebook>
@@ -178,6 +179,7 @@
                                     <field name="imd"/>
                                     <field name="exa"/>
                                     <field name="lfr"/>
+                                    <field name="expa"/>
                                 </tree>
                             </field>
                         </page>

@@ -24,11 +24,22 @@ class DeliveryOrder(models.Model):
     truckco_code = fields.Char(string='Truck Co Code', related='truckco.panex_code', readonly=True)
     delivery_id = fields.Many2one('panexlogi.delivery', string='Delivery ID', required=True)
     delivery_detail_id = fields.Many2one('panexlogi.delivery.detail', string='Delivery Detail ID', required=True)
+    trailer_type = fields.Many2one('panexlogi.trailertype', string='Type of trailer')
     state = fields.Selection([
         ('new', 'New'),
         ('confirm', 'Confirm'),
         ('cancel', 'Cancel')
     ], string='State', default='new', tracking=True)
+    delivery_state = fields.Selection([
+        ('none', 'None'),
+        ('order', 'Order Placed'),
+        ('transit', 'In Transit'),
+        ('delivery', 'Delivered'),
+        ('cancel', 'Cancel'),
+        ('return', 'Return'),
+        ('other', 'Other'),
+        ('complete', 'Complete'),
+    ], string='Delivery State', related='delivery_detail_id.state', readonly=True, default='none')
 
     load_address = fields.Char(string='Address')
     load_company_name = fields.Char(string='Company Name')
@@ -75,6 +86,9 @@ class DeliveryOrder(models.Model):
     order_file = fields.Binary(string='Order File')
     order_filename = fields.Char(string='Order File Name')
 
+    client = fields.Char('Client', default='WD Europe')
+    contact_person = fields.Char('Contact Person', default='Cris +31627283491')
+
     @api.model
     def create(self, values):
         """
@@ -113,88 +127,83 @@ class DeliveryOrder(models.Model):
                 return True
 
     def action_print_delivery_order(self):
-        from odoo import _  # 显式导入翻译函数
+        # Generate PDF using standard reporting method
+        from odoo import _
         try:
+            self.ensure_one()
             for rec in self:
                 rec.write({
                     'order_file': False,
                     'order_filename': False
                 })
-                report = self.env['ir.actions.report'].create({
-                    'name': 'Delivery Order',
-                    'report_type': 'qweb-pdf',
-                    'report_name': 'panexLogi.report_delivery_order_my',  # Modified key point
-                    'model': 'panexlogi.delivery.order',
-                    'binding_model_id': self.env['ir.model']._get_id('panexlogi.delivery.order'),
-                })
 
-                self.env['ir.ui.view'].create({
-                    'type': 'qweb',
-                    'name': 'report_delivery_order_my',
-                    'key': 'panexLogi.report_delivery_order_my',
-                    'arch': '''
-                        <t t-call="web.html_container">
-                            <t t-call="web.internal_layout">
-                                <t t-name="panexLogi.report_delivery_order_my">
-                                    <t t-foreach="docs" t-as="o">
-                                        <div class="page">
-                                            <h2>Delivery Order: <span t-field="o.billno"/></h2>
-                                            <table class="table table-bordered">
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Date</td>
-                                                        <td><span t-field="o.date"/></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Project</td>
-                                                        <td><span t-field="o.project.project_name"/></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Load Address</td>
-                                                        <td><span t-field="o.load_address"/></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Unload Address</td>
-                                                        <td><span t-field="o.unload_address"/></td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </t>
-                                </t>
-                            </t>
-                        </t>
-                            '''
-                })
+                # Get predefined report reference
+                report = self.env['ir.actions.report'].search([
+                    ('report_name', '=', 'panexLogi.report_delivery_order_my')
+                ], limit=1)
+
                 # Force template reload and generate PDF
                 self.env.flush_all()
-                # Corrected _render call
-                # pdf_content, content_type = self.env['ir.actions.report']._render(report.id, self.ids)
-                # 直接使用标准方法生成PDF
+
+                # Use standard rendering method
                 result = report._render_qweb_pdf(report_ref=report.report_name,
-                                                 res_ids=rec.id,
+                                                 res_ids=[rec.id],
                                                  data=None)
 
-                # 验证返回结果结构
+                # Validate return structure
                 if not isinstance(result, tuple) or len(result) < 1:
-                    raise ValueError("报表渲染返回无效的数据结构")
+                    raise ValueError("Invalid data structure returned from report rendering")
 
                 pdf_content = result[0]
 
-                rec.write({
-                    'order_file': base64.b64encode(pdf_content),
-                    'order_filename': f'Delivery_Order_{self.billno}_{fields.Datetime.now().strftime("%Y%m%d%H%M%S")}.pdf'
+                # Create attachment
+                order_file = self.env['ir.attachment'].create({
+                    'name': f'Delivery_Order_{self.billno}_{fields.Datetime.now().strftime("%Y%m%d%H%M%S")}.pdf',
+                    'type': 'binary',
+                    'datas': base64.b64encode(pdf_content),
+                    'res_model': self._name,
+                    'res_id': rec.id,
                 })
-                """
-                return {
-                    'type': 'ir.actions.act_url',
-                    'url': f'/web/content/panexlogi.delivery.order/{self.id}/order_file/{self.order_filename}?download=true',
-                    'target': 'self'
-                }
-                """
+                # Write the attachment to the record
+                rec.write({
+                    'order_file': order_file.datas,
+                    'order_filename': order_file.name
+                })
+
         except Exception as e:
             _logger.error("PDF generate failed: %s", str(e))
             raise UserError(_("PDF generate failed: %s") % str(e))
+
+    def action_print_delivery_order_tree(self):
+        try:
+            selected_orders = self.browse(self.env.context.get('active_ids'))
+
+            # Ensure at least one record is selected
+            if not selected_orders:
+                raise UserError("Please select at least one Delivery Order.")
+
+            # Generate PDF for each selected order
+            for order in selected_orders:
+                if order.state != 'confirm':
+                    raise UserError(_("You only can print Confirm Order"))
+
+            for order in selected_orders:
+                order.action_print_delivery_order_tree()
+            # return a seccuess message
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('PDF generated successfully!'),
+                    'sticky': False,
+                },
+            }
+
+
+        except Exception as e:
+            _logger.error("PDF generation failed: %s", str(e))
+            raise UserError(_("PDF generation error: %s") % str(e))
 
 
 class DeliveryOrderLine(models.Model):

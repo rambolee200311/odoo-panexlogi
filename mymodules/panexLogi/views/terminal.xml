@@ -22,7 +22,14 @@
                     <group string="Main">
                         <field name="terminal_code"/>
                         <field name="terminal_name"/>
-                        <field name="terminal_address"/>
+                        <field name="address"/>
+                        <field name="street"/>
+                        <field name="zip"/>
+                        <field name="city"/>
+                        <field name="state"/>
+                        <field name="country"/>
+                        <field name="phone"/>
+                        <field name="mobile"/>
                     </group>
                 </sheet>
             </form>
@@ -36,7 +43,14 @@
                 <search>
                     <field name="terminal_code"/>
                     <field name="terminal_name"/>
-                    <field name="terminal_address"/>
+                    <field name="address"/>
+                    <field name="street"/>
+                    <field name="zip"/>
+                    <field name="city"/>
+                    <field name="state"/>
+                    <field name="country"/>
+                    <field name="phone"/>
+                    <field name="mobile"/>
                 </search>
             </field>
         </record>
@@ -48,7 +62,14 @@
             <tree>
                 <field name="terminal_code"/>
                 <field name="terminal_name"/>
-                <field name="terminal_address"/>
+                <field name="address"/>
+                <field name="street"/>
+                <field name="zip"/>
+                <field name="city"/>
+                <field name="state"/>
+                <field name="country"/>
+                <field name="phone"/>
+                <field name="mobile"/>
             </tree>
         </field>
     </record>

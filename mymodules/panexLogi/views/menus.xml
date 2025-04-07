@@ -93,6 +93,7 @@
         <menuitem id="menu_partner_bankinfo"  name="Partner BankInfos"   parent="configuration_menu" sequence="911" action="action_partner_bankinfo"/>
         <menuitem id="menu_accounting_periods" name="Accounting Periods" parent="configuration_menu" sequence="912" action="action_period_tree"/>
         <menuitem id="menu_clearance_type" name="Clearance Types" sequence="913" parent="configuration_menu" action="action_clearance_type"/>
+        <menuitem id="menu_trailertype_type" name="Trailer Types" sequence="914" parent="configuration_menu" action="panexlogi_trailertype_action"/>
 
         <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->

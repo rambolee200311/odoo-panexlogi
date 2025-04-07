@@ -25,7 +25,8 @@
                         <field name="project_name"/>
                         <field name="project_code"/>
                         <field name="customer"/>
-                        <field name="group" groups="panexLogi.groups_panex_logistic_manager"/>
+                        <field name="warehouse" widget="many2many_tags" />
+                        <field name="group" groups="panexLogi.groups_panex_logistic_manager" class="oe_inline"/>
                     </group>
                     <notebook>
                         <page string="Customs Clearance">

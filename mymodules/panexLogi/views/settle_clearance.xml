@@ -84,6 +84,7 @@
                                     <field name="imd"/>
                                     <field name="exa"/>
                                     <field name="lfr"/>
+                                    <field name="expa"/>
                                     <field name="amount"/>
                                     <field name="invoice_amount"/>
                                     <field name="remark"/>

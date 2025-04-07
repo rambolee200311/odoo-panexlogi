@@ -1,0 +1,17 @@
+<odoo>
+    <template id="report_layout_no_header_footer" name="PanexLogi Template (No Header/Footer)">
+        <!-- Define the layout with a unique t-name -->
+        <t t-name="panexLogi.report_layout_no_header_footer">
+            <div class="page">
+                <!-- Hide headers and footers -->
+                <div class="header" style="display: none;"></div>
+                <div class="footer" style="display: none;"></div>
+
+                <!-- Body content placeholder -->
+                <div class="main">
+                    <t t-raw="0"/>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

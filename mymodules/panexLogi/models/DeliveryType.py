@@ -8,3 +8,11 @@ class DeliveryType(models.Model):
 
     deliverytype_shortname = fields.Char(string='Short Name', required=True)
     deliverytype_name = fields.Char(string='Name', required=True)
+
+class TrailerType(models.Model):
+    _name = 'panexlogi.trailertype'
+    _description = 'TrailerType'
+    _rec_name = "trailertype_shortname"
+
+    trailertype_shortname = fields.Char(string='Short Name', required=True)
+    trailertype_name = fields.Char(string='Name', required=True)

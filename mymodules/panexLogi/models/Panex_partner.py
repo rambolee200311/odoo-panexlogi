@@ -86,6 +86,23 @@ class PartnerBankinfo(models.Model):
             else:
                 record.error = 'Partner not found'
 
+    def set_kvknr(self):
+        selected_partner = self.browse(self.env.context.get('active_ids'))
+        for record in selected_partner:
+            if record.partner_id:
+                if record.panex_kvknr:
+                    record.partner_id.x_kvknr = record.panex_kvknr
+        # return successful message
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'KvKnr set successfully',
+                'sticky': False,
+            },
+        }
+
 
 class Product(models.Model):
     _inherit = 'product.template'

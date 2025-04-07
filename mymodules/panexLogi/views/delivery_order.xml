@@ -92,8 +92,12 @@
                             <field name="delivery_type" readonly="state!='new'"/>
                             <field name="delivery_id"/>
                             <field name="delivery_detail_id"/>
+                            <field name="client"/>
+                            <field name="contact_person"/>
                         </group>
                         <group string="Info" col="2">
+                            <field name="delivery_state"/>
+                            <field name="trailer_type"/>
                             <field name="order_remark" />
                             <field name="pod_file" filename="pod_filename" widget="binary" readonly="state!='new'"/>
                             <field name="pod_filename" readonly="state!='new'"/>
@@ -176,6 +180,8 @@
                 <field name="truckco"/>
                 <field name="quote"/>
                 <field name="state"/>
+                <field name="delivery_state"/>
+                <field name="trailer_type"/>
                 <field name="load_address"/>
                 <field name="load_company_name"/>
                 <field name="load_contact_phone"/>
@@ -193,5 +199,16 @@
             </search>
         </field>
     </record>
-
+    <!-- Delivery Order tree Print Action -->
+    <record id="action_print_delivery_order" model="ir.actions.server">
+        <field name="name">Print Delivery Orders</field>
+        <field name="model_id" ref="model_panexlogi_delivery_order"/>
+        <field name="binding_model_id" ref="model_panexlogi_delivery_order"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = env['panexlogi.delivery.order'].browse(
+                env.context.get('active_ids')
+            ).action_print_delivery_order_tree()
+        </field>
+    </record>
 </odoo>

@@ -9,6 +9,7 @@
                 <page string="Panex_Options">
                     <group col="2">
                         <group col="2">
+                            <field name="x_kvknr"/>
                             <field name="panex_code"/>
                             <field name="shipline"/>
                             <field name="project"/>
@@ -50,6 +51,7 @@
                         <button string="get Partner ID" type="object" name="get_partner_id" class="btn-primary"/>
                         <button string="set Partner Name" type="object" name="set_partner_name" class="btn-primary"/>
                         <button string="set Partner Bank" type="object" name="set_bank_account" class="btn-primary"/>
+                        <button string="set KvKnr" type="object" name="set_kvknr" class="btn-primary"/>
                     </header>
                 <field name="odoo_name"/>
                 <field name="fi_name"/>

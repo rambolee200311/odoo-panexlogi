@@ -102,6 +102,17 @@ class Delivery(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can confirm New Order"))
             else:
+                # Check if the delivery details are empty
+                if not rec.deliverydetatilids:
+                    raise UserError(_("You must add delivery details before confirming."))
+                else:
+                    # Check if the delivery details loading_ref or cntrno is empty
+                    for detail in rec.deliverydetatilids:
+                        if not detail.loading_ref and not detail.cntrno:
+                            raise ValidationError(_("Either Loading Ref or Container No is required."))
+
+
+
                 rec.state = 'confirm'
                 return True
 
@@ -445,14 +456,14 @@ class DeliveryDetail(models.Model):
         for record in self:
             if record.adr and not record.uncode:
                 raise ValidationError(_("UN CODE is required when ADR is true."))
-
+    """
     # check that either loading_ref or cntrno is required
     @api.constrains('loading_ref', 'cntrno')
     def _check_loading_ref_or_cntrno(self):
         for record in self:
             if not record.loading_ref and not record.cntrno:
                 raise ValidationError(_("Either Loading Ref or Container No is required."))
-
+    """
     def cancel_delivery_detail(self):
         for rec in self:
             if rec.delivery_order_id:

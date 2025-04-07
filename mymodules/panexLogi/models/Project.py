@@ -13,6 +13,7 @@ class Project(models.Model):
     customer = fields.Many2one('res.partner', string='Partner Name', required=True)
     productids = fields.One2many('panexlogi.project.product', 'projectid', string='Product lines')
     group = fields.Many2one('res.groups', string='Group')
+    warehouse = fields.Many2many('stock.warehouse', string='Warehouse')
 
     clearance_price_rule = fields.Boolean(string='Depend on Container Count')
     clearance_entry_price = fields.Float(string='Entry Item', default=0)

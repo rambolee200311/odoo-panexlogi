@@ -87,8 +87,7 @@
         'views/sequence.xml',
         'report/report.xml',
         'views/menus.xml',
-        #'views/template_delivery_order.xml',
-
+        'views/template_panexlogi.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
@@ -99,7 +98,8 @@
              # 'static/src/js/samplecollection_barcode_handler.js',
              # 'static/src/xml/*.xml',
              # 'static/src/xml/samplecollection_barcode_handler.xml'
-        ]
+            #'static/src/scss/styles_panexlogi.scss',
+        ],
     },
 
 }

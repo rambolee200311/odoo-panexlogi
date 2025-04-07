@@ -95,6 +95,7 @@ class SettleClearance(models.Model):
                     detail.clearinvoice_detail_id.imd = detail.imd
                     detail.clearinvoice_detail_id.exa = detail.exa
                     detail.clearinvoice_detail_id.lfr = detail.lfr
+                    detail.clearinvoice_detail_id.expa = detail.expa
 
     def _not_update_poa_fields(self):
         for rec in self:
@@ -144,6 +145,7 @@ class SettleClearance(models.Model):
                     detail.clearinvoice_detail_id.imd = 0
                     detail.clearinvoice_detail_id.exa = 0
                     detail.clearinvoice_detail_id.lfr = 0
+                    detail.clearinvoice_detail_id.expa = 0
 
     def _dont_reset_poa(self, state):
         for rec in self:
@@ -176,7 +178,7 @@ class SettleClearance(models.Model):
                     # user confirm to unlink all the details
                     rec.settle_clearance_detail_ids.unlink()
                     settle_clearance_detail = []
-                    #rec.settle_clearance_detail_ids = False
+                    # rec.settle_clearance_detail_ids = False
                     for invoice in clearance_invoices:
                         cntrnos = ','.join([str(x) for x in invoice.waybill_billno.details_ids.mapped('cntrno')])
                         cntrqty = len(invoice.waybill_billno.details_ids.mapped('cntrno'))
@@ -230,6 +232,7 @@ class SettleClearance(models.Model):
                                         'imd': detail.imd,
                                         'exa': detail.exa,
                                         'lfr': detail.lfr,
+                                        'expa': detail.expa,
                                         'invoice_amount': invoice.eurtotal,
                                         'remark': invoice.desc,
                                     }))
@@ -253,7 +256,7 @@ class SettleClearance(models.Model):
             headers = ['Invoice ID', 'Invoice No', 'Waybill ID', 'Job No', 'Waybill No', 'Container',
                        'Container Quantity', 'POA', 'T1', 'VAT defer notification', 'Import declaration',
                        'Extra article', 'LFR', 'Amount',
-                       'Invoice Amount', 'Remark']
+                       'Invoice Amount', 'Remark', 'Export']
 
             # Define a format with border
             border_format = workbook.add_format({'border': 1})
@@ -281,6 +284,7 @@ class SettleClearance(models.Model):
                 worksheet.write(row, 13, detail.amount, border_format)
                 worksheet.write(row, 14, detail.invoice_amount, border_format)
                 worksheet.write(row, 15, detail.remark if detail.remark else '', border_format)
+                worksheet.write(row, 16, detail.expa, border_format)
                 row += 1
 
             workbook.close()
@@ -372,15 +376,16 @@ class SettleClearanceDetail(models.Model):
     imd = fields.Float(string='Import declaration', tracking=True, default=0)
     exa = fields.Float(string='Extra article', tracking=True, default=0)
     lfr = fields.Float(string='LFR', tracking=True, default=0)
+    expa = fields.Float(string='Export', tracking=True, default=0)
     amount = fields.Float(string='Amount（欧元金额）', compute='get_total_amount', store=True)
     invoice_amount = fields.Float(string='Invoice Amount(发票金额)', readonly=True)
     remark = fields.Text(string='Remark', tracking=True)
 
-    @api.depends('poa', 't1', 'vdn', 'imd', 'exa', 'lfr')
+    @api.depends('poa', 't1', 'vdn', 'imd', 'exa', 'lfr', 'expa')
     def get_total_amount(self):
         for rec in self:
             amount = 0
-            amount += rec.poa + rec.t1 + rec.vdn + rec.imd + rec.exa + rec.lfr
+            amount += rec.poa + rec.t1 + rec.vdn + rec.imd + rec.exa + rec.lfr + rec.expa
             rec.amount = amount
 
     """
@@ -431,8 +436,11 @@ class ResetWaybillClearanceWizard(models.TransientModel):
     def action_dont_reset_poa(self):
         self.settle_clearance_id._dont_reset_poa(self.state)
         return {'type': 'ir.actions.act_window_close'}
+
     def action_cancel(self):
         return {'type': 'ir.actions.act_window_close'}
+
+
 # Confirm Update POA Wizard
 class ConfirmUpdateWaybillClearanceWizard(models.TransientModel):
     _name = 'panexlogi.settle.clearance.update.wizard'

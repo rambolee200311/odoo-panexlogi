@@ -171,6 +171,10 @@ class Waybill(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can confirm New Order"))
             else:
+                if not rec.eta:
+                    raise UserError(_("Please select ETA"))
+                if not rec.terminal_a:
+                    raise UserError(_("Please select terminal of arrival"))
                 rec.state = 'confirm'
                 return True
 

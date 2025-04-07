@@ -49,4 +49,27 @@
             </tree>
         </field>
     </record>
+    <!-- window_action -->
+    <record id="panexlogi_trailertype_action" model="ir.actions.act_window">
+        <field name="name">trailertype.management</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">panexlogi.trailertype</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                create your first one!
+            </p>
+        </field>
+    </record>
+     <!--Tree(List) View-->
+    <record id="trailertype_view_tree" model="ir.ui.view">
+        <field name="name">trailertype.tree</field>
+        <field name="model">panexlogi.trailertype</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="trailertype_shortname"/>
+                <field name="trailertype_name"/>
+            </tree>
+        </field>
+    </record>
 </odoo>
