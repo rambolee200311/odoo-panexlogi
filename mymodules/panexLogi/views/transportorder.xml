@@ -128,7 +128,7 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="Container NO">
+                            <page string="Container Details">
                                 <field name="transportorderdetailids" readonly="state!='new'">
                                     <!--<tree  readonly="state!='new'" >
                                         <field name="cntrno" readonly="state!='new'"/>

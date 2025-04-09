@@ -1,0 +1,85 @@
+<!-- mymodules/panexLogi/views/waybill_batch_edit_wizard_view.xml -->
+
+<odoo>
+    <record id="view_waybill_batch_edit_wizard_form" model="ir.ui.view">
+        <field name="name">waybill.batch.edit.wizard.form</field>
+        <field name="model">panexlogi.waybill.batch.edit.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Batch Edit Container Details" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                            <h1>
+                                Container Details
+                            </h1>
+                    </div>
+                    <group>
+                        <field name="waybill_id" readonly="1"/>
+                        <field name="truck_type"/>
+                    </group>
+                    <group>
+                        <field name="detail_ids"
+                               options="{'no_create': True}"
+                               context="{'tree_view_ref': 'panexLogi.view_waybill_details_tree_wizard'}"/>
+                    </group>
+                    <notebook>
+                        <page string="Inboud">
+                            <group col="2">
+                                <group col="2" readonly="truck_type != 'inbound'">
+                                    <field name="warehouse"/>
+                                    <field name="warehouse_address_street"/>
+                                    <field name="warehouse_address_city"/>
+                                    <field name="warehouse_address_state"/>
+                                    <field name="warehouse_address_country"/>
+                                </group>
+                                <group col="2" readonly="truck_type != 'inbound'">
+                                    <field name="warehouse_address_zip"/>
+                                    <field name="warehouse_phone"/>
+                                    <field name="warehouse_mobile"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Delivery">
+                            <group col="2">
+                                <group col="2" readonly="truck_type != 'delivery'">
+                                    <field name="delivery_type"/>
+                                    <field name="delivery_address"/>
+                                    <field name="delivery_company_name"/>
+                                </group>
+                                <group col="2" readonly="truck_type != 'delivery'">
+                                    <field name="delivery_contact_phone"/>
+                                    <field name="delivery_postcode"/>
+                                    <field name="delivery_country"/>
+                                    <field name="delivery_address_timeslot"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Apply" type="object" name="apply_changes" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="view_waybill_details_tree_wizard" model="ir.ui.view">
+    <field name="name">waybill.details.tree.wizard</field>
+    <field name="model">panexlogi.waybill.details</field>
+    <field name="arch" type="xml">
+        <tree create="false" delete="false" editable="bottom">
+            <field name="cntrno"/>
+            <field name="pallets"/>
+            <field name="note"/>
+        </tree>
+    </field>
+</record>
+
+    <record id="action_waybill_batch_edit_wizard" model="ir.actions.act_window">
+        <field name="name">Batch Edit Container Details</field>
+        <field name="res_model">panexlogi.waybill.batch.edit.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -53,3 +53,5 @@ from . import settle_shipping
 from . import settle_clearance
 from . import clearance_type
 from . import deliveryorder
+from . import waybill_batch_edit
+from . import transport_order_extended

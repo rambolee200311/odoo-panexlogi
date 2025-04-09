@@ -450,6 +450,8 @@ class DeliveryDetail(models.Model):
     )
     delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
 
+    waybill_detail_id = fields.Many2one('panexlogi.waybill.details', string='Waybill Detail ID')
+
     # check is adr then uncode is required
     @api.constrains('adr', 'uncode')
     def _check_uncode_required(self):

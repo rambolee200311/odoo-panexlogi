@@ -90,13 +90,18 @@ class WaybillDetails(models.Model):
     delivery_address_timeslot = fields.Char('Timeslot', tracking=True)
     delivery_type = fields.Many2one('panexlogi.deliverytype', 'Delivery Type', tracking=True)
 
+    @api.model
+    def name_get(self):
+        """正确返回 (id, cntrno) 结构，避免多余字段"""
+        return [(record.id, record.cntrno or f"Container ({record.id})") for record in self]
+
     # check if waybill_billno.adr=ture then uncode is required
     @api.constrains('uncode')
     def _check_uncode(self):
         for rec in self:
             if rec.waybill_billno.adr and not rec.uncode:
                 raise UserError(_("UN Code is required!"))
-
+"""
     # check if truck_type=inbound then warehouse is required
     @api.constrains('truck_type', 'warehouse')
     def _check_truck_type_warehouse(self):
@@ -110,3 +115,4 @@ class WaybillDetails(models.Model):
         for rec in self:
             if rec.truck_type == 'delivery' and not rec.delivery_address:
                 raise UserError(_("Delivery Address is required!"))
+"""

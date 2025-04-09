@@ -229,6 +229,8 @@ class TransportOrderDetail(models.Model):
     cmr_file = fields.Binary(string='CMR File')
     cmr_filename = fields.Char(string='CMR File name')
 
+    waybill_detail_id = fields.Many2one('panexlogi.waybill.details', string='Waybill Detail ID')
+
 
 # 其他附件
 class TransportOrderOtherDocs(models.Model):

@@ -30,43 +30,6 @@
         <field name="model">panexlogi.waybill</field>
         <field name="arch" type="xml">
             <kanban limit="20">
-                <!--
-                <field name="billno"/>
-                <field name="waybill_billno"/>
-                <field name="date"/>
-                <field name="block_date"/>
-                <field name="project"/>
-                <field name="shipping"/>
-                <templates>
-                    <t t-name="kanban-box">
-                        <div t-attf-class="oe_kanban_global_click">
-                            <div clasds="oe_kanban_detail">
-                                <ul>
-                                    <li>
-                                        <field name="billno"/>
-                                    </li>
-                                    <li>
-                                        <span >Waybill No（提单号）:</span>
-                                        <field name="waybill_billno"/>
-                                    </li>
-                                    <li>
-                                        <field name="date"/>
-                                    </li>
-                                    <li>
-                                    <field name="block_date"/>
-                                    </li>
-                                    <li>
-                                        <field name="project"/>
-                                    </li>
-                                    <li>
-                                        <field name="shipping"/>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </t>
-                </templates>
-                -->
                 <field name="color"/>
                 <templates>
                     <t t-name="kanban-box">
@@ -192,17 +155,25 @@
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="add_actual_date"
-                                    type="object"
-                                    string="Actual Arrival"
-                                    class="oe_stat_button" icon="fa-building"/>
+                                type="object"
+                                string="Actual Arrival"
+                                class="oe_stat_button" icon="fa-building"/>
                         <button name="action_budget_cal"
                                 type="object"
                                 string="Budget"
                                 class="oe_stat_button" icon="fa-money"/>
-                        <button name="action_tranportorder_add"
-                                    type="object"
-                                    string="Transport Order"
-                                    class="oe_stat_button" icon="fa-truck"/>
+                        <button name="open_batch_edit_wizard"
+                                string="Batch Edit Details"
+                                type="object"
+                                class="oe_stat_button" icon="fa-pencil"/>
+                        <button name="action_transport_order_add"
+                                type="object"
+                                string="Transport Order"
+                                class="oe_stat_button" icon="fa-truck"/>
+                        <button name="action_delivery_request_add"
+                                type="object"
+                                string="Delivery Request"
+                                class="oe_stat_button" icon="fa-bus"/>
                     </div>
                     <div class="oe_title">
                         <h1>

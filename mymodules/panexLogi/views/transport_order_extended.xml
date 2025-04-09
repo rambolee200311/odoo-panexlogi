@@ -1,0 +1,90 @@
+<odoo>
+    <!-- Tree View for Extended Transport Order Details -->
+    <record id="view_transport_order_detail_extended_tree" model="ir.ui.view">
+        <field name="name">transport.order.detail.extended.tree</field>
+        <field name="model">panexlogi.transport.order.detail</field>
+        <field name="arch" type="xml">
+            <tree string="Extended Transport Order Details">
+                <header>
+                    <button name="set_arrived" string="Set Arrived" type="object" class="btn-primary"/>
+                </header>
+                <field name="project"/>
+                <field name="billno"/>
+                <field name="cntrno"/>
+                <field name="uncode" optional="show"/>
+                <field name="coldate" optional="show"/>
+                <field name="warehouse" optional="show"/>
+                <field name="unlolocation" optional="show"/>
+                <field name="unlodate" optional="show"/>
+                <field name="waybillno" optional="show"/>
+                <field name="order_state" optional="show"/>
+                <field name="state" optional="show"/>
+                <field name="arrived_date" optional="show"/>
+                <field name="cmr_file" widget="binary_filename" filename="cmr_filename"/>
+                <field name="cmr_filename"/>
+            </tree>
+        </field>
+    </record>
+
+    <!--search View for Extended Transport Order Details  -->
+    <record id="view_transport_order_detail_extended_search" model="ir.ui.view">
+        <field name="name">transport.order.detail.extended.search</field>
+        <field name="model">panexlogi.transport.order.detail</field>
+        <field name="arch" type="xml">
+            <search string="Extended Transport Order Details">
+                <filter
+                    name="state_confirm"
+                    string="Confirmed"
+                    domain="[('order_state','=','confirm')]"/> <!-- 核心过滤器 -->
+                <field name="project"/>
+                <field name="billno"/>
+                <field name="cntrno"/>
+                <field name="uncode"/>
+                <field name="coldate"/>
+                <field name="warehouse"/>
+                <field name="unlolocation"/>
+                <field name="unlodate"/>
+                <field name="waybillno"/>
+                <field name="state"/>
+            </search>
+        </field>
+    </record>
+
+
+
+    <!-- action for Extended Transport Order Details -->
+    <record id="action_transport_order_detail_extended" model="ir.actions.act_window">
+        <field name="name">Extended Transport Order Details</field>
+        <field name="res_model">panexlogi.transport.order.detail</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_transport_order_detail_extended_tree"/>
+        <field name="search_view_id" ref="view_transport_order_detail_extended_search"/>
+        <field name="context">{'search_default_state_confirm': 1}</field> <!-- 自动激活过滤 -->
+    </record>
+    <!-- set arrived wizard -->
+    <record id="view_set_arrived_wizard_form" model="ir.ui.view">
+        <field name="name">set.arrived.wizard.form</field>
+        <field name="model">panexlogi.transport.order.set.arrived.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Set Arrived" create="false" edit="false">
+                <group>
+                    <field name="arrived_date"/>
+                    <field name="arrived_remark"/>
+                    <field name="cmr_signed" widget="binary" filename="cmr_signed_name"/>
+                    <field name="cmr_signed_name" invisible="1"/>
+                </group>
+                <footer>
+                    <button string="Apply" type="object" name="apply_changes" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!-- action for set arrived wizard -->
+    <record id="action_set_arrived_wizard" model="ir.actions.act_window">
+        <field name="name">Set Arrived</field>
+        <field name="res_model">panexlogi.transport.order.set.arrived.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

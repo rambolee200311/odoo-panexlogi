@@ -127,8 +127,6 @@ class Waybill(models.Model):
     eta_remark = fields.Text(string='ETA Remark')
     transport_order = fields.One2many('panexlogi.transport.order', 'waybill_billno', string='Transport Order')
 
-
-
     # Autofill project_type when project is selected
     @api.onchange('project')
     def _onchange_project(self):
@@ -258,8 +256,7 @@ class Waybill(models.Model):
 
             if self.project.inbound_trucking_fix:
                 # per container
-                inbound_trucking_fee_budget_amount = (
-                                                             entry_num + extra_num) * self.project.inbound_trucking_fixfee_per_pallet
+                inbound_trucking_fee_budget_amount = (entry_num + extra_num) * self.project.inbound_trucking_fixfee_per_pallet
             self.inbound_trucking_fee_budget_amount = inbound_trucking_fee_budget_amount
 
             if self.project.outbound_operating_fix:
@@ -278,10 +275,14 @@ class Waybill(models.Model):
             }
         }
 
-    # 生成运输单
-    def action_tranportorder_add(self):
+    # 生成港倒仓运输单
+    def action_transport_order_add(self):
 
         for record in self:
+            # check if waybill has container details set to inbound
+            if not record.details_ids.search([('truck_type', '=', 'inbound')]):
+                raise UserError(_("Please set container details to inbound first!"))
+
             if self.env['panexlogi.transport.order'].search(
                     [('waybill_billno', '=', record.id), ('state', '!=', 'cancel')]):
                 raise UserError(_("Transport order already exists"))
@@ -293,12 +294,33 @@ class Waybill(models.Model):
                 args_list = []
                 iRow = 0
                 for rec in record.details_ids:
-                    args_list.append((0, 0, {
-                        'cntrno': rec.cntrno,
-                        'pallets': rec.pallets,
-                        'uncode': rec.uncode,
-                    }))
-                    iRow += 1
+                    if rec.truck_type == 'inbound':
+                        """动态合并地址字段，自动跳过空值"""
+                        address_parts = []
+                        if rec.warehouse.partner_id.street:
+                            address_parts.append(rec.warehouse.partner_id.street)
+                        if rec.warehouse.partner_id.zip:
+                            address_parts.append(rec.warehouse.partner_id.zip)
+                        if rec.warehouse.partner_id.city:
+                            address_parts.append(rec.warehouse.partner_id.city)
+                        if rec.warehouse.partner_id.state_id.name:
+                            address_parts.append(rec.warehouse.partner_id.state_id.name)
+
+                        # 用逗号+空格分隔非空字段（例如：Street, 12345 City, State）
+                        warehouse_full_address = ', '.join(address_parts) if address_parts else ''
+                        args_list.append((0, 0, {
+                            'cntrno': rec.cntrno,
+                            'pallets': rec.pallets,
+                            'uncode': rec.uncode,
+                            'coldate': record.eta,
+                            'unlodate': record.eta,
+                            'warehouse': rec.warehouse.id,
+                            'unlolocation': warehouse_full_address,
+                            'dropterminal': record.terminal_a.id,
+                            'drop_off_planned_date': record.eta,
+                            'waybill_detail_id': rec.id,
+                        }))
+                        iRow += 1
 
                 if iRow == 0:
                     raise UserError(_("Please add container details first!"))
@@ -310,7 +332,8 @@ class Waybill(models.Model):
                     'state': 'new',
                     'transportorderdetailids': args_list,
                     'adr': record.adr,
-
+                    'collterminal': record.terminal_a.id,
+                    'coldate': record.eta,
                 }
                 try:
                     # 创建运输单
@@ -326,9 +349,6 @@ class Waybill(models.Model):
                 transport_order_url = "{}/web#id={}&model=panexlogi.transport.order&view_type=form".format(base_url,
                                                                                                            transport_order.id)
                 transport_order_code = transport_order.billno
-                # content = 'Transport order: <a href="{}">{}</a> created successfully!'.format(transport_order_url,
-                #                                                                              transport_order.billno)
-
                 # HTML content with button styling
                 content = f'''
                 <p>Hello,</p>
@@ -367,6 +387,132 @@ class Waybill(models.Model):
 
             else:
                 raise UserError(_("Please add container details first!"))
+
+    # 生成配送单
+    def action_delivery_request_add(self):
+        for rec in self:
+            try:
+                # 按地址分组集装箱
+                address_groups = {}
+                # 港口地址（street, zip, city）
+                terminal_full_address = ''
+
+               # check if waybill has container details set to delivery
+                if not rec.details_ids.search([('truck_type', '=', 'delivery')]):
+                    raise UserError(_("Please set container details to delivery first!"))
+
+                # check if delivery request already exists
+                domain = [('waybill_detail_id', 'in', rec.details_ids.ids), ('deliveryid.state', '!=', 'cancel')]
+                existing_delivery = self.env['panexlogi.delivery.detail'].search(domain)
+                if existing_delivery:
+                    raise UserError(_("Delivery request already exists"))
+
+
+
+                for detail in rec.details_ids.search([('truck_type', '=', 'delivery')]):
+                    """动态合并地址字段，自动跳过空值"""
+                    address_parts = []
+                    if rec.terminal_a.address.street:
+                        address_parts.append(rec.terminal_a.address.street)
+                    if rec.terminal_a.address.zip:
+                        address_parts.append(rec.terminal_a.address.zip)
+                    if rec.terminal_a.address.city:
+                        address_parts.append(rec.terminal_a.address.city)
+
+                    # 用逗号+空格分隔非空字段（例如：Street, 12345 City, State）
+                    terminal_full_address = ', '.join(address_parts) if address_parts else ''
+
+                    # 生成唯一地址标识
+                    address_key = (
+                        detail.delivery_address,
+                        detail.delivery_company_name,
+                        detail.delivery_postcode,
+                        detail.delivery_country.id,
+                        detail.delivery_contact_phone,
+                        detail.delivery_address_timeslot,
+                    )
+                    if address_key not in address_groups:
+                        address_groups[address_key] = []
+                    address_groups[address_key].append(detail)
+
+                # 为每个地址组创建 Delivery 和 Detail
+                for addr_key, details_address in address_groups.items():
+                    # 为每个集装箱创建 Detail
+                    details_vals = []
+                    for detail_address in details_address:
+                        details_vals.append((0, 0, {
+                            'cntrno': detail_address.cntrno,
+                            'loading_ref': f"REF-{detail_address.cntrno}",
+                            'adr': rec.adr,
+                            'uncode': detail_address.uncode,
+                            'waybill_detail_id': detail_address.id,
+                        }))
+                        # 创建或更新 Delivery 记录
+                        delivery_vals = {
+                            'delivery_type': detail_address.delivery_type.id,
+                            'unload_address': addr_key[0],
+                            'unload_company_name': addr_key[1],
+                            'unload_postcode': addr_key[2],
+                            'unload_country': addr_key[3],
+                            'unload_contact_phone': addr_key[4],
+                            'unload_address_timeslot': addr_key[5],
+                            'project': rec.project.id,
+                            'load_address': terminal_full_address,
+                            # 'load_company_name': rec.shipping.name,
+                            'load_contact_phone': rec.terminal_a.address.phone,
+                            'load_postcode': rec.terminal_a.address.zip,
+                            'load_country': rec.terminal_a.address.country_id.id,
+                            'deliverydetatilids': details_vals,
+                        }
+                        delivery_new = self.env['panexlogi.delivery'].create(delivery_vals)
+
+                        # Send Odoo message
+                        subject = 'Transport Order'
+                        # Get base URL
+                        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                        # Construct URL to transport order
+                        delivery_request_url = "{}/web#id={}&model=panexlogi.delivery&view_type=form".format(
+                            base_url,
+                            delivery_new.id)
+                        delivery_request_code = delivery_new.billno
+                        # HTML content with button styling
+                        content = f'''
+                                        <p>Hello,</p>
+                                        <p>A new Delivery request has been created:</p>                                
+                                        <p>Click the button above to access the details.</p>
+                                        '''
+                        # Get users in the Delivery group
+                        group = self.env['res.groups'].search([('name', '=', 'Delivery')], limit=1)
+                        users = self.env['res.users'].search([('groups_id', '=', group.id)])
+                        # Get partner IDs from users
+                        partner_ids = users.mapped("partner_id").ids
+                        # Add Transport group users as followers
+                        delivery_new.message_subscribe(partner_ids=partner_ids)
+                        # Send message
+                        delivery_new.message_post(
+                            body=content,
+                            subject=subject,
+                            message_type='notification',
+                            subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                            body_is_html=True,  # Render HTML in email
+                            force_send=True,
+                        )
+
+
+
+                # return success message
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'display_notification',
+                    'params': {
+                        'title': 'Success',
+                        'message': 'Delivery request create successfully!',
+                        'type': 'success',
+                        'sticky': False,
+                    }
+                }
+            except Exception as e:
+                raise UserError(f"Failed to create delivery request: {e}")
 
     # 维护到港实际日期 跳转wizard视图
     def add_actual_date(self):
@@ -462,6 +608,21 @@ class Waybill(models.Model):
         """Called via the UI button for the current record."""
         self.ensure_one()  # Ensure only one record is processed
         self.cron_check_eta_reminder()  # Reuse the cron logic
+
+    # batch edit
+    def open_batch_edit_wizard(self):
+        for rec in self:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Batch Edit Container Details',
+                'res_model': 'panexlogi.waybill.batch.edit.wizard',
+                'view_mode': 'form',
+                'target': 'new',
+                'context': {
+                    'default_waybill_id': rec.id,
+                    'default_detail_ids': rec.details_ids.ids,
+                }
+            }
 
 
 # 其他附件
