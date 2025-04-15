@@ -95,16 +95,25 @@ class DeliveryQuote(models.Model):
     def _onchange_delivery_id(self):
         self.project = self.delivery_id.project.project_code
         self.deliveryquest_date = self.delivery_id.date
-        self.planned_for_loading = self.delivery_id.planned_for_loading
-        self.planned_for_unloading = self.delivery_id.planned_for_unloading
-        self.load_country = self.delivery_id.load_country.name
-        self.unload_country = self.delivery_id.unload_country.name
-        self.load_address = self.delivery_id.load_address
-        self.unload_address = self.delivery_id.unload_address
+        # self.planned_for_loading = self.delivery_id.planned_for_loading
+        # self.planned_for_unloading = self.delivery_id.planned_for_unloading
+        # self.load_country = self.delivery_id.load_country.name
+        # self.unload_country = self.delivery_id.unload_country.name
+        # self.load_address = self.delivery_id.load_address
+        # self.unload_address = self.delivery_id.unload_address
         lines = []
         for rec in self.delivery_id.deliverydetatilids:
             lines.append((0, 0, {
                 'loading_ref': rec.loading_ref,
+                'consignee_ref': rec.consignee_ref,
+                'load_address': rec.load_address.id,
+                'load_condition': rec.load_condition.id,
+                'load_date': rec.load_date,
+                'load_timeslot': rec.load_timeslot,
+                'unload_condition': rec.unload_condition.id,
+                'unload_address': rec.unload_address.id,
+                'unload_timeslot': rec.unload_timeslot,
+                'unload_date': rec.unload_date,
                 'cntrno': rec.cntrno,
                 'quote': rec.quote,
                 'additional_cost': rec.additional_cost,
@@ -197,7 +206,19 @@ class DeliveryQuotDetail(models.Model):
     delivery_quote_id = fields.Many2one('panexlogi.delivery.quote', 'Delivery Quote ID')
 
     loading_ref = fields.Char(string='Loading Ref')
-    cntrno = fields.Char('Cantainer No')
+    consignee_ref = fields.Char(string='Consignee Ref')
+
+    load_address = fields.Many2one('panexlogi.address', 'Load Address')
+    load_condition = fields.Many2one('panexlogi.loadingcondition', 'Load Condition')
+    load_date = fields.Datetime(string='Load Date')
+    load_timeslot = fields.Char('Unload Timeslot')
+
+    unload_condition = fields.Many2one('panexlogi.loadingcondition', 'Unload Condition')
+    unload_address = fields.Many2one('panexlogi.address', 'Unload Address')
+    unload_timeslot = fields.Char('Unload Timeslot')
+    unload_date = fields.Datetime(string='Unload Date')
+
+    cntrno = fields.Char('Container No')
     quote = fields.Float('Quote', default=0, tracking=True)  # 报价
     additional_cost = fields.Float('Additional Cost', default=0)  # 额外费用
     extra_cost = fields.Float('Extra Cost', default=0)  # 额外费用

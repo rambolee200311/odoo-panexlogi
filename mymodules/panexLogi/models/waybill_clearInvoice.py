@@ -50,7 +50,10 @@ class WaybillClearInvoice(models.Model):
     imd = fields.Float(string='Import declaration', readonly=True, tracking=True, compute='_compute_total')
     exa = fields.Float(string='Extra article', readonly=True, tracking=True, compute='_compute_total')
     lfr = fields.Float(string='LFR', readonly=True, tracking=True, compute='_compute_total')
-    expa = fields.Float(string='Export',readonly=True,  tracking=True, compute='_compute_total')
+    expa = fields.Float(string='Export', readonly=True, tracking=True, compute='_compute_total')
+    cntrnos = fields.Char(string='Container No(集装箱号)', compute='_get_cntrno_refno')
+    refnos = fields.Char(string='Reference No(参考号)', compute='_get_cntrno_refno')
+
     @api.model
     def create(self, values):
         """
@@ -257,12 +260,21 @@ class WaybillClearInvoice(models.Model):
                                     'waybill': r.waybill_billno.waybillno
                                 })
 
+    @api.depends('waybillclearinvoicedetail_ids.cntrno', 'waybillclearinvoicedetail_ids.refno')
+    def _get_cntrno_refno(self):
+        for rec in self:
+            # Filter out None values before joining
+            rec.cntrnos = ', '.join(filter(None, rec.waybillclearinvoicedetail_ids.mapped('cntrno')))
+            rec.refnos = ', '.join(filter(None, rec.waybillclearinvoicedetail_ids.mapped('refno')))
+
 
 class WaybillClearInvoiceDetail(models.Model):
     _name = 'panexlogi.waybill.clearinvoice.detail'
     _description = 'panexlogi.waybill.clearinvoice.detail'
 
     clearance_type = fields.Many2one('panexlogi.clearance.type', string='Clearance Type')
+    cntrno = fields.Char(string='Container No(集装箱号)', tracking=True)
+    refno = fields.Char(string='Reference No(参考号)', tracking=True)
     fitem = fields.Many2one('panexlogi.fitems', string='Item(费用项目)', tracking=True)
     fitem_name = fields.Char(string='Item Name(费用项目名称)', related='fitem.name', readonly=True)
     amount = fields.Float(string='Amount（欧元金额）', tracking=True)

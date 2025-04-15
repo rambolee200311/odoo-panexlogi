@@ -16,7 +16,7 @@ class Waybill(models.Model):
 
     billno = fields.Char(string='BillNo', readonly=True)
     direction = fields.Selection([('import', 'Import'), ('export', 'Export'), ('other', 'Other')], string='Direction',
-                                 default='import')
+                                 default='import', required=True, tracking=True)
 
     docno = fields.Char(string='Document No（文件号）', required=False)
     expref = fields.Char(string='Export Refrences', required=False)
@@ -169,10 +169,11 @@ class Waybill(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can confirm New Order"))
             else:
-                if not rec.eta:
-                    raise UserError(_("Please select ETA"))
-                if not rec.terminal_a:
-                    raise UserError(_("Please select terminal of arrival"))
+                if rec.direction == 'import':
+                    if not rec.eta:
+                        raise UserError(_("Please select ETA"))
+                    if not rec.terminal_a:
+                        raise UserError(_("Please select terminal of arrival"))
                 rec.state = 'confirm'
                 return True
 
@@ -189,11 +190,19 @@ class Waybill(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can cancel New Order"))
             else:
-                if rec.shipinvoice_ids.state != 'cancel':
+                if rec.shipinvoice_ids.state != 'cancel' and rec.shipinvoice_ids:
                     raise UserError(_("shipping invoice must be cancel first"))
-                if rec.clearinvoice_ids.state != 'cancel':
+                if rec.clearinvoice_ids.state != 'cancel' and rec.clearinvoice_ids:
                     raise UserError(_("clearance invoice must be cancel first"))
                 rec.state = 'cancel'
+                return True
+
+    def action_renew_order(self):
+        for rec in self:
+            if rec.state != 'cancel':
+                raise UserError(_("You only can renew Cancelled Order"))
+            else:
+                rec.state = 'new'
                 return True
 
     @api.model
@@ -256,7 +265,8 @@ class Waybill(models.Model):
 
             if self.project.inbound_trucking_fix:
                 # per container
-                inbound_trucking_fee_budget_amount = (entry_num + extra_num) * self.project.inbound_trucking_fixfee_per_pallet
+                inbound_trucking_fee_budget_amount = (
+                                                             entry_num + extra_num) * self.project.inbound_trucking_fixfee_per_pallet
             self.inbound_trucking_fee_budget_amount = inbound_trucking_fee_budget_amount
 
             if self.project.outbound_operating_fix:
@@ -397,7 +407,7 @@ class Waybill(models.Model):
                 # 港口地址（street, zip, city）
                 terminal_full_address = ''
 
-               # check if waybill has container details set to delivery
+                # check if waybill has container details set to delivery
                 if not rec.details_ids.search([('truck_type', '=', 'delivery')]):
                     raise UserError(_("Please set container details to delivery first!"))
 
@@ -406,8 +416,6 @@ class Waybill(models.Model):
                 existing_delivery = self.env['panexlogi.delivery.detail'].search(domain)
                 if existing_delivery:
                     raise UserError(_("Delivery request already exists"))
-
-
 
                 for detail in rec.details_ids.search([('truck_type', '=', 'delivery')]):
                     """动态合并地址字段，自动跳过空值"""
@@ -497,8 +505,6 @@ class Waybill(models.Model):
                             body_is_html=True,  # Render HTML in email
                             force_send=True,
                         )
-
-
 
                 # return success message
                 return {

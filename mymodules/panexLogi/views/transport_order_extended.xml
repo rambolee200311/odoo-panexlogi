@@ -18,10 +18,41 @@
                 <field name="unlodate" optional="show"/>
                 <field name="waybillno" optional="show"/>
                 <field name="order_state" optional="show"/>
-                <field name="state" optional="show"/>
                 <field name="arrived_date" optional="show"/>
-                <field name="cmr_file" widget="binary_filename" filename="cmr_filename"/>
-                <field name="cmr_filename"/>
+                <field name="cmr_file" widget="binary_filename" filename="cmr_filename"  optional="show"/>
+                <field name="cmr_filename" optional="show"/>
+                <!--<field name="cmr_signed" widget="binary_filename" filename="cmr_signed_name" optional="show"/>
+                <field name="cmr_signed_name" optional="show"/>
+                <field name="attachment_ids" widget="many2many_binary" optional="show"/>-->
+                 <field name="state" optional="show"/>
+                <!-- CMR文件展示 -->
+                <field name="cmr_signed"
+                       widget="binary"
+                       filename="cmr_signed_name"
+                       string="CMR Signed"
+                       options="{
+                           'human_readable': true,
+                           'icon_size': (32, 32)
+                       }"
+                       class="oe_attachment_preview"/>
+                <!-- 附件图标展示 -->
+                <field name="attachment_ids"
+                       widget="many2many_binary"
+                       string="Attachments"
+                       options="{
+                           'preview': true,
+                           'icon_only': true,
+                           'max_items': 3,
+                           'icon_size': (24, 24)
+                       }"/>
+
+                <!-- 状态指示器 -->
+                <field name="state" widget="badge"
+                       options="{'classes': {
+                           'draft': 'bg-secondary',
+                           'confirmed': 'bg-warning',
+                           'arrived': 'bg-success'
+                       }}"/>
             </tree>
         </field>
     </record>
@@ -62,20 +93,75 @@
         <field name="context">{'search_default_state_confirm': 1}</field> <!-- 自动激活过滤 -->
     </record>
     <!-- set arrived wizard -->
-    <record id="view_set_arrived_wizard_form" model="ir.ui.view">
-        <field name="name">set.arrived.wizard.form</field>
+    <record id="transport_order_set_arrived_wizard_form" model="ir.ui.view">
+        <field name="name">transport.order.set.arrived.wizard.form</field>
         <field name="model">panexlogi.transport.order.set.arrived.wizard</field>
         <field name="arch" type="xml">
-            <form string="Set Arrived" create="false" edit="false">
-                <group>
-                    <field name="arrived_date"/>
-                    <field name="arrived_remark"/>
-                    <field name="cmr_signed" widget="binary" filename="cmr_signed_name"/>
-                    <field name="cmr_signed_name" invisible="1"/>
-                </group>
+            <form string="Set Arrived">
+                <sheet>
+                    <!-- Arrived Date -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label for="arrived_date" class="d-block o_form_label">Arrived Date</label>
+                            <field name="arrived_date" widget="date" class="w-100"/>
+                        </div>
+                    </div>
+
+                    <!-- CMR Signed -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label for="cmr_signed" class="d-block o_form_label">CMR Signed</label>
+                            <field name="cmr_signed"
+                                   widget="binary"
+                                   filename="cmr_signed_name"
+                                   string="CMR Signed"
+                                   class="btn-block"
+                                   style="background-color: #6f42c1; border-color: #6f42c1; width: 100%; padding: 12px;"/>
+                        </div>
+                    </div>
+
+                    <!-- File Name -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label for="cmr_signed_name" class="d-block o_form_label">File name</label>
+                            <field name="cmr_signed_name"
+                                   class="w-100"
+                                   placeholder="Enter file name"
+                                   readonly="1"
+                                   style="background-color: #f8f9fa; border: 1px solid #e0e0e0; padding: 8px;"/>
+                        </div>
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label for="arrived_remark" class="d-block o_form_label">Add remarks</label>
+                            <field name="arrived_remark" class="w-100" placeholder="Type your remarks here..."/>
+                        </div>
+                    </div>
+
+                    <!-- Attachments -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card p-3" style="border: 1px solid #e0e0e0; border-radius: 8px;">
+                                <label for="attachment_ids" class="d-block o_form_label">Attachments</label>
+                                <field name="attachment_ids"
+                                       widget="many2many_binary"
+                                       string=" "
+                                       class="oe_attachment_preview"
+                                       options="{'preview': true}"
+                                       style="min-height: 100px;"/>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+
+                <!-- Footer Buttons -->
                 <footer>
-                    <button string="Apply" type="object" name="apply_changes" class="btn-primary"/>
-                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button special="cancel" string="Cancel" class="btn-secondary"/>
+                        <button name="apply_changes" string="Apply" type="object" class="btn-primary"/>
+                    </div>
                 </footer>
             </form>
         </field>

@@ -85,6 +85,8 @@
         'views/settle_clearance.xml',
         'views/clearance_type.xml',
         'views/delivery_order.xml',
+        'views/excel_template.xml',
+        'views/address.xml',
         'data/ir_cron_data.xml',
         'views/sequence.xml',
         'report/report.xml',

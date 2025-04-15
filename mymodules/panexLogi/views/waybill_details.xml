@@ -19,6 +19,7 @@
         <field name="model">panexlogi.waybill.details</field>
         <field name="arch" type="xml">
             <tree string="Waybill_details_Tree">
+                <field name="waybill_billno"/>
                 <field name="cntrno"/>
                 <field name="uncode"/>
                 <field name="pallets"/>
@@ -43,6 +44,7 @@
                         </h1>
                     </div>
                     <group>
+                        <field name="waybill_billno" readonly="1"/>
                         <field name="cntrno"/>
                         <field name="uncode"/>
                         <field name="pallets"/>

@@ -5,6 +5,8 @@ from odoo import _, models, fields, api, exceptions
 from odoo.exceptions import UserError, ValidationError
 import logging
 import base64
+from io import BytesIO
+import openpyxl
 
 _logger = logging.getLogger(__name__)
 
@@ -22,8 +24,8 @@ class DeliveryOrder(models.Model):
     project_code = fields.Char(string='Project Code', related='project.project_code', readonly=True)
     truckco = fields.Many2one('res.partner', string='Truck Co（卡车公司）', required=True)
     truckco_code = fields.Char(string='Truck Co Code', related='truckco.panex_code', readonly=True)
-    delivery_id = fields.Many2one('panexlogi.delivery', string='Delivery ID', required=True)
-    delivery_detail_id = fields.Many2one('panexlogi.delivery.detail', string='Delivery Detail ID', required=True)
+    delivery_id = fields.Many2one('panexlogi.delivery', string='Delivery ID')
+    delivery_detail_id = fields.Many2one('panexlogi.delivery.detail', string='Delivery Detail ID')
     trailer_type = fields.Many2one('panexlogi.trailertype', string='Type of trailer')
     state = fields.Selection([
         ('new', 'New'),
@@ -40,11 +42,24 @@ class DeliveryOrder(models.Model):
         ('other', 'Other'),
         ('complete', 'Complete'),
     ], string='Delivery State', related='delivery_detail_id.state', readonly=True, default='none')
+    # load type
+    load_type = fields.Selection(
+        selection=[
+            ('warehouse', 'Warehouse'),
+            ('terminal', 'Terminal'),
+            ('other', 'Other'),
+        ],
+        string='Load Type',
+        default='other'
+    )
+    load_warehouse = fields.Many2one('stock.warehouse', string='Warehouse')
+    load_terminal = fields.Many2one('panexlogi.terminal', string='Terminal')
 
     load_address = fields.Char(string='Address')
     load_company_name = fields.Char(string='Company Name')
     load_contact_phone = fields.Char(string='Contact Phone')
     load_postcode = fields.Char(string='Postcode')
+    load_city = fields.Char(string='City')
     load_country = fields.Many2one('res.country', 'Load Country')
     load_country_code = fields.Char('Country Code', related='load_country.code')
     load_address_timeslot = fields.Char('Timeslot')
@@ -52,6 +67,7 @@ class DeliveryOrder(models.Model):
     unload_company_name = fields.Char(string='Company Name')
     unload_contact_phone = fields.Char(string='Contact Phone')
     unload_postcode = fields.Char(string='Postcode')
+    unload_city = fields.Char(string='City')
     unload_country = fields.Many2one('res.country', 'Unload Country')
     unload_country_code = fields.Char('Country Code', related='unload_country.code')
     unload_address_timeslot = fields.Char('Timeslot')
@@ -67,7 +83,10 @@ class DeliveryOrder(models.Model):
     cntrno = fields.Char('Container No')
     product = fields.Many2one('product.product', 'Product')
     product_name = fields.Char('Product Name', related='product.name')
-    qty = fields.Float('Quantity', default=1)
+    pallets = fields.Float('Palltes', default=1)
+    qty = fields.Float('Pcs', default=1)
+    batch_no = fields.Char('Batch No')
+    model_type = fields.Char('Model Type')
     package_type = fields.Many2one('panexlogi.packagetype', 'Package Type')
     package_size = fields.Char('Size L*W*H')
     weight_per_unit = fields.Float('Weight PER Unit')
@@ -85,9 +104,65 @@ class DeliveryOrder(models.Model):
     pod_filename = fields.Char(string='POD File Name')
     order_file = fields.Binary(string='Order File')
     order_filename = fields.Char(string='Order File Name')
+    cmr_file = fields.Binary(string='CMR File')
+    cmr_filename = fields.Char(string='CMR File Name')
 
     client = fields.Char('Client', default='WD Europe')
     contact_person = fields.Char('Contact Person', default='Cris +31627283491')
+
+    cntrnos = fields.Char('Container Nos', compute='_compute_cntrnos', store=True)
+    loading_refs = fields.Char(string='Loading Refs', compute='_compute_cntrnos', store=True)
+    delivery_order_line_ids = fields.One2many('panexlogi.delivery.order.line',
+                                              'delivery_order_id',
+                                              string='Delivery Order Line')
+    delivery_order_cmr_line_ids = fields.One2many('panexlogi.delivery.order.cmr.line',
+                                                  'delivery_order_id',
+                                                  string='Delivery Order CMR Line')
+
+    @api.onchange('load_warehouse')
+    def _onchange_load_warehouse(self):
+        if self.load_warehouse and self.load_type == 'warehouse':
+            self.load_terminal = False
+            self.load_address = self.load_warehouse.partner_id.street
+            self.load_company_name = self.load_warehouse.partner_id.name
+            self.load_postcode = self.load_warehouse.partner_id.zip
+            self.load_city = self.load_warehouse.partner_id.city
+            self.load_country = self.load_warehouse.partner_id.country_id.id
+
+    @api.onchange('load_terminal')
+    def _onchange_load_terminal(self):
+        if self.load_terminal and self.load_type == 'terminal':
+            self.load_warehouse = False
+            self.load_address = self.load_terminal.address.street
+            self.load_company_name = self.load_terminal.address.name
+            self.load_postcode = self.load_terminal.address.zip
+            self.load_city = self.load_terminal.address.city
+            self.load_country = self.load_terminal.address.country_id.id
+
+    @api.constrains('load_type', 'load_warehouse', 'load_terminal')
+    def _check_load_type(self):
+        for record in self:
+            if record.load_type == 'warehouse' and not record.load_warehouse:
+                raise ValidationError(_("Please select a warehouse."))
+            if record.load_type == 'terminal' and not record.load_terminal:
+                raise ValidationError(_("Please select a terminal."))
+
+    @api.depends('delivery_detail_id.cntrno', 'delivery_detail_id.loading_ref')
+    def _compute_cntrnos(self):
+        """
+            Compute container numbers and loading references.
+        """
+        for rec in self:
+            cntrnos = []
+            loading_refs = []
+            for line in rec.delivery_detail_id:
+                # Ensure values are strings, skip if False or None
+                if line.cntrno:
+                    cntrnos.append(str(line.cntrno))
+                if line.loading_ref:
+                    loading_refs.append(str(line.loading_ref))
+            rec.cntrnos = ', '.join(cntrnos)
+            rec.loading_refs = ', '.join(loading_refs)
 
     @api.model
     def create(self, values):
@@ -205,6 +280,155 @@ class DeliveryOrder(models.Model):
             _logger.error("PDF generation failed: %s", str(e))
             raise UserError(_("PDF generation error: %s") % str(e))
 
+    # 生成CMR文件
+    def generate_cmr_file(self):
+        try:
+            template_record = self.env['panexlogi.excel.template'].search([('type', '=', 'delivery')], limit=1)
+            # check if the template is em
+            if not template_record:
+                raise UserError(_('Template not found!'))
+            template_data = base64.b64decode(template_record.template_file)
+            template_buffer = BytesIO(template_data)
+            for rec in self:
+                # check if the load_company_name is empty
+                if not rec.load_company_name:
+                    raise UserError(_('Please fill in the load company name!'))
+                # check if the unload_company_name is empty
+                if not rec.unload_company_name:
+                    raise UserError(_('Please fill in the unload company name!'))
+                # check if the load_address is empty
+                if not rec.load_address:
+                    raise UserError(_('Please fill in the load address!'))
+                # check if the unload_address is empty
+                if not rec.unload_address:
+                    raise UserError(_('Please fill in the unload address!'))
+
+                # receiver = rec.waybill_billno.project.customer.name
+                # teminal = rec.collterminal.terminal_name
+
+                # Load the template workbook
+                workbook = openpyxl.load_workbook(template_buffer)
+                worksheet = workbook.active
+
+                # Write data to the specified cells
+                worksheet['B6'] = ''
+                worksheet['B6'] = rec.project.project_name if rec.project else ''
+                worksheet['B7'] = ''
+                worksheet['B7'] = rec.load_comanpy_name + ' ' + rec.load_address
+                worksheet['B13'] = ''
+                worksheet['B13'] = rec.unload_comanpy_name + ' ' + rec.unload_address
+                worksheet['B20'] = ''
+                worksheet['B20'] = ''
+                worksheet['B21'] = ''
+                worksheet['B21'] = rec.load_country.name
+                worksheet['D21'] = ''
+                worksheet['D21'] = fields.Date.today().strftime('  -   -%Y  (DD-MM-YYYY)')  # --2025
+                worksheet['B27'] = ''
+                worksheet['B29'] = ''
+                worksheet['B29'] = ''
+                worksheet['D29'] = ''
+                ref = []
+                if not rec.cntrno:
+                    ref.append(rec.cntrnos)
+                if not rec.loading_refs:
+                    ref.append(rec.loading_refs)
+                ref_fullname = '-'.join(ref)
+
+                worksheet['D29'] = ''
+                worksheet['F29'] = ref_fullname
+                worksheet['F29'] = rec.product.name if rec.product else ''
+                worksheet['H29'] = ''
+                worksheet['H29'] = rec.qty if rec.qty else 1
+                worksheet['I29'] = ''
+                worksheet['I29'] = rec.gross_weight if rec.gross_weight else 0
+
+                worksheet['J28'] = ''
+                worksheet['J28'] = 'Pieces'
+                worksheet['J29'] = ''
+                worksheet['J29'] = rec.qty if rec.qty else 1
+
+                worksheet['B48'] = ''
+                worksheet['B48'] = 'warehouse'
+
+                # Save the workbook to a BytesIO object
+                excel_buffer = BytesIO()
+                workbook.save(excel_buffer)
+                excel_buffer.seek(0)
+                rec.cmr_file = base64.b64encode(excel_buffer.read())
+                rec.cmr_filename = f'CMR_{rec.billno}_{ref_fullname}.xlsx'
+            # return a success message
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Success',
+                    'message': 'CMR file generated successfully!',
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+
+        except Exception as e:
+            raise UserError(_('Error generating CMR file: %s') % str(e))
+
+    class DeliveryOrder(models.Model):
+        _name = 'panexlogi.delivery.order'
+
+        # ... (其他字段保持原样)
+
+    # 生成CMR Lines
+    def action_create_cmr_lines(self):
+        """ 为每个唯一的 loading_ref + cntrno 组合创建 CMR Line """
+        for order in self:
+
+            # 1. 校验 delivery_order_line_ids 是否存在
+            if not order.delivery_order_line_ids:
+                raise UserError(_("No delivery order lines found!"))
+
+            # 2. 收集所有唯一的 loading_ref + cntrno 组合
+            unique_combinations = set()
+            for line in order.delivery_order_line_ids:
+                if not line.loading_ref or not line.cntrno:
+                    raise UserError(
+                        _("Line %s has empty Loading Ref or Container No!") % line.billno
+                    )
+                unique_combinations.add((line.loading_ref, line.cntrno))
+
+            # 3. 为每个组合创建 CMR Line
+            cmr_lines = []
+            for loading_ref, cntrno in unique_combinations:
+                # 查找第一个匹配的 line 获取其他字段值
+                reference_line = order.delivery_order_line_ids.filtered(
+                    lambda l: l.loading_ref == loading_ref and l.cntrno == cntrno
+                )[:1]
+
+                cmr_vals = {
+                    'loading_ref': loading_ref,
+                    'cntrno': cntrno,
+                    '': reference_line.product.id,
+                    'qty': reference_line.qty,
+                    'gross_weight': reference_line[0].gross_weight,
+                    'planned_for_loading': reference_line[0].planned_for_loading,
+                    'planned_for_unloading': reference_line[0].planned_for_unloading,
+                    # 其他必要字段...
+                }
+                cmr_lines.append((0, 0, cmr_vals))
+
+            # 4. 批量写入 CMR Lines
+            order.write({'delivery_cmr_line_ids': cmr_lines})
+
+            # 返回成功提示
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('CMR Lines created for %s unique combinations!') % len(unique_combinations),
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+
 
 class DeliveryOrderLine(models.Model):
     _name = 'panexlogi.delivery.order.line'
@@ -222,10 +446,13 @@ class DeliveryOrderLine(models.Model):
     planned_for_loading = fields.Datetime(string='Planned Loading')
     planned_for_unloading = fields.Datetime(string='Planned Unloading')
 
-    cntrno = fields.Char('Cantainer No')
+    cntrno = fields.Char('Container No')
     product = fields.Many2one('product.product', 'Product')
-    product_name = fields.Char('Product Name', related='product.name', readonly=True)
-    qty = fields.Float('Quantity', default=1)
+    product_name = fields.Char('Product Name', related='product.name')
+    pallets = fields.Float('Palltes', default=1)
+    qty = fields.Float('Pcs', default=1)
+    batch_no = fields.Char('Batch No')
+    model_type = fields.Char('Model Type')
     package_type = fields.Many2one('panexlogi.packagetype', 'Package Type')
     package_size = fields.Char('Size L*W*H')
     weight_per_unit = fields.Float('Weight PER Unit')
@@ -233,26 +460,48 @@ class DeliveryOrderLine(models.Model):
     uncode = fields.Char('UN CODE')
     class_no = fields.Char('Class')
     adr = fields.Boolean(string='ADR')
-    remark = fields.Text('Remark', tracking='1')
-
+    remark = fields.Text('Remark')
+    order_remark = fields.Text('Order Remark', tracking='1')
+    load_remark = fields.Text('Load Remark', tracking='1')
+    unload_remark = fields.Text('Unload Remark', tracking='1')
     quote = fields.Float('Quote', default=0)  # 报价
+    additional_cost = fields.Float('Additional Cost', default=0)  # 附加报价
 
-    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
-
-    state = fields.Selection([
-        ('new', 'New'),
-        ('order', 'Order Placed'),
-        ('transit', 'In Transit'),
-        ('delivery', 'Delivered'),
-        ('cancel', 'Cancel'),
-        ('return', 'Return'),
-        ('other', 'Other'),
-        ('complete', 'Complete')], string='Status', default='new', tracking='1')
 
     pod_file = fields.Binary(string='POD File')
     pod_filename = fields.Char(string='POD File Name')
     order_file = fields.Binary(string='Order File')
     order_filename = fields.Char(string='Order File Name')
+
+    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
+    order_billno = fields.Char(string='Order BillNo', related='delivery_order_id.billno', readonly=True)
+    load_type = fields.Selection(
+        selection=[
+            ('warehouse', 'Warehouse'),
+            ('terminal', 'Terminal'),
+            ('other', 'Other'),
+        ],
+        string='Load Type',
+        default='other'
+    )
+    load_warehouse = fields.Many2one('stock.warehouse', string='Warehouse')
+    load_terminal = fields.Many2one('panexlogi.terminal', string='Terminal')
+    load_address = fields.Char(string='Address')
+    load_company_name = fields.Char(string='Company Name')
+    load_contact_phone = fields.Char(string='Contact Phone')
+    load_postcode = fields.Char(string='Postcode')
+    load_city = fields.Char(string='City')
+    load_country = fields.Many2one('res.country', 'Load Country')
+    load_country_code = fields.Char('Country Code', related='load_country.code')
+    load_address_timeslot = fields.Char('Timeslot')
+    unload_address = fields.Char(string='Address')
+    unload_company_name = fields.Char(string='Company Name')
+    unload_contact_phone = fields.Char(string='Contact Phone')
+    unload_postcode = fields.Char(string='Postcode')
+    unload_city = fields.Char(string='City')
+    unload_country = fields.Many2one('res.country', 'Unload Country')
+    unload_country_code = fields.Char('Country Code', related='unload_country.code')
+    unload_address_timeslot = fields.Char('Timeslot')
 
     @api.model
     def create(self, values):
@@ -262,4 +511,50 @@ class DeliveryOrderLine(models.Model):
         times = fields.Date.today()
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.delivery.order.line', times)
         delivery_request = super(DeliveryOrderLine, self).create(values)
+        return delivery_request
+
+
+class DeliveryOrderCmrLine(models.Model):
+    _name = 'panexlogi.delivery.order.cmr.line'
+    _description = 'panexlogi.delivery.order.cmr.line'
+    _rec_name = 'billno'
+
+    billno = fields.Char(string='BillNo', readonly=True)
+    loading_ref = fields.Char(string='Loading Ref')
+    cntrno = fields.Char('Container No')
+
+    loading_conditon = fields.Many2one('panexlogi.loadingcondition', ' Condition')
+    unloading_conditon = fields.Many2one('panexlogi.loadingcondition', 'Condition')
+    planned_for_loading = fields.Datetime(string='Planned Loading')
+    planned_for_unloading = fields.Datetime(string='Planned Unloading')
+    product = fields.Many2one('product.product', 'Product')
+    product_name = fields.Char('Product Name', related='product.name')
+    pallets = fields.Float('Palltes', default=1)
+    qty = fields.Float('Pcs', default=1)
+    batch_no = fields.Char('Batch No')
+    model_type = fields.Char('Model Type')
+    package_type = fields.Many2one('panexlogi.packagetype', 'Package Type')
+    package_size = fields.Char('Size L*W*H')
+    weight_per_unit = fields.Float('Weight PER Unit')
+    gross_weight = fields.Float('Gross Weight')
+    uncode = fields.Char('UN CODE')
+    class_no = fields.Char('Class')
+    adr = fields.Boolean(string='ADR')
+    remark = fields.Text('Remark')
+    cmr_file = fields.Binary(string='CMR File')
+    cmr_filename = fields.Char(string='CMR File Name')
+    cmr_signed = fields.Binary(string='CMR Signed')
+    cmr_signed_filename = fields.Char(string='CMR Signed File Name')
+    pod_file = fields.Binary(string='POD File')
+    pod_filename = fields.Char(string='POD File Name')
+    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
+
+    @api.model
+    def create(self, values):
+        """
+            生成订单号
+        """
+        times = fields.Date.today()
+        values['billno'] = self.env['ir.sequence'].next_by_code('seq.delivery.order.cmr.line', times)
+        delivery_request = super(DeliveryOrderCmrLine, self).create(values)
         return delivery_request

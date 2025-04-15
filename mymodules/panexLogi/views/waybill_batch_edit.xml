@@ -63,23 +63,25 @@
         </field>
     </record>
 
-
+    <!-- Action to open the batch edit wizard -->
     <record id="view_waybill_details_tree_wizard" model="ir.ui.view">
-    <field name="name">waybill.details.tree.wizard</field>
-    <field name="model">panexlogi.waybill.details</field>
-    <field name="arch" type="xml">
-        <tree create="false" delete="false" editable="bottom">
-            <field name="cntrno"/>
-            <field name="pallets"/>
-            <field name="note"/>
-        </tree>
-    </field>
-</record>
-
+        <field name="name">waybill.details.tree.wizard</field>
+        <field name="model">panexlogi.waybill.details</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false" editable="bottom">
+                <field name="cntrno"/>
+                <field name="pallets"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Action to open the batch edit wizard -->
     <record id="action_waybill_batch_edit_wizard" model="ir.actions.act_window">
         <field name="name">Batch Edit Container Details</field>
         <field name="res_model">panexlogi.waybill.batch.edit.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
+
+
 </odoo>

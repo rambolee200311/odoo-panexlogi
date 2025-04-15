@@ -146,6 +146,12 @@
                             string="Cancel"
                             invisible="state == 'confirm' or state == 'cancel'"
                             class="btn-warning"/>
+                    <button name="action_renew_order"
+                            type="object"
+                            string="Renew"
+                            invisible="state != 'cancel'"
+                            class="btn-primary"
+                            groups="panexLogi.groups_panex_logistic_manager" />
                      <field
                             name="state"
                             widget="statusbar"

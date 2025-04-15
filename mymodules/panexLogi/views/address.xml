@@ -1,0 +1,117 @@
+<odoo>
+    <!--Tree view for Address-->
+    <record id="view_address_tree" model="ir.ui.view">
+        <field name="name">panexlogi.address.tree</field>
+        <field name="model">panexlogi.address</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="address_code"/>
+                <field name="street"/>
+                <field name="postcode"/>
+                <field name="city"/>
+                <field name="state"/>
+                <field name="country"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+                <field name="company_name"/>
+                <field name="timeslot"/>
+                <field name="is_warehouse"/>
+                <field name="warehouse"/>
+                <field name="is_terminal"/>
+                <field name="terminal"/>
+                <field name="remark"/>
+            </tree>
+        </field>
+    </record>
+    <!--Search view for Address-->
+    <record id="view_address_search" model="ir.ui.view">
+        <field name="name">panexlogi.address.search</field>
+        <field name="model">panexlogi.address</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="address_code"/>
+                <field name="street"/>
+                <field name="postcode"/>
+                <field name="city"/>
+                <field name="state"/>
+                <field name="country"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+                <field name="company_name"/>
+                <field name="timeslot"/>
+                <field name="is_warehouse"/>
+                <field name="warehouse"/>
+                <field name="is_terminal"/>
+                <field name="terminal"/>
+                <field name="remark"/>
+            </search>
+        </field>
+    </record>
+    <!-- Form view for Address-->
+    <record id="view_address_form" model="ir.ui.view">
+        <field name="name">panexlogi.address.form</field>
+        <field name="model">panexlogi.address</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            Address
+                        </h1>
+                        <h2>
+                            <field name="address_code"/>
+                        </h2>
+                    </div>
+                    <group col="2" string="Address Information">
+                        <group col="2">
+                            <field name="is_warehouse"/>
+                            <field name="warehouse"/>
+                        </group>
+                        <group col="2">
+                            <field name="is_terminal"/>
+                            <field name="terminal"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group col="2" string="Address">
+                            <field name="street"/>
+                            <field name="postcode"/>
+                            <field name="city"/>
+                            <field name="state"/>
+                            <field name="country"/>
+                        </group>
+                        <group col="2" string="Contact">
+                            <field name="company_name"/>
+                            <field name="timeslot"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="remark"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- action for Address -->
+     <record id="action_address_tree" model="ir.actions.act_window">
+        <field name="name">Addresses</field>
+        <field name="res_model">panexlogi.address</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Action: Get Address from Warehouse
+    <record id="action_get_address_form_warehouse" model="ir.actions.server">
+        <field name="name">Get Address from Warehouse</field>
+        <field name="model_id" ref="model_panexlogi_address"/>
+        <field name="binding_model_id" ref="model_panexlogi_address"/>
+        <field name="state">code</field>
+        <field name="code">model.get_address_form_warehouse()</field>
+    </record> -->
+    <!-- Action: Get Address from Terminal
+    <record id="action_get_address_form_terminal" model="ir.actions.server">
+        <field name="name">Get Address from Terminal</field>
+        <field name="model_id" ref="model_panexlogi_address"/>
+        <field name="binding_model_id" ref="model_panexlogi_address"/>
+        <field name="state">code</field>
+        <field name="code">model.get_address_form_terminal()</field>
+    </record>-->
+</odoo>

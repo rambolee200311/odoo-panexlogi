@@ -1,5 +1,8 @@
 from odoo import _, models, fields, api, exceptions, tools
 from odoo.exceptions import UserError
+import base64
+from io import BytesIO
+import openpyxl
 
 '''
     Transport Order
@@ -167,6 +170,126 @@ class TransportOrder(models.Model):
             }
         }
 
+    # 生成CMR文件
+    def generate_cmr_file(self):
+        try:
+            template_record = self.env['panexlogi.excel.template'].search([('type', '=', 'inbound')], limit=1)
+            if not template_record:
+                raise UserError(_('Template not found!'))
+            template_data = base64.b64decode(template_record.template_file)
+            template_buffer = BytesIO(template_data)
+            for rec in self:
+                # check teminal is not empty
+                if not rec.collterminal:
+                    raise UserError(_('Terminal is required!'))
+                # check warehouse is not empty
+                for detail in rec.transportorderdetailids:
+                    if not detail.warehouse:
+                        raise UserError(_('Warehouse is required!'))
+                for detail in rec.transportorderdetailids:
+                    # generate CMR file based details
+                    bill_num = rec.waybill_billno.waybillno
+                    cntrno = detail.cntrno
+                    pallets = detail.pallets
+                    model_type = detail.model_type
+                    weight_kg = detail.weight_kg
+                    # receiver = rec.waybill_billno.project.customer.name
+                    # teminal = rec.collterminal.terminal_name
+                    total_pcs = detail.total_pcs
+                    # combinate teminal address with street,zip,city,country
+                    teminal_address_parts = []
+                    if rec.collterminal.address.street:
+                        teminal_address_parts.append(rec.collterminal.address.street)
+                    if rec.collterminal.address.zip:
+                        teminal_address_parts.append(rec.collterminal.address.zip)
+                    if rec.collterminal.address.city:
+                        teminal_address_parts.append(rec.collterminal.address.city)
+                    if rec.collterminal.address.country_id.name:
+                        teminal_address_parts.append(rec.collterminal.address.country_id.name)
+                    # 用逗号+空格分隔非空字段（例如：Street, 12345 City, State）
+                    teminal_full_address = ', '.join(teminal_address_parts) if teminal_address_parts else ''
+                    teminal_name = rec.collterminal.address.name if rec.collterminal.address.name else ''
+                    project_name = rec.project.project_name if rec.project else ''
+
+                    warehouse_address_parts = []
+                    if detail.warehouse.partner_id.street:
+                        warehouse_address_parts.append(detail.warehouse.partner_id.street)
+                    if detail.warehouse.partner_id.zip:
+                        warehouse_address_parts.append(detail.warehouse.partner_id.zip)
+                    if detail.warehouse.partner_id.city:
+                        warehouse_address_parts.append(detail.warehouse.partner_id.city)
+                    warehouse_full_address = ', '.join(warehouse_address_parts) if warehouse_address_parts else ''
+                    warehouse_city_name = detail.warehouse.partner_id.city if detail.warehouse.partner_id.city else ''
+                    warehouse_country_name = detail.warehouse.partner_id.country_id.name if detail.warehouse.partner_id.country_id else ''
+                    warehouse_name = detail.warehouse.name if detail.warehouse.name else ''
+
+                    # Load the template workbook
+                    workbook = openpyxl.load_workbook(template_buffer)
+                    worksheet = workbook.active
+
+                    # Write data to the specified cells
+                    worksheet['B6'] = ''
+                    worksheet['B6'] = project_name
+                    worksheet['B7'] = ''
+                    worksheet['B7'] = teminal_name
+                    worksheet['B13'] = ''
+                    worksheet['B13'] = warehouse_full_address
+                    worksheet['B20'] = ''
+                    worksheet['B20'] = warehouse_city_name
+                    worksheet['B21'] = ''
+                    worksheet['B21'] = warehouse_country_name
+                    worksheet['D21'] = ''
+                    worksheet['D21'] = fields.Date.today().strftime('  -   -%Y  (DD-MM-YYYY)')  # --2025
+                    worksheet['B27'] = ''
+                    worksheet['B29'] = ''
+                    worksheet['B29'] = bill_num
+                    worksheet['D29'] = ''
+                    worksheet['D29'] = cntrno
+                    worksheet['F29'] = ''
+                    worksheet['F29'] = model_type
+                    worksheet['H29'] = ''
+                    worksheet['H29'] = pallets
+                    worksheet['I29'] = ''
+                    worksheet['I29'] = weight_kg
+                    if total_pcs != 0:
+                        worksheet['J28'] = ''
+                        worksheet['J28'] = 'Pieces'
+                        worksheet['J29'] = ''
+                        worksheet['J29'] = total_pcs
+                    worksheet['G36'] = ''
+                    worksheet['G36'] = 'Total Pallets:'
+                    worksheet['H36'] = ''
+                    worksheet['H36'] = pallets
+                    if total_pcs != 0:
+                        worksheet['G37'] = ''
+                        worksheet['G37'] = 'Total Pieces:'
+                        worksheet['H37'] = ''
+                        worksheet['H37'] = total_pcs
+
+                    worksheet['B48'] = ''
+                    worksheet['B48'] = warehouse_name
+
+                    # Save the workbook to a BytesIO object
+                    excel_buffer = BytesIO()
+                    workbook.save(excel_buffer)
+                    excel_buffer.seek(0)
+                    detail.cmr_file = base64.b64encode(excel_buffer.read())
+                    detail.cmr_filename = f'CMR_{rec.billno}_{cntrno}.xlsx'
+            # return a success message
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Success',
+                    'message': 'CMR file generated successfully!',
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+
+        except Exception as e:
+            raise UserError(_('Error generating CMR file: %s') % str(e))
+    """
     @api.constrains('waybill_billno')
     def _check_waybillno_id(self):
         for r in self:
@@ -178,7 +301,7 @@ class TransportOrder(models.Model):
             existing_records = self.search(domain)
             if existing_records:
                 raise UserError(_('waybill_billno must be unique per transport order!'))
-
+    """
     # 维护到港实际日期 跳转wizard视图
     def add_actual_date(self):
         if not self.id:
@@ -194,10 +317,26 @@ class TransportOrder(models.Model):
             'context': {'default_billno': self.id},
         }
 
+    # batch edit
+    def open_batch_edit_wizard(self):
+        for rec in self:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Batch Edit Container Details',
+                'res_model': 'panexlogi.transport.order.detail.batch.edit.wizard',
+                'view_mode': 'form',
+                'target': 'new',
+                'context': {
+                    'default_transportorderid': rec.id,
+                    'default_detail_ids': rec.transportorderdetailids.ids,
+                }
+            }
+
 
 class TransportOrderDetail(models.Model):
     _name = 'panexlogi.transport.order.detail'
     _description = 'panexlogi.transport.order.detail'
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     cntrno = fields.Char(string='Container NO')
     pallets = fields.Float(string='Pallets', default=26)
@@ -299,3 +438,50 @@ class TransportOrderCntrnos(models.Model):
                     join panexlogi_transport_order_detail d on o.id = d.transportorderid
                     where o.state = 'confirm'   )
         """)
+
+
+class TransportOrderDetailBatchEditWizard(models.TransientModel):
+    _name = 'panexlogi.transport.order.detail.batch.edit.wizard'
+    _description = 'Batch Edit Transport Order Details'
+
+    transportorderid = fields.Many2one('panexlogi.transport.order', string='Transport Order')
+    detail_ids = fields.Many2many(
+        'panexlogi.transport.order.detail',
+        string='Container Details',
+        domain="[('transportorderid', '=', transportorderid)]",
+        relation='transportorder_batch_edit_details_rel'  # Shorter table name
+    )
+
+    coldate = fields.Date(string='Collection Date')
+    warehouse = fields.Many2one('stock.warehouse', string='Unloaded Warehouse')
+    unlolocation = fields.Char(string='Unloaded Location')
+    unlodate = fields.Date(string='Unloaded Date')
+    dropterminal = fields.Many2one('panexlogi.terminal', string='Drop-off Terminal')
+    drop_off_planned_date = fields.Date(string='Drop-off Date')
+    model_type = fields.Char(string='Model Type')
+    weight_kg = fields.Float(string='Weight (kg)')
+    total_pcs = fields.Float(string='Total Pieces')
+
+
+    def apply_changes(self):
+        for rec in self:
+            for detail in rec.detail_ids:
+                if rec.coldate:
+                    detail.coldate = rec.coldate
+                if rec.warehouse:
+                    detail.warehouse = rec.warehouse
+                if rec.unlolocation:
+                    detail.unlolocation = rec.unlolocation
+                if rec.dropterminal:
+                    detail.dropterminal = rec.dropterminal
+                if rec.drop_off_planned_date:
+                    detail.drop_off_planned_date = rec.drop_off_planned_date
+                if rec.model_type:
+                    detail.model_type = rec.model_type
+                if rec.weight_kg:
+                    detail.weight_kg = rec.weight_kg
+                if rec.total_pcs:
+                    detail.total_pcs = rec.total_pcs
+                if rec.unlodate:
+                    detail.unlodate = rec.unlodate
+        return {'type': 'ir.actions.act_window_close'}

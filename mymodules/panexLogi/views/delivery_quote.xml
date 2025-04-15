@@ -55,6 +55,7 @@
                             <field name="date"/>
                             <field name="project"/>
                         </group>
+                        <!--
                         <group col="2" string="Info">
                             <group>
                                 <field name="planned_for_loading"/>
@@ -67,6 +68,7 @@
                                 <field name="unload_address"/>
                             </group>
                         </group>
+                        -->
                         <group col="2" string="Quote">
                             <group>
                                 <field name="delivery_id" readonly="True"/>
@@ -88,11 +90,20 @@
                             <page string="Details">
                                 <field name="deliverydetailids" readonly="state!='new'">
                                     <tree editable="bottom" create="false" delete="false">
-                                        <field name="loading_ref"/>
                                         <field name="cntrno"/>
                                         <field name="quote"/>
                                         <field name="additional_cost"/>
                                         <field name="extra_cost"/>
+                                        <field name="loading_ref"/>
+                                        <field name="load_address"/>
+                                        <field name="load_condition"/>
+                                        <field name="load_date"/>
+                                        <field name="load_timeslot"/>
+                                        <field name="consignee_ref"/>
+                                        <field name="unload_address"/>
+                                        <field name="unload_condition"/>
+                                        <field name="unload_date"/>
+                                        <field name="unload_timeslot"/>
                                         <field name="product"/>
                                         <field name="product_name"/>
                                         <field name="adr"/>

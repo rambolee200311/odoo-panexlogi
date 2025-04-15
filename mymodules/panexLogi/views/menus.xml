@@ -34,6 +34,7 @@
         <menuitem id="waybill_cargorelease_menu" name="Cargo Release" parent="import_logi_menu" sequence="106" action="waybill_cargorelease_action"/>
          -->
         <menuitem id="waybill_packlist_menu" name="Packing List" parent="import_logi_menu" sequence="107" action="waybill_packlist_action"/>
+        <menuitem id="waybill_details_menu" name="Container Details" parent="import_logi_menu" sequence="108" action="waybill_details_action"/>
 <!--
         <menuitem id="cartage_logi_menu" name="Cartage" parent="panex_logi_menu" sequence="200" />
         <menuitem id="cartage_order_menu" name="Order" parent="cartage_logi_menu" sequence="201" action="cartage_order_action"/>
@@ -78,23 +79,25 @@
         <menuitem id="panexlogi_warehouse_invoice_detail_menu" name="Warehouse Invoice Details"  parent="warehouse_invoice_menu"  action="action_warehouse_invoice_detail" sequence="523"/>
 
         <menuitem id="configuration_menu" name="Configuration" parent="panex_logi_menu" sequence="900" />
-        <menuitem id="partner_menu" name="Partner files" parent="configuration_menu" sequence="901" action="action_partner"/>
+        <menuitem id="partner_menu" name="Partners" parent="configuration_menu" sequence="901" action="action_partner"/>
 <!--    <menuitem id="sender_menu" name="Spot files" parent="configuration_menu" sequence="902" action="sender_action"/>
         <menuitem id="receiver_menu" name="Receiver files" parent="configuration_menu" sequence="903" action="receiver_action"/>-->
-        <menuitem id="cartage_tag_menu" name="Cartage Tag files" parent="configuration_menu" sequence="904" action="cartage_tag_action"/>
-        <menuitem id="panex_project_menu" name="Project files" parent="configuration_menu" sequence="905" action="panexlogi_project_action"/>
-        <menuitem id="panex_fitems_menu" name="Fitems files" parent="configuration_menu" sequence="906" action="panexlogi_fitems_action"/>
-        <menuitem id="panex_country_menu" name="Country files" parent="configuration_menu" sequence="907" action="panexlogi_country_action"/>
-        <menuitem id="panex_deliverytype_menu" name="DeliveryType files" parent="configuration_menu" sequence="908" action="panexlogi_deliverytype_action"/>
-        <menuitem id="panex_loadingcondition_menu" name="Loading Condition files" parent="configuration_menu" sequence="909" action="panexlogi_loadingcondition_action"/>
-        <menuitem id="panex_packagetype_menu" name="packagetype files" parent="configuration_menu" sequence="907" action="panexlogi_packagetype_action"/>
-        <menuitem id="panex_terminal_menu" name="terminal files" parent="configuration_menu" sequence="908" action="panexlogi_terminal_action"/>
-	    <menuitem id="panex_paymentmethod_menu" name="Payment Method" parent="configuration_menu" sequence="909" action="action_payment_method"/>
-	    <menuitem id="panex_project_type_menu" name="Project Type" parent="configuration_menu" sequence="910" action="action_project_type"/>
+        <menuitem id="cartage_tag_menu" name="Cartage Tags" parent="configuration_menu" sequence="904" action="cartage_tag_action"/>
+        <menuitem id="panex_project_menu" name="Projects" parent="configuration_menu" sequence="905" action="panexlogi_project_action"/>
+        <menuitem id="panex_fitems_menu" name="Fitems" parent="configuration_menu" sequence="906" action="panexlogi_fitems_action"/>
+        <menuitem id="panex_country_menu" name="Countries" parent="configuration_menu" sequence="907" action="panexlogi_country_action"/>
+        <menuitem id="panex_deliverytype_menu" name="DeliveryTypes" parent="configuration_menu" sequence="908" action="panexlogi_deliverytype_action"/>
+        <menuitem id="panex_loadingcondition_menu" name="Loading Conditions" parent="configuration_menu" sequence="909" action="panexlogi_loadingcondition_action"/>
+        <menuitem id="panex_packagetype_menu" name="packagetypes" parent="configuration_menu" sequence="907" action="panexlogi_packagetype_action"/>
+        <menuitem id="panex_terminal_menu" name="Terminals" parent="configuration_menu" sequence="908" action="panexlogi_terminal_action"/>
+	    <menuitem id="panex_paymentmethod_menu" name="Payment Methods" parent="configuration_menu" sequence="909" action="action_payment_method"/>
+	    <menuitem id="panex_project_type_menu" name="Project Types" parent="configuration_menu" sequence="910" action="action_project_type"/>
         <menuitem id="menu_partner_bankinfo"  name="Partner BankInfos"   parent="configuration_menu" sequence="911" action="action_partner_bankinfo"/>
         <menuitem id="menu_accounting_periods" name="Accounting Periods" parent="configuration_menu" sequence="912" action="action_period_tree"/>
         <menuitem id="menu_clearance_type" name="Clearance Types" sequence="913" parent="configuration_menu" action="action_clearance_type"/>
         <menuitem id="menu_trailertype_type" name="Trailer Types" sequence="914" parent="configuration_menu" action="panexlogi_trailertype_action"/>
+        <menuitem id="menu_excel_template_type" name="Excel Templates" sequence="915" parent="configuration_menu" action="action_excel_template"/>
+        <menuitem id="menu_address" name="Addresses" sequence="916" parent="configuration_menu" action="action_address_tree"/>
 
         <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->

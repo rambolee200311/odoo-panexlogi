@@ -25,32 +25,56 @@
                         <button name="cancel_delivery_detail"
                             type="object"
                             string="Cancel"
-                            invisible="state == 'cancel' or deliveryid.state=='order'"
+                            invisible="state == 'cancel'"
                             confirm="Are you sure you want to cancel this delivery detail?"
                             class="btn-warning"/>
                         <field
                             name="state"
                             widget="statusbar"
-                            statusbar_visible="new,approve,reject,cancel"/>
+                            statusbar_visible="new,approve,reject"/>
                         <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
                     </header>
                     <sheet>
                         <group>
                             <field name="deliveryid" readonly="1"/>
-                            <field name="loading_ref"/>
-                            <field name="cntrno"/>
-                            <field name="product"/>
-                            <field name="product_name"/>
-                            <field name="adr"/>
-                            <field name="uncode"/>
-                            <field name="qty"/>
-                            <field name="package_size"/>
-                            <field name="weight_per_unit"/>
-                            <field name="gross_weight"/>
-                            <field name="class_no"/>
-                            <field name="remark"/>
-                            <field name="quote" readonly="1"/>
-                            <field name="delivery_order_id" readonly="1"/>
+                        </group>
+                        <group col="2">
+                             <group col="2" string="Loading">
+                                <field name="loading_ref" string="reference" readonly="state!='new'"/>
+                                <field name="load_condition" string="condition" readonly="state!='new'"/>
+                                <field name="load_address" string="address" readonly="state!='new'"/>
+                                <field name="load_date" string="date time" readonly="state!='new'"/>
+                                <field name="load_timeslot" string="timeslot" readonly="state!='new'"/>
+                            </group>
+                            <group col="2" string="Unloading">
+                                <field name="consignee_ref" string="reference" readonly="state!='new'"/>
+                                <field name="unload_condition" string="condition" readonly="state!='new'"/>
+                                <field name="unload_address" string="address" readonly="state!='new'"/>
+                                <field name="unload_date" string="date time" readonly="state!='new'"/>
+                                <field name="unload_timeslot" string="timeslot" readonly="state!='new'"/>
+                            </group>
+                        </group>
+                        <group col="2">
+                            <group  col="2" string="product">
+                                <field name="cntrno" readonly="state!='new'"/>
+                                <field name="product" readonly="state!='new'"/>
+                                <field name="product_name" readonly="state!='new'"/>
+                                <field name="adr" readonly="state!='new'"/>
+                                <field name="uncode" readonly="state!='new'"/>
+                                <field name="pallets" readonly="state!='new'"/>
+                                <field name="qty" readonly="state!='new'"/>
+                                <field name="batch_no" readonly="state!='new'"/>
+                            </group>
+                            <group col="2" string="Details">
+                                <field name="model_type" readonly="state!='new'"/>
+                                <field name="package_size" readonly="state!='new'"/>
+                                <field name="weight_per_unit" readonly="state!='new'"/>
+                                <field name="gross_weight" readonly="state!='new'"/>
+                                <field name="class_no" readonly="state!='new'"/>
+                                <field name="remark" readonly="state!='new'"/>
+                                <field name="quote" readonly="1"/>
+                                <field name="delivery_order_id" readonly="1"/>
+                            </group>
                         </group>
                     </sheet>
                 </form>
@@ -64,6 +88,15 @@
             <field name="arch" type="xml">
                 <tree string="Delivery Details">
                     <field name="loading_ref"/>
+                    <field name="load_address"/>
+                    <field name="load_condition"/>
+                    <field name="load_date"/>
+                    <field name="load_timeslot"/>
+                    <field name="consignee_ref"/>
+                    <field name="unload_address"/>
+                    <field name="unload_condition"/>
+                    <field name="unload_date"/>
+                    <field name="unload_timeslot"/>
                     <field name="cntrno"/>
                     <field name="product"/>
                     <field name="product_name"/>

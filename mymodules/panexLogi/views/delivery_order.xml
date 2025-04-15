@@ -24,10 +24,16 @@
                 <field name="project" optional="show"/>
                 <field name="truckco" optional="show"/>
                 <field name="quote" optional="show"/>
+                <field name="cntrnos" optional="show"/>
+                <field name="load_type"/>
+                <field name="load_warehouse"/>
+                <field name="load_terminal"/>
+                <field name="loading_refs" optional="show"/>
                 <field name="load_address" optional="show"/>
                 <field name="load_company_name" optional="show"/>
                 <field name="load_contact_phone" optional="show"/>
                 <field name="load_postcode" optional="show"/>
+                <field name="load_city" optional="show"/>
                 <field name="load_country" optional="show"/>
                 <field name="load_country_code" optional="show"/>
                 <field name="load_address_timeslot" optional="show"/>
@@ -35,6 +41,7 @@
                 <field name="unload_company_name" optional="show"/>
                 <field name="unload_contact_phone" optional="show"/>
                 <field name="unload_postcode" optional="show"/>
+                <field name="unload_city" optional="show"/>
                 <field name="unload_country" optional="show"/>
                 <field name="unload_country_code" optional="show"/>
                 <field name="unload_address_timeslot" optional="show"/>
@@ -96,11 +103,14 @@
                             <field name="contact_person"/>
                         </group>
                         <group string="Info" col="2">
+                            <field name="load_type"/>
+                            <field name="load_warehouse"/>
+                            <field name="load_terminal"/>
                             <field name="delivery_state"/>
                             <field name="trailer_type"/>
                             <field name="order_remark" />
-                            <field name="pod_file" filename="pod_filename" widget="binary" readonly="state!='new'"/>
-                            <field name="pod_filename" readonly="state!='new'"/>
+                            <field name="pod_file" filename="pod_filename" widget="binary"/>
+                            <field name="pod_filename"/>
                             <field name="order_file" filename="order_filename" widget="binary" readonly="state!='new'"/>
                             <field name="order_filename" readonly="state!='new'"/>
                         </group>
@@ -116,6 +126,7 @@
                                     <field name="load_company_name" readonly="state!='new'"/>
                                     <field name="load_contact_phone" readonly="state!='new'"/>
                                     <field name="load_postcode" readonly="state!='new'"/>
+                                    <field name="load_city" readonly="state!='new'"/>
                                     <field name="load_country" readonly="state!='new'"/>
                                     <field name="load_country_code" readonly="state!='new'"/>
                                     <field name="load_address_timeslot" readonly="state!='new'"/>
@@ -129,6 +140,7 @@
                                     <field name="unload_company_name" readonly="state!='new'"/>
                                     <field name="unload_contact_phone" readonly="state!='new'"/>
                                     <field name="unload_postcode" readonly="state!='new'"/>
+                                    <field name="unload_city" readonly="state!='new'"/>
                                     <field name="unload_country" readonly="state!='new'"/>
                                     <field name="unload_country_code" readonly="state!='new'"/>
                                     <field name="unload_address_timeslot" readonly="state!='new'"/>
@@ -137,11 +149,15 @@
                             </group>
                         </page>
                         <page string="Good Info">
-                            <group col="2">
+                            <field name="delivery_order_line_ids"/>
+                            <!--<group col="2">
                                 <group col="2">
                                     <field name="cntrno" readonly="state!='new'"/>
                                     <field name="product" readonly="state!='new'"/>
                                     <field name="product_name" readonly="state!='new'"/>
+                                    <field name="batch_no" readonly="state!='new'"/>
+                                    <field name="model_type" readonly="state!='new'"/>
+                                    <field name="pallets" readonly="state!='new'"/>
                                     <field name="qty" readonly="state!='new'"/>
                                     <field name="package_type" readonly="state!='new'"/>
                                     <field name="package_size" readonly="state!='new'"/>
@@ -155,7 +171,7 @@
                                     <field name="remark" readonly="state!='new'"/>
                                     <field name="quote" readonly="state!='new'"/>
                                 </group>
-                            </group>
+                            </group>-->
                         </page>
                     </notebook>
                 </sheet>
@@ -178,14 +194,20 @@
                 <field name="date"/>
                 <field name="project"/>
                 <field name="truckco"/>
+                <field name="cntrnos"/>
+                <field name="loading_refs"/>
                 <field name="quote"/>
                 <field name="state"/>
                 <field name="delivery_state"/>
                 <field name="trailer_type"/>
+                <field name="load_type"/>
+                <field name="load_warehouse"/>
+                <field name="load_terminal"/>
                 <field name="load_address"/>
                 <field name="load_company_name"/>
                 <field name="load_contact_phone"/>
                 <field name="load_postcode"/>
+                <field name="load_city"/>
                 <field name="load_country"/>
                 <field name="load_country_code"/>
                 <field name="load_address_timeslot"/>
@@ -193,6 +215,7 @@
                 <field name="unload_company_name"/>
                 <field name="unload_contact_phone"/>
                 <field name="unload_postcode"/>
+                <field name="unload_city"/>
                 <field name="unload_country"/>
                 <field name="unload_country_code"/>
                 <field name="unload_address_timeslot"/>
@@ -209,6 +232,106 @@
             action = env['panexlogi.delivery.order'].browse(
                 env.context.get('active_ids')
             ).action_print_delivery_order_tree()
+        </field>
+    </record>
+    <!-- Delivery Order Line Form View -->
+    <record id="view_delivery_order_line_form" model="ir.ui.view">
+        <field name="name">panexlogi.delivery.order.line.form</field>
+        <field name="model">panexlogi.delivery.order.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group col="2">
+                        <group col="2">
+                            <field name="billno" string="Bill No" readonly="1"/>
+                            <field name="loading_ref" string="Loading Ref"/>
+                            <field name="consignee_ref" string="Consignee Ref"/>
+                            <field name="delivery_type" string="Delivery Type"/>
+                            <field name="loading_conditon" string="Loading Condition"/>
+                            <field name="unloading_conditon" string="Unloading Condition"/>
+                        </group>
+                        <group col="2">
+                            <field name="planned_for_loading" string="Planned Loading"/>
+                            <field name="planned_for_unloading" string="Planned Unloading"/>
+                            <field name="cntrno" string="Container No"/>
+                            <field name="product" string="Product"/>
+                            <field name="product_name" string="Product Name"/>
+                            <field name="qty" string="Pcs"/>
+                            <field name="pallets" string="Pallets"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                    <!-- 包装和重量信息 -->
+                        <group string="Package Details" col="2">
+                            <field name="package_type" string="Package Type"/>
+                            <field name="package_size" string="Size (L*W*H)"/>
+                            <field name="weight_per_unit" string="Weight per Unit"/>
+                            <field name="gross_weight" string="Gross Weight"/>
+                        </group>
+                        <!-- 备注和文件 -->
+                        <group string="Additional Info" col="2">
+                            <field name="batch_no" string="Batch No"/>
+                            <field name="model_type" string="Model Type"/>
+                            <field name="uncode" string="UN Code"/>
+                            <field name="class_no" string="Class"/>
+                            <field name="adr" string="ADR"/>
+                            <field name="remark" string="Remark"/>
+                        </group>
+                    </group>
+                    <!-- 文件上传字段 -->
+                    <group string="Documents" col="4">
+                        <field name="pod_file" string="POD File" widget="binary"/>
+                        <field name="pod_filename" string="POD Filename"/>
+                        <field name="order_file" string="Order File" widget="binary"/>
+                        <field name="order_filename" string="Order Filename"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Delivery Order Line Tree View -->
+    <record id="view_delivery_order_line_full_tree" model="ir.ui.view">
+        <field name="name">panexlogi.delivery.order.line.full.tree</field>
+        <field name="model">panexlogi.delivery.order.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <!-- 核心字段（默认显示） -->
+                <field name="billno" string="Bill No" optional="hide"/>
+                <field name="loading_ref" string="Loading Ref" optional="show"/>
+
+                <!-- 可选字段（用户可通过列选择器显示） -->
+                <field name="loading_conditon" string="Loading Condition" optional="show"/>
+                <field name="unloading_conditon" string="Unloading Condition" optional="show"/>
+                <field name="cntrno" string="Container No" optional="show"/>
+                <field name="product" string="Product" optional="show"/>
+                <field name="product_name" string="Product Name" optional="show"/>
+                <field name="pallets" string="Pallets" optional="show"/>
+                <field name="qty" string="Quantity" optional="show"/>
+                <field name="batch_no" string="Batch No" optional="show"/>
+                <field name="model_type" string="Model Type" optional="show"/>
+                <field name="package_type" string="Package Type" optional="show"/>
+                <field name="package_size" string="Size (L*W*H)" optional="show"/>
+                <field name="weight_per_unit" string="Weight per Unit" optional="show"/>
+                <field name="gross_weight" string="Gross Weight" optional="show"/>
+                <field name="uncode" string="UN Code" optional="show"/>
+                <field name="class_no" string="Class" optional="show"/>
+                <field name="adr" string="ADR" optional="show"/>
+                <field name="remark" string="Remark" optional="show"/>
+                <field name="order_remark" string="Order Remark" optional="show"/>
+                <field name="load_remark" string="Load Remark" optional="show"/>
+                <field name="unload_remark" string="Unload Remark" optional="show"/>
+                <field name="quote" string="Quote" optional="show"/>
+                <field name="additional_cost" string="Additional Cost" optional="show"/>
+                <field name="pod_file" string="POD File" optional="show"/>
+                <field name="pod_filename" string="POD Filename" optional="show"/>
+                <field name="order_file" string="Order File" optional="show"/>
+                <field name="order_filename" string="Order Filename" optional="show"/>
+
+                <field name="consignee_ref" string="Consignee Ref" optional="show"/>
+                <field name="delivery_type" string="Delivery Type" optional="show"/>
+                <field name="planned_for_loading" string="Planned Loading" optional="show"/>
+                <field name="planned_for_unloading" string="Planned Unloading" optional="show"/>
+            </tree>
         </field>
     </record>
 </odoo>

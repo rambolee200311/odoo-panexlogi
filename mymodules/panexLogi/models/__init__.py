@@ -55,3 +55,6 @@ from . import clearance_type
 from . import deliveryorder
 from . import waybill_batch_edit
 from . import transport_order_extended
+from . import excel_template
+from . import delivery_order_extended
+from . import address
