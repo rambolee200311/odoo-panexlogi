@@ -90,6 +90,8 @@ class WaybillDetails(models.Model):
     delivery_address_timeslot = fields.Char('Timeslot', tracking=True)
     delivery_type = fields.Many2one('panexlogi.deliverytype', 'Delivery Type', tracking=True)
 
+    waybill_packlist_id = fields.One2many('panexlogi.waybill.packlist', 'waybll_detail_id', string='Packing List')
+
     @api.model
     def name_get(self):
         """正确返回 (id, cntrno) 结构，避免多余字段"""

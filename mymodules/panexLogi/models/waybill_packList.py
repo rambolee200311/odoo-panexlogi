@@ -31,6 +31,8 @@ class WaybillPackList(models.Model):
     gw = fields.Float(string='GW')
     mea = fields.Float(string='MEA')
 
+    waybll_detail_id = fields.Many2one('panexlogi.waybill.details', string='Waybill Details')
+
     @api.model
     def create(self, values):
         """

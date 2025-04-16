@@ -369,21 +369,28 @@
                                 <field name="drop_off_planned_date"/>
                             </group>
                         </group>
-                        <group>
-                            <field name="special_instructions" widget="textarea"/>
-                            <field name="additional_comments" widget="textarea"/>
-                            <field name="remark" widget="textarea"/>
+                        <group col="2">
+                            <group>
+                                <field name="special_instructions" widget="textarea"/>
+                                <field name="additional_comments" widget="textarea"/>
+                                <field name="remark" widget="textarea"/>
+                            </group>
+                            <group>
+                                <field name="cmr_file" filename="cmr_filename"
+                                       string="CMR File"
+                                       widget="binary_filename"/>
+                                <field name="arrived_date"/>
+                                <field name="cmr_signed" filename="cmr_signed_name"
+                                       string="CMR File(signed)"
+                                       widget="binary_filename"/>
+                                <field name="attachment_ids" widget="many2many_binary"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="cmr_file" filename="cmr_filename"
-                                   string="CMR File"
-                                   widget="binary_filename"/>
-                            <field name="arrived_date"/>
-                            <field name="cmr_signed" filename="cmr_signed_name"
-                                   string="CMR File(signed)"
-                                   widget="binary_filename"/>
-                            <field name="attachment_ids" widget="many2many_binary"/>
-                        </group>
+                        <notebook>
+                            <page string="Packing List">
+                                <field name="packlist_ids" readonly="1"/>
+                            </page>
+                        </notebook>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" />
@@ -423,6 +430,7 @@
                             <field name="drop_off_planned_date"/>
                         </group>
                     </group>
+
                     <footer>
                         <button string="Apply" type="object" name="apply_changes" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>

@@ -3,6 +3,8 @@ from odoo.exceptions import UserError
 import base64
 from io import BytesIO
 import openpyxl
+from openpyxl.styles import Font
+from openpyxl.styles import Alignment
 
 '''
     Transport Order
@@ -173,12 +175,33 @@ class TransportOrder(models.Model):
     # 生成CMR文件
     def generate_cmr_file(self):
         try:
+            # Alignment styles for Excel cells
+            ALIGN_TOP_RIGHT = Alignment(
+                vertical="top",  # Align text to the top vertically
+                horizontal="right",  # Align text to the right horizontally
+                wrap_text=True  # Enable text wrapping
+            )
+
+            ALIGN_TOP_LEFT = Alignment(
+                vertical="top",  # Align text to the top vertically
+                horizontal="left",  # Align text to the left horizontally
+                wrap_text=True  # Enable text wrapping
+            )
+            # Black font
+            ARIAL_10 = Font(name='Arial', size=10, color='000000')
+
+            style = 'common_style'
             template_record = self.env['panexlogi.excel.template'].search([('type', '=', 'inbound')], limit=1)
+            if self.project.project_code == 'HIH-trina':
+                style = 'hih_style'
+                template_record = self.env['panexlogi.excel.template'].search(
+                    [('type', '=', 'inbound'), ('project', '=', 'HIH-trina')], limit=1)
             if not template_record:
                 raise UserError(_('Template not found!'))
             template_data = base64.b64decode(template_record.template_file)
             template_buffer = BytesIO(template_data)
             for rec in self:
+                shipping = rec.waybill_billno.shipping.name if rec.waybill_billno.shipping else ''
                 # check teminal is not empty
                 if not rec.collterminal:
                     raise UserError(_('Terminal is required!'))
@@ -190,12 +213,12 @@ class TransportOrder(models.Model):
                     # generate CMR file based details
                     bill_num = rec.waybill_billno.waybillno
                     cntrno = detail.cntrno
-                    pallets = detail.pallets
-                    model_type = detail.model_type
-                    weight_kg = detail.weight_kg
+                    # pallets = detail.pallets
+                    # model_type = detail.model_type
+                    # weight_kg = detail.weight_kg
                     # receiver = rec.waybill_billno.project.customer.name
                     # teminal = rec.collterminal.terminal_name
-                    total_pcs = detail.total_pcs
+                    # total_pcs = detail.total_pcs
                     # combinate teminal address with street,zip,city,country
                     teminal_address_parts = []
                     if rec.collterminal.address.street:
@@ -207,7 +230,7 @@ class TransportOrder(models.Model):
                     if rec.collterminal.address.country_id.name:
                         teminal_address_parts.append(rec.collterminal.address.country_id.name)
                     # 用逗号+空格分隔非空字段（例如：Street, 12345 City, State）
-                    teminal_full_address = ', '.join(teminal_address_parts) if teminal_address_parts else ''
+                    # teminal_full_address = ', '.join(teminal_address_parts) if teminal_address_parts else ''
                     teminal_name = rec.collterminal.address.name if rec.collterminal.address.name else ''
                     project_name = rec.project.project_name if rec.project else ''
 
@@ -223,53 +246,145 @@ class TransportOrder(models.Model):
                     warehouse_country_name = detail.warehouse.partner_id.country_id.name if detail.warehouse.partner_id.country_id else ''
                     warehouse_name = detail.warehouse.name if detail.warehouse.name else ''
 
+                    shipping = detail.packlist_ids[0].shipping if detail.packlist_ids else ''
+
                     # Load the template workbook
                     workbook = openpyxl.load_workbook(template_buffer)
-                    worksheet = workbook.active
 
-                    # Write data to the specified cells
-                    worksheet['B6'] = ''
-                    worksheet['B6'] = project_name
-                    worksheet['B7'] = ''
-                    worksheet['B7'] = teminal_name
-                    worksheet['B13'] = ''
-                    worksheet['B13'] = warehouse_full_address
-                    worksheet['B20'] = ''
-                    worksheet['B20'] = warehouse_city_name
-                    worksheet['B21'] = ''
-                    worksheet['B21'] = warehouse_country_name
-                    worksheet['D21'] = ''
-                    worksheet['D21'] = fields.Date.today().strftime('  -   -%Y  (DD-MM-YYYY)')  # --2025
-                    worksheet['B27'] = ''
-                    worksheet['B29'] = ''
-                    worksheet['B29'] = bill_num
-                    worksheet['D29'] = ''
-                    worksheet['D29'] = cntrno
-                    worksheet['F29'] = ''
-                    worksheet['F29'] = model_type
-                    worksheet['H29'] = ''
-                    worksheet['H29'] = pallets
-                    worksheet['I29'] = ''
-                    worksheet['I29'] = weight_kg
-                    if total_pcs != 0:
+                    # hih_style(workbook)
+                    def set_cell_style(cell, alignment, font):
+                        cell.alignment = alignment
+                        cell.font = font
+
+                    def common_style(workbook):  # common style
+                        worksheet = workbook.active
+                        # Write data to the specified cells
+                        worksheet['B6'] = ''
+                        worksheet['B6'] = project_name
+                        worksheet['B7'] = ''
+                        worksheet['B7'] = teminal_name
+                        worksheet['B13'] = ''
+                        worksheet['B13'] = warehouse_full_address
+                        worksheet['B20'] = ''
+                        worksheet['B20'] = warehouse_city_name
+                        worksheet['B21'] = ''
+                        worksheet['B21'] = warehouse_country_name
+                        worksheet['D21'] = ''
+                        worksheet['D21'] = fields.Date.today().strftime('  -   -%Y  (DD-MM-YYYY)')  # --2025
+                        worksheet['B27'] = ''
+                        worksheet['B29'] = ''
+                        worksheet['B29'] = bill_num
+
                         worksheet['J28'] = ''
                         worksheet['J28'] = 'Pieces'
-                        worksheet['J29'] = ''
-                        worksheet['J29'] = total_pcs
-                    worksheet['G36'] = ''
-                    worksheet['G36'] = 'Total Pallets:'
-                    worksheet['H36'] = ''
-                    worksheet['H36'] = pallets
-                    if total_pcs != 0:
-                        worksheet['G37'] = ''
-                        worksheet['G37'] = 'Total Pieces:'
-                        worksheet['H37'] = ''
-                        worksheet['H37'] = total_pcs
+                        cell = worksheet['J28']
+                        cell.alignment = ALIGN_TOP_LEFT
+                        cell.font = ARIAL_10
+                        worksheet['D29'] = ''
+                        worksheet['D29'] = cntrno
 
-                    worksheet['B48'] = ''
-                    worksheet['B48'] = warehouse_name
+                        row = 29
+                        total_pallets = 0
+                        total_pcs = 0
+
+                        for packlist in detail.packlist_ids:
+                            if packlist.product_id:
+                                model = packlist.product_id.model or ''
+                                name = packlist.product_id.name or ''
+                                worksheet[f'F{row}'] = f'[{model}]{name}'
+                                set_cell_style(worksheet[f'F{row}'], ALIGN_TOP_LEFT, ARIAL_10)
+
+                            gross_weight = packlist.gw or 0
+                            if gross_weight == 0 and packlist.gwp:
+                                if packlist.pallets:
+                                    gross_weight = packlist.gwp * packlist.pallets
+                                elif packlist.pcs:
+                                    gross_weight = packlist.gwp * packlist.pcs
+
+                            worksheet[f'H{row}'] = f'{packlist.pallets or 0}'
+                            set_cell_style(worksheet[f'H{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+
+                            worksheet[f'I{row}'] = f'{gross_weight}'
+                            set_cell_style(worksheet[f'I{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+
+                            worksheet[f'J{row}'] = f'{packlist.pcs or 0}'
+                            set_cell_style(worksheet[f'J{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+
+                            total_pallets += packlist.pallets or 0
+                            total_pcs += packlist.pcs or 0
+                            row += 1
+
+                        worksheet['G36'] = 'Total Pallets:'
+                        worksheet['H36'] = total_pallets
+                        set_cell_style(worksheet['H36'], ALIGN_TOP_RIGHT, ARIAL_10)
+
+                        worksheet['G37'] = 'Total Pieces:'
+                        worksheet['H37'] = total_pcs
+                        set_cell_style(worksheet['H37'], ALIGN_TOP_RIGHT, ARIAL_10)
+                        worksheet['B48'] = ''
+                        worksheet['B48'] = warehouse_name
+
+                    def hih_style(workbook):  # hih style
+                        worksheet = workbook.active
+                        # Write data to the specified cells
+                        worksheet['B6'] = ''
+                        worksheet['B7'] = project_name
+                        worksheet['B8'] = rec.collterminal.terminal_name if rec.collterminal.terminal_name else ''
+                        worksheet['B9'] = rec.collterminal.zip if rec.collterminal.zip else ''
+                        worksheet['B9'] = rec.collterminal.city if rec.collterminal.city else ''
+                        worksheet['B16'] = warehouse_full_address
+                        worksheet['B17'] = warehouse_city_name
+                        worksheet['B18'] = warehouse_country_name
+                        worksheet['D17'] = fields.Date.today().strftime('  -   -%Y  (DD-MM-YYYY)')  # --2025
+                        worksheet['B25'] = shipping
+                        worksheet['C25'] = bill_num
+                        worksheet['G25'] = cntrno
+                        row = 25
+                        total_pallets = 0
+                        total_pcs = 0
+
+                        for packlist in detail.packlist_ids:
+                            if packlist.product_id:
+                                model = packlist.product_id.model or ''
+                                name = packlist.product_id.name or ''
+                                worksheet[f'F{row}'] = packlist.batch if packlist.batch else ''
+                                set_cell_style(worksheet[f'F{row}'], ALIGN_TOP_LEFT, ARIAL_10)
+                            """
+                            gross_weight = packlist.gw or 0
+                            if gross_weight == 0 and packlist.gwp:
+                                if packlist.pallets:
+                                    gross_weight = packlist.gwp * packlist.pallets
+                                elif packlist.pcs:
+                                    gross_weight = packlist.gwp * packlist.pcs
+                            """
+
+                            worksheet[f'H{row}'] = f'{packlist.pallets or 0}'
+                            set_cell_style(worksheet[f'H{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+
+                            worksheet[f'I{row}'] = f'{packlist.pcs or 0}'
+                            set_cell_style(worksheet[f'I{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+
+                            total_pallets += packlist.pallets or 0
+                            total_pcs += packlist.pcs or 0
+                            row += 1
+
+                        worksheet['G41'] = 'Total Pallets:'
+                        worksheet['H41'] = total_pallets
+                        set_cell_style(worksheet['H41'], ALIGN_TOP_RIGHT, ARIAL_10)
+                        """
+                        worksheet['G37'] = 'Total Pieces:'
+                        worksheet['H37'] = total_pcs
+                        set_cell_style(worksheet['H37'], ALIGN_TOP_RIGHT, ARIAL_10)
+                        """
+                        worksheet['B43'] = ''
+                        worksheet['B43'] = warehouse_name
 
                     # Save the workbook to a BytesIO object
+                    if style == 'common_style':
+                        common_style(workbook)
+                    elif style == 'hih_style':
+                        hih_style(workbook)
+
                     excel_buffer = BytesIO()
                     workbook.save(excel_buffer)
                     excel_buffer.seek(0)
@@ -289,6 +404,7 @@ class TransportOrder(models.Model):
 
         except Exception as e:
             raise UserError(_('Error generating CMR file: %s') % str(e))
+
     """
     @api.constrains('waybill_billno')
     def _check_waybillno_id(self):
@@ -302,6 +418,7 @@ class TransportOrder(models.Model):
             if existing_records:
                 raise UserError(_('waybill_billno must be unique per transport order!'))
     """
+
     # 维护到港实际日期 跳转wizard视图
     def add_actual_date(self):
         if not self.id:
@@ -331,6 +448,11 @@ class TransportOrder(models.Model):
                     'default_detail_ids': rec.transportorderdetailids.ids,
                 }
             }
+
+    @staticmethod
+    def format_multi_line(values):
+        """Process multiple values into a multi-line string."""
+        return '\n'.join(str(v) for v in values) if values else ''
 
 
 class TransportOrderDetail(models.Model):
@@ -369,6 +491,14 @@ class TransportOrderDetail(models.Model):
     cmr_filename = fields.Char(string='CMR File name')
 
     waybill_detail_id = fields.Many2one('panexlogi.waybill.details', string='Waybill Detail ID')
+    # In the panexlogi.transport.order.detail model
+
+    packlist_ids = fields.One2many(
+        'panexlogi.waybill.packlist',
+        related='waybill_detail_id.waybill_packlist_id',
+        string='Packing Lists',
+        readonly=True
+    )
 
 
 # 其他附件
@@ -461,7 +591,6 @@ class TransportOrderDetailBatchEditWizard(models.TransientModel):
     model_type = fields.Char(string='Model Type')
     weight_kg = fields.Float(string='Weight (kg)')
     total_pcs = fields.Float(string='Total Pieces')
-
 
     def apply_changes(self):
         for rec in self:

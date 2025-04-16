@@ -19,8 +19,8 @@
                 <field name="state"/>
                 <field name="source"/>
                 <field name="source_Code"/>
-                <filter string="Waybill" name="filter_waybill" domain="[('type', 'in', ['import', 'export', 'other'])]"  context="{'default_type': 'import'}"/>
-                <filter string="MyWaybill" name="filter_mywaybill" domain="[('type', 'in', ['import', 'export', 'other']),('create_uid', '=', uid)]"  context="{'default_type': 'mywaybill'}"/>
+                <filter string="Waybill" name="filter_waybill" domain="[('type', 'in', ['import', 'export', 'other',False])]"  context="{'default_type': 'import'}"/>
+                <filter string="MyWaybill" name="filter_mywaybill" domain="[('type', 'in', ['import', 'export', 'other',False]),('create_uid', '=', uid)]"  context="{'default_type': 'mywaybill'}"/>
             </search>
         </field>
     </record>

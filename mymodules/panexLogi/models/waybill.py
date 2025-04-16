@@ -287,8 +287,16 @@ class Waybill(models.Model):
 
     # 生成港倒仓运输单
     def action_transport_order_add(self):
-
         for record in self:
+            # link packlist details
+            for rec in record.packlist_ids:
+                if rec.cntrno:
+                    cntrno = rec.cntrno.strip().upper()
+                    domain = [('waybill_billno', '=', record.id), ('cntrno', '=ilike', cntrno)]
+                    details = self.env['panexlogi.waybill.details'].search(domain)
+                    if details:
+                        rec.waybll_detail_id = details.id
+
             # check if waybill has container details set to inbound
             if not record.details_ids.search([('truck_type', '=', 'inbound')]):
                 raise UserError(_("Please set container details to inbound first!"))
@@ -629,6 +637,65 @@ class Waybill(models.Model):
                     'default_detail_ids': rec.details_ids.ids,
                 }
             }
+
+    def cron_link_packlist_details(self):
+        try:
+            """Cron job to link PackList and Details records with matching Waybill + Container No"""
+            # Find all PackLists without linked Details
+            packlists = self.env['panexlogi.waybill.packlist'].search([
+                ('waybll_detail_id', '=', False),
+                ('waybill_billno', '!=', False),
+                ('cntrno', '!=', False)
+            ])
+
+            # Group PackLists by (waybill_billno, cntrno)
+            grouped_packs = {}
+            for pack in packlists:
+                key = (pack.waybill_billno.id, pack.cntrno.strip().upper())  # Normalize cntrno
+                grouped_packs.setdefault(key, []).append(pack)
+
+            # Find existing Details records and link PackLists
+            for key, packs in grouped_packs.items():
+                waybill_id, cntrno = key
+                # Search for existing Details with exact match
+                detail = self.env['panexlogi.waybill.details'].search([
+                    ('waybill_billno', '=', waybill_id),
+                    ('cntrno', '=ilike', cntrno)  # Case-insensitive search
+                ], limit=1)
+                # Skip if no matching Details record is found
+                if not detail:
+                    continue
+                # Update all PackLists in the group
+                for pack in packs:
+                    pack.write({'waybll_detail_id': detail.id})
+        except Exception as e:
+            _logger.error(f"Error in cron_link_packlist_details: {str(e)}")
+
+    def cron_link_transportoder_detail(self):
+        try:
+            for record in self.search([]):
+                # Fetch all waybill details
+                details = record.details_ids
+                for rec in details:
+                    cntrno = ''
+                    if rec.cntrno:
+                        cntrno = rec.cntrno.strip().upper()
+                    # Search for transport order details with matching waybill and container number
+                    if cntrno != '':
+                        transport_order_detail = self.env['panexlogi.transport.order.detail'].search([
+                            ('transportorderid.waybill_billno', '=', record.id),
+                            ('cntrno', '=ilike', cntrno),
+                            ('waybill_detail_id', '=', False)  # Ensure it's not already linked
+                        ], limit=1)
+
+                        # Skip if no matching transport order detail is found
+                        if not transport_order_detail:
+                            continue
+                        else:
+                            transport_order_detail.write({'waybill_detail_id': rec.id})
+
+        except Exception as e:
+            _logger.error(f"Error in cron_link_transportoder_detail: {str(e)}")
 
 
 # 其他附件
