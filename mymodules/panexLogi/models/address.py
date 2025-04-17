@@ -1,5 +1,9 @@
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
+import requests
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class Address(models.Model):
@@ -7,12 +11,15 @@ class Address(models.Model):
     _description = 'panexlogi.address'
     _rec_name = "address_code"
 
-    address_code = fields.Char(string='Code',readonly=True)
-    street = fields.Char(string='Street', required=True)
+    address_code = fields.Char(string='Code', readonly=True)
+    street = fields.Char(string='Street')
+    latlng = fields.Char(string='LatLng', help='Latitude and Longitude, separated by a comma, like 52.5200,13.4050')
     postcode = fields.Char(string='Zip', )
     city = fields.Char(string='City')
     state = fields.Many2one("res.country.state", string='State', )
     country = fields.Many2one("res.country", string='Country')
+    latitude = fields.Float(string='Latitude')
+    longitude = fields.Float(string='Longitude')
     phone = fields.Char(string='Phone')
     mobile = fields.Char(string='Mobile')
     is_warehouse = fields.Boolean(string='Is Warehouse', default=False)
@@ -37,7 +44,7 @@ class Address(models.Model):
     @api.model
     def create(self, vals):
         address = []
-        address_code=''
+        address_code = ''
         # 拼接地址部分
         if vals.get('street'):
             address.append(vals['street'])
@@ -95,7 +102,7 @@ class Address(models.Model):
             vals['address_code'] = address_code
 
         return super(Address, self).write(vals)
-    
+
     @api.onchange('warehouse')
     def _onchange_warehouse(self):
         for record in self:
@@ -108,10 +115,10 @@ class Address(models.Model):
                 record.state = record.warehouse.partner_id.state_id.id if record.warehouse.partner_id.state_id else False
                 record.country = record.warehouse.partner_id.country_id.id
                 record.phone = record.warehouse.partner_id.phone
-                record.mobile = record.warehouse.partner_id.mobile            
+                record.mobile = record.warehouse.partner_id.mobile
             else:
                 record.is_warehouse = False
-    
+
     @api.onchange('terminal')
     def _onchange_terminal(self):
         for record in self:
@@ -186,4 +193,85 @@ class Address(models.Model):
                     'warehouse': False,
                 })
 
+    def button_fetch_google_maps_details(self):
+        self.ensure_one()
+        if not self.street and not self.latlng:
+            raise UserError("Please enter a street or latlng to fetch details.")
 
+        # Build address query from existing fields
+
+        """
+        if self.city:
+            address_parts.append(self.city)
+        if self.postcode:
+            address_parts.append(self.postcode)
+        if self.country:
+            address_parts.append(self.country.name)
+        """
+
+
+        # Get Google Maps API key
+        api_key = self.env['ir.config_parameter'].sudo().get_param('base_geolocalize.google_map_api_key')
+        if not api_key:
+            raise UserError("Google Maps API key not configured. Contact your administrator.")
+
+        # API request
+        try:
+            response = None
+            if self.latlng:
+                lat, lng = self.latlng.split(',')
+                address_query = f"{lat},{lng}"
+                response = requests.get(
+                    "https://maps.googleapis.com/maps/api/geocode/json",
+                    params={'latlng': address_query, 'key': api_key},
+                    timeout=10
+                )
+            if self.street:
+                address_query = self.street
+                response = requests.get(
+                    "https://maps.googleapis.com/maps/api/geocode/json",
+                    params={'address': address_query, 'key': api_key},
+                    timeout=10
+                )
+            response.raise_for_status()
+            data = response.json()
+        except Exception as e:
+            _logger.error("API Error: %s", str(e))
+            raise UserError("Failed to connect to Google Maps API")
+
+        if data.get('status') != 'OK':
+            raise UserError("Address not found or API error")
+
+        # Parse first result
+        result = data['results'][0]
+        components = {c['types'][0]: c for c in result['address_components']}
+
+        # Update address fields
+        if not self.street:
+            self.street = components.get('route', {}).get('long_name', self.street)
+        self.postcode = components.get('postal_code', {}).get('long_name', self.postcode)
+        self.city = components.get('locality', {}).get('long_name', self.city) or \
+                    components.get('administrative_area_level_2', {}).get('long_name', self.city)
+        self.latitude = result['geometry']['location'].get('lat', self.latitude)
+        self.longitude = result['geometry']['location'].get('lng', self.longitude)
+        if not self.latlng:
+            self.latlng = f"{self.latitude},{self.longitude}"
+
+        # Update country
+        if 'country' in components:
+            country = self.env['res.country'].search([
+                ('code', '=', components['country']['short_name'])
+            ], limit=1)
+            if country:
+                self.country = country.id
+
+        # Update state
+        if 'administrative_area_level_1' in components and self.country:
+            state = self.env['res.country.state'].search([
+                ('name', 'ilike', components['administrative_area_level_1']['long_name']),
+                ('country_id', '=', self.country.id)
+            ], limit=1)
+            if state:
+                self.state = state.id
+
+        return True

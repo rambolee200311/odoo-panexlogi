@@ -62,6 +62,7 @@
                             <field name="address_code"/>
                         </h2>
                     </div>
+
                     <group col="2" string="Address Information">
                         <group col="2">
                             <field name="is_warehouse"/>
@@ -72,13 +73,24 @@
                             <field name="terminal"/>
                         </group>
                     </group>
+                    <group col="2" string="Street">
+                        <field name="street"/>
+                        <field name="latlng"/>
+                    </group>
+                    <group>
+                        <button name="button_fetch_google_maps_details"
+                                    string="Google Maps"
+                                    type="object"
+                                    class="oe_stat_button" icon="fa-globe"/>
+                    </group>
                     <group col="2">
                         <group col="2" string="Address">
-                            <field name="street"/>
                             <field name="postcode"/>
                             <field name="city"/>
                             <field name="state"/>
                             <field name="country"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
                         </group>
                         <group col="2" string="Contact">
                             <field name="company_name"/>

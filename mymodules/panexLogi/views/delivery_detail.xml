@@ -40,18 +40,18 @@
                         </group>
                         <group col="2">
                              <group col="2" string="Loading">
-                                <field name="loading_ref" string="reference" readonly="state!='new'"/>
-                                <field name="load_condition" string="condition" readonly="state!='new'"/>
-                                <field name="load_address" string="address" readonly="state!='new'"/>
-                                <field name="load_date" string="date time" readonly="state!='new'"/>
-                                <field name="load_timeslot" string="timeslot" readonly="state!='new'"/>
+                                <field name="loading_ref" string="reference"/>
+                                <field name="load_condition" string="condition"/>
+                                <field name="load_address" string="address"/>
+                                <field name="load_date" string="date time"/>
+                                <field name="load_timeslot" string="timeslot"/>
                             </group>
                             <group col="2" string="Unloading">
-                                <field name="consignee_ref" string="reference" readonly="state!='new'"/>
-                                <field name="unload_condition" string="condition" readonly="state!='new'"/>
-                                <field name="unload_address" string="address" readonly="state!='new'"/>
-                                <field name="unload_date" string="date time" readonly="state!='new'"/>
-                                <field name="unload_timeslot" string="timeslot" readonly="state!='new'"/>
+                                <field name="consignee_ref" string="reference"/>
+                                <field name="unload_condition" string="condition"/>
+                                <field name="unload_address" string="address"/>
+                                <field name="unload_date" string="date time"/>
+                                <field name="unload_timeslot" string="timeslot"/>
                             </group>
                         </group>
                         <group col="2">

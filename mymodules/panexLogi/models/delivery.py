@@ -445,7 +445,7 @@ class Delivery(models.Model):
                     'remark': rec.remark,
                     'quote': rec.quote,
                     'additional_cost': rec.additional_cost,
-                    'delivery_id': rec.deliveryid.id,
+                    #'delivery_id': rec.deliveryid.id,
                     'delivery_detail_id': rec.id,
                 })
             delivery_order_vals = {
@@ -455,39 +455,39 @@ class Delivery(models.Model):
                 'truckco': recs[0].deliveryid.trucker.id,
                 'delivery_type': recs[0].deliveryid.delivery_type.id,
                 'loading_ref': recs[0].loading_ref,
-                'unloading_ref': recs[0].deliveryid.consignee_ref,
-                'loading_conditon': recs[0].deliveryid.loading_conditon.id,
-                'unloading_conditon': recs[0].deliveryid.unloading_conditon.id,
-                'planned_for_loading': recs[0].deliveryid.planned_for_loading,
-                'planned_for_unloading': recs[0].deliveryid.planned_for_unloading,
-                'load_type': recs[0].deliveryid.load_type,
-                'load_warehouse': recs[0].deliveryid.load_warehouse.id,
-                'load_terminal': recs[0].deliveryid.load_terminal.id,
-                'load_address': recs[0].deliveryid.load_address,
-                'load_company_name': recs[0].deliveryid.load_company_name,
-                'load_contact_phone': recs[0].deliveryid.load_contact_phone,
-                'load_postcode': recs[0].deliveryid.load_postcode,
-                'load_city': recs[0].deliveryid.load_city,
-                'load_country': recs[0].deliveryid.load_country.id,
-                'load_country_code': recs[0].deliveryid.load_country_code,
-                'load_address_timeslot': recs[0].deliveryid.load_address_timeslot,
-                'unload_address': recs[0].deliveryid.unload_address,
-                'unload_company_name': recs[0].deliveryid.unload_company_name,
-                'unload_contact_phone': recs[0].deliveryid.unload_contact_phone,
-                'unload_postcode': recs[0].deliveryid.unload_postcode,
-                'unload_city': recs[0].deliveryid.unload_city,
-                'unload_country': recs[0].deliveryid.unload_country.id,
-                'unload_country_code': recs[0].deliveryid.unload_country_code,
-                'unload_address_timeslot': recs[0].deliveryid.unload_address_timeslot,
+                'unloading_ref': recs[0].consignee_ref,
+                'loading_condition': recs[0].load_condition.id,
+                'unloading_condition': recs[0].unload_condition.id,
+                #'planned_for_loading': recs[0].deliveryid.planned_for_loading,
+                #'planned_for_unloading': recs[0].deliveryid.planned_for_unloading,
+                #'load_type': recs[0].deliveryid.load_type,
+                #'load_warehouse': recs[0].load_warehouse.id,
+                #'load_terminal': recs[0].load_terminal.id,
+                'loading_address': recs[0].load_address.id,
+                #'load_company_name': recs[0].deliveryid.load_company_name,
+                #'load_contact_phone': recs[0].deliveryid.load_contact_phone,
+                #'load_postcode': recs[0].deliveryid.load_postcode,
+                #'load_city': recs[0].deliveryid.load_city,
+                #'load_country': recs[0].deliveryid.load_country.id,
+                #'load_country_code': recs[0].deliveryid.load_country_code,
+                'load_address_timeslot': recs[0].load_timeslot,
+                'unloading_address': recs[0].unload_address.id,
+                #'unload_company_name': recs[0].deliveryid.unload_company_name,
+                #'unload_contact_phone': recs[0].deliveryid.unload_contact_phone,
+                #'unload_postcode': recs[0].deliveryid.unload_postcode,
+                #'unload_city': recs[0].deliveryid.unload_city,
+                #'unload_country': recs[0].deliveryid.unload_country.id,
+                #'unload_country_code': recs[0].deliveryid.unload_country_code,
+                'unload_address_timeslot': recs[0].unload_timeslot,
                 'delivery_order_line_ids': [(0, 0, dt) for dt in dts],
             }
             delivery_order = self.env['panexlogi.delivery.order'].create(delivery_order_vals)
 
-            for rec in recs:
-                rec.write({
-                    'state': 'order',
-                    'delivery_order_id': delivery_order.id
-                })
+            #for rec in recs:
+            #    rec.write({
+                    #'state': 'order',
+                    #'delivery_order_id': delivery_order.id
+            #    })
 
         except Exception as e:
             raise UserError(_("Error creating delivery order: %s") % str(e))

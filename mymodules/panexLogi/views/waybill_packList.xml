@@ -35,6 +35,8 @@
              <tree string="Packing_List_Tree">
                     <field name="billno"/>
                     <field name="product_id"/>
+                    <field name="portbase_product_code"/>
+                    <field name="portbase_product"/>
                     <field name="batch"/>
                     <field name="sn"/>
                     <field name="interpono"/>
@@ -62,9 +64,12 @@
         <field name="model">panexlogi.waybill.packlist</field>
         <field name="arch" type="xml">
             <form>
-                <group>
+                <group col="2">
+                    <group col="2">
                     <field name="billno"/>
                     <field name="product_id"/>
+                    <field name="portbase_product_code" readonly="1"/>
+                    <field name="portbase_product" readonly="1"/>
                     <field name="batch"/>
                     <field name="sn"/>
                     <field name="interpono"/>
@@ -72,6 +77,8 @@
                     <field name="pcs"/>
                     <field name="pallets"/>
                     <field name="totalvo"/>
+                </group>
+                <group col="2">
                     <field name="shipping"/>
                     <field name="waybillno"/>
                     <field name="cntrno"/>
@@ -82,6 +89,7 @@
                     <field name="gwp"/>
                     <field name="gw"/>
                     <field name="mea"/>
+                </group>
                 </group>
             </form>
         </field>

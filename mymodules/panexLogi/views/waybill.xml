@@ -160,6 +160,10 @@
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
+                        <button name="fetch_portbase_data"
+                                type="object"
+                                string="Get Portbase Data"
+                                class="oe_stat_button" icon="fa-cloud-download"/>
                         <button name="add_actual_date"
                                 type="object"
                                 string="Actual Arrival"
@@ -203,6 +207,7 @@
                         </group>
                         <group string="Index">
                             <field name="waybillno" readonly="state!='new'"/>
+                            <field name="cntrno"/>
                             <field name="docno" readonly="state!='new'"/>
                             <field name="expref" readonly="state!='new'"/>
                             <field name="date" readonly="state!='new'"/>
@@ -222,6 +227,7 @@
                             <field name="eta" readonly="state!='new'"/>
                             <field name="ata" readonly="state!='new'"/>
                             <field name="terminal_a" readonly="state!='new'"/>
+                            <field name="portbase_discharge_terminal" readonly="1"/>
                             <field name="eta_remark" readonly="state!='new'"/>
                         </group>
                     </group>

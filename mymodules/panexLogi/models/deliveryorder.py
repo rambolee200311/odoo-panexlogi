@@ -55,28 +55,30 @@ class DeliveryOrder(models.Model):
     load_warehouse = fields.Many2one('stock.warehouse', string='Warehouse')
     load_terminal = fields.Many2one('panexlogi.terminal', string='Terminal')
 
-    load_address = fields.Char(string='Address')
-    load_company_name = fields.Char(string='Company Name')
-    load_contact_phone = fields.Char(string='Contact Phone')
-    load_postcode = fields.Char(string='Postcode')
-    load_city = fields.Char(string='City')
-    load_country = fields.Many2one('res.country', 'Load Country')
+    # load_address = fields.Char(string='Address')
+    loading_address = fields.Many2one('panexlogi.address', 'Load Address')
+    load_company_name = fields.Char(string='Company Name', related='loading_address.company_name')
+    load_contact_phone = fields.Char(string='Contact Phone', related='loading_address.phone')
+    load_postcode = fields.Char(string='Postcode', related='loading_address.postcode')
+    load_city = fields.Char(string='City', related='loading_address.city')
+    load_country = fields.Many2one('res.country', 'Load Country', related='loading_address.country')
     load_country_code = fields.Char('Country Code', related='load_country.code')
     load_address_timeslot = fields.Char('Timeslot')
-    unload_address = fields.Char(string='Address')
-    unload_company_name = fields.Char(string='Company Name')
-    unload_contact_phone = fields.Char(string='Contact Phone')
-    unload_postcode = fields.Char(string='Postcode')
-    unload_city = fields.Char(string='City')
-    unload_country = fields.Many2one('res.country', 'Unload Country')
+    # unload_address = fields.Char(string='Address')
+    unloading_address = fields.Many2one('panexlogi.address', 'Unload Address')
+    unload_company_name = fields.Char(string='Company Name', related='unloading_address.company_name')
+    unload_contact_phone = fields.Char(string='Contact Phone', related='unloading_address.phone')
+    unload_postcode = fields.Char(string='Postcode', related='unloading_address.postcode')
+    unload_city = fields.Char(string='City', related='unloading_address.city')
+    unload_country = fields.Many2one('res.country', 'Unload Country', related='unloading_address.country')
     unload_country_code = fields.Char('Country Code', related='unload_country.code')
     unload_address_timeslot = fields.Char('Timeslot')
 
     delivery_type = fields.Many2one('panexlogi.deliverytype', 'Delivery Type')
     loading_ref = fields.Char(string='Loading Ref')
     unloading_ref = fields.Char(string='Unloading Ref')
-    loading_conditon = fields.Many2one('panexlogi.loadingcondition', 'Condition')
-    unloading_conditon = fields.Many2one('panexlogi.loadingcondition', 'Condition')
+    loading_condition = fields.Many2one('panexlogi.loadingcondition', 'Condition')
+    unloading_condition = fields.Many2one('panexlogi.loadingcondition', 'Condition')
     planned_for_loading = fields.Datetime(string='Planned Loading')
     planned_for_unloading = fields.Datetime(string='Planned Unloading')
 
@@ -112,9 +114,15 @@ class DeliveryOrder(models.Model):
 
     cntrnos = fields.Char('Container Nos', compute='_compute_cntrnos', store=True)
     loading_refs = fields.Char(string='Loading Refs', compute='_compute_cntrnos', store=True)
-    delivery_order_line_ids = fields.One2many('panexlogi.delivery.order.line',
-                                              'delivery_order_id',
-                                              string='Delivery Order Line')
+    # delivery_order_line_ids = fields.One2many('panexlogi.delivery.order.line',
+    #                                          'delivery_order_id',
+    #                                          string='Delivery Order Line')
+    delivery_order_line_ids = fields.One2many(
+        'panexlogi.delivery.order.line',  # Replace with the correct model name for order lines
+        'delivery_order_id',  # Replace with the correct foreign key field in the related model
+        string='Delivery Order Lines'
+    )
+
     delivery_order_cmr_line_ids = fields.One2many('panexlogi.delivery.order.cmr.line',
                                                   'delivery_order_id',
                                                   string='Delivery Order CMR Line')
@@ -195,10 +203,11 @@ class DeliveryOrder(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can cancel New Order"))
             else:
-                rec.delivery_detail_id.delivery_order_id = False
-                rec.delivery_detail_id.state = 'approve'
+                for line in rec.delivery_order_line_ids:
+                    line.delivery_detail_id.delivery_order_id = False
+                    line.delivery_detail_id.state = 'approve'
                 rec.state = 'cancel'
-                rec.delivery_id.state = 'confirm'
+                # rec.delivery_id.state = 'confirm'
                 return True
 
     def action_print_delivery_order(self):
@@ -441,8 +450,8 @@ class DeliveryOrderLine(models.Model):
     consignee_ref = fields.Char(string='Consignee Ref')
 
     delivery_type = fields.Many2one('panexlogi.deliverytype', 'Delivery Type')
-    loading_conditon = fields.Many2one('panexlogi.loadingcondition', ' Condition')
-    unloading_conditon = fields.Many2one('panexlogi.loadingcondition', 'Condition')
+    loading_condition = fields.Many2one('panexlogi.loadingcondition', ' Condition')
+    unloading_condition = fields.Many2one('panexlogi.loadingcondition', 'Condition')
     planned_for_loading = fields.Datetime(string='Planned Loading')
     planned_for_unloading = fields.Datetime(string='Planned Unloading')
 
@@ -467,13 +476,26 @@ class DeliveryOrderLine(models.Model):
     quote = fields.Float('Quote', default=0)  # 报价
     additional_cost = fields.Float('Additional Cost', default=0)  # 附加报价
 
-
     pod_file = fields.Binary(string='POD File')
     pod_filename = fields.Char(string='POD File Name')
     order_file = fields.Binary(string='Order File')
     order_filename = fields.Char(string='Order File Name')
 
-    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
+    # delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
+    delivery_id = fields.Many2one(
+        'panexlogi.delivery',
+        string='Delivery',
+        ondelete='cascade'
+    )
+    delivery_order_id = fields.Many2one(
+        'panexlogi.delivery.order',
+        string='Delivery Order',
+        ondelete='cascade'
+    )
+    delivery_detail_id = fields.Many2one(
+        'panexlogi.delivery.detail',
+        string='Delivery Detail'
+    )
     order_billno = fields.Char(string='Order BillNo', related='delivery_order_id.billno', readonly=True)
     load_type = fields.Selection(
         selection=[
@@ -486,20 +508,22 @@ class DeliveryOrderLine(models.Model):
     )
     load_warehouse = fields.Many2one('stock.warehouse', string='Warehouse')
     load_terminal = fields.Many2one('panexlogi.terminal', string='Terminal')
-    load_address = fields.Char(string='Address')
-    load_company_name = fields.Char(string='Company Name')
-    load_contact_phone = fields.Char(string='Contact Phone')
-    load_postcode = fields.Char(string='Postcode')
-    load_city = fields.Char(string='City')
-    load_country = fields.Many2one('res.country', 'Load Country')
+    # load_address = fields.Char(string='Address')
+    load_address = fields.Many2one('panexlogi.address', 'load Address')
+    load_company_name = fields.Char(string='Company Name', related='load_address.company_name')
+    load_contact_phone = fields.Char(string='Contact Phone', related='load_address.phone')
+    load_postcode = fields.Char(string='Postcode', related='load_address.postcode')
+    load_city = fields.Char(string='City', related='load_address.city')
+    load_country = fields.Many2one('res.country', 'Load Country', related='load_address.country')
     load_country_code = fields.Char('Country Code', related='load_country.code')
     load_address_timeslot = fields.Char('Timeslot')
-    unload_address = fields.Char(string='Address')
-    unload_company_name = fields.Char(string='Company Name')
-    unload_contact_phone = fields.Char(string='Contact Phone')
-    unload_postcode = fields.Char(string='Postcode')
-    unload_city = fields.Char(string='City')
-    unload_country = fields.Many2one('res.country', 'Unload Country')
+    # unload_address = fields.Char(string='Address')
+    unload_address = fields.Many2one('panexlogi.address', 'Unload Address')
+    unload_company_name = fields.Char(string='Company Name', related='unload_address.company_name')
+    unload_contact_phone = fields.Char(string='Contact Phone', related='unload_address.phone')
+    unload_postcode = fields.Char(string='Postcode', related='unload_address.postcode')
+    unload_city = fields.Char(string='City', related='unload_address.city')
+    unload_country = fields.Many2one('res.country', 'Unload Country', related='unload_address.country')
     unload_country_code = fields.Char('Country Code', related='unload_country.code')
     unload_address_timeslot = fields.Char('Timeslot')
 

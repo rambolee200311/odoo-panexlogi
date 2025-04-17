@@ -29,7 +29,7 @@
                 <field name="load_warehouse"/>
                 <field name="load_terminal"/>
                 <field name="loading_refs" optional="show"/>
-                <field name="load_address" optional="show"/>
+                <field name="loading_address" optional="show"/>
                 <field name="load_company_name" optional="show"/>
                 <field name="load_contact_phone" optional="show"/>
                 <field name="load_postcode" optional="show"/>
@@ -37,7 +37,7 @@
                 <field name="load_country" optional="show"/>
                 <field name="load_country_code" optional="show"/>
                 <field name="load_address_timeslot" optional="show"/>
-                <field name="unload_address" optional="show"/>
+                <field name="unloading_address" optional="show"/>
                 <field name="unload_company_name" optional="show"/>
                 <field name="unload_contact_phone" optional="show"/>
                 <field name="unload_postcode" optional="show"/>
@@ -120,9 +120,9 @@
                             <group col="2">
                                 <group string="Loading">
                                     <field name="loading_ref" readonly="state!='new'"/>
-                                    <field name="loading_conditon" readonly="state!='new'"/>
+                                    <field name="loading_condition" readonly="state!='new'"/>
                                     <field name="planned_for_loading" readonly="state!='new'"/>
-                                    <field name="load_address" readonly="state!='new'"/>
+                                    <field name="loading_address" readonly="state!='new'"/>
                                     <field name="load_company_name" readonly="state!='new'"/>
                                     <field name="load_contact_phone" readonly="state!='new'"/>
                                     <field name="load_postcode" readonly="state!='new'"/>
@@ -134,9 +134,9 @@
                                 </group>
                                 <group string="Unloading">
                                     <field name="unloading_ref" readonly="state!='new'"/>
-                                    <field name="unloading_conditon" readonly="state!='new'"/>
+                                    <field name="unloading_condition" readonly="state!='new'"/>
                                     <field name="planned_for_unloading" readonly="state!='new'"/>
-                                    <field name="unload_address" readonly="state!='new'"/>
+                                    <field name="unloading_address" readonly="state!='new'"/>
                                     <field name="unload_company_name" readonly="state!='new'"/>
                                     <field name="unload_contact_phone" readonly="state!='new'"/>
                                     <field name="unload_postcode" readonly="state!='new'"/>
@@ -203,7 +203,7 @@
                 <field name="load_type"/>
                 <field name="load_warehouse"/>
                 <field name="load_terminal"/>
-                <field name="load_address"/>
+                <field name="loading_address"/>
                 <field name="load_company_name"/>
                 <field name="load_contact_phone"/>
                 <field name="load_postcode"/>
@@ -211,7 +211,7 @@
                 <field name="load_country"/>
                 <field name="load_country_code"/>
                 <field name="load_address_timeslot"/>
-                <field name="unload_address"/>
+                <field name="unloading_address"/>
                 <field name="unload_company_name"/>
                 <field name="unload_contact_phone"/>
                 <field name="unload_postcode"/>
@@ -247,8 +247,8 @@
                             <field name="loading_ref" string="Loading Ref"/>
                             <field name="consignee_ref" string="Consignee Ref"/>
                             <field name="delivery_type" string="Delivery Type"/>
-                            <field name="loading_conditon" string="Loading Condition"/>
-                            <field name="unloading_conditon" string="Unloading Condition"/>
+                            <!--<field name="loading_conditon" string="Loading Condition"/>
+                            <field name="unloading_conditon" string="Unloading Condition"/>-->
                         </group>
                         <group col="2">
                             <field name="planned_for_loading" string="Planned Loading"/>
@@ -300,8 +300,8 @@
                 <field name="loading_ref" string="Loading Ref" optional="show"/>
 
                 <!-- 可选字段（用户可通过列选择器显示） -->
-                <field name="loading_conditon" string="Loading Condition" optional="show"/>
-                <field name="unloading_conditon" string="Unloading Condition" optional="show"/>
+               <!-- <field name="loading_conditon" string="Loading Condition" optional="show"/>
+                <field name="unloading_conditon" string="Unloading Condition" optional="show"/>-->
                 <field name="cntrno" string="Container No" optional="show"/>
                 <field name="product" string="Product" optional="show"/>
                 <field name="product_name" string="Product Name" optional="show"/>
