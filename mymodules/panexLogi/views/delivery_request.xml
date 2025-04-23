@@ -159,7 +159,7 @@
                         <page string="Detail">
                             <field name="deliverydetatilids" readonly="state!='new'"/>
                         </page>
-                        <page string="Address">
+                       <!-- <page string="Address">
                             <group>
                                 <group string="LOADING">
                                     <field name="loading_conditon" readonly="1"/>
@@ -186,7 +186,7 @@
                                     <field name="planned_for_unloading" readonly="1"/>
                                 </group>
                             </group>
-                        </page>
+                        </page>-->
                         <page string="Quote">
                             <group string="Common" col="2">
                                 <group>

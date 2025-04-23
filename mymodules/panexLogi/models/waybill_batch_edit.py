@@ -63,11 +63,12 @@ class WaybillBatchEditWizard(models.TransientModel):
     )
 
     # delivery_address
-    delivery_address = fields.Char(string='Delivery Address')
-    delivery_company_name = fields.Char('Company Name', tracking=True)
-    delivery_contact_phone = fields.Char('contact_phone', tracking=True)
-    delivery_postcode = fields.Char(string='Postcode', tracking=True)
-    delivery_country = fields.Many2one('res.country', 'Unload Country', tracking=True)
+    unload_address = fields.Many2one('panexlogi.address', string='Unload Address', tracking=True)
+    delivery_address = fields.Char(string='Delivery Address',related='unload_address.street', tracking=True)
+    delivery_company_name = fields.Char('Company Name', tracking=True,related='unload_address.company_name')
+    delivery_contact_phone = fields.Char('contact_phone', tracking=True,related='unload_address.phone')
+    delivery_postcode = fields.Char(string='Postcode', tracking=True,related='unload_address.postcode')
+    delivery_country = fields.Many2one('res.country', 'Unload Country', tracking=True,related='unload_address.country')
     delivery_address_timeslot = fields.Char('Timeslot', tracking=True)
     delivery_type = fields.Many2one('panexlogi.deliverytype', 'Delivery Type', tracking=True)
 

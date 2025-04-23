@@ -66,6 +66,7 @@
                                 <field name="batch_no" readonly="state!='new'"/>
                             </group>
                             <group col="2" string="Details">
+                                <field name="stackable"/>
                                 <field name="model_type" readonly="state!='new'"/>
                                 <field name="package_size" readonly="state!='new'"/>
                                 <field name="weight_per_unit" readonly="state!='new'"/>
@@ -80,37 +81,36 @@
                 </form>
             </field>
         </record>
-
         <!-- Tree View -->
         <record id="view_delivery_detail_tree" model="ir.ui.view">
             <field name="name">delivery.detail.tree</field>
             <field name="model">panexlogi.delivery.detail</field>
             <field name="arch" type="xml">
                 <tree string="Delivery Details">
-                    <field name="loading_ref"/>
-                    <field name="load_address"/>
-                    <field name="load_condition"/>
-                    <field name="load_date"/>
-                    <field name="load_timeslot"/>
-                    <field name="consignee_ref"/>
-                    <field name="unload_address"/>
-                    <field name="unload_condition"/>
-                    <field name="unload_date"/>
-                    <field name="unload_timeslot"/>
-                    <field name="cntrno"/>
-                    <field name="product"/>
-                    <field name="product_name"/>
-                    <field name="adr"/>
-                     <field name="uncode"/>
-                    <field name="qty"/>
-                    <field name="package_size"/>
-                    <field name="weight_per_unit"/>
-                    <field name="gross_weight"/>
-                    <field name="class_no"/>
-                    <field name="remark"/>
-                    <field name="quote" readonly="1"/>
-                    <field name="state" readonly="1"/>
-                    <field name="delivery_order_id" readonly="1"/>
+                    <field name="loading_ref" optional="show"/>
+                    <field name="load_address" optional="show"/>
+                    <field name="unload_address" optional="show"/>
+                    <field name="load_condition" optional="had"/>
+                    <field name="load_date" optional="show"/>
+                    <field name="load_timeslot" optional="show"/>
+                    <field name="consignee_ref" optional="hide"/>
+                    <field name="unload_condition" optional="show"/>
+                    <field name="unload_date" optional="hide"/>
+                    <field name="unload_timeslot" optional="hide"/>
+                    <field name="cntrno" optional="hide"/>
+                    <field name="product" optional="hide"/>
+                    <field name="product_name" optional="hide"/>
+                    <field name="adr" optional="hide"/>
+                    <field name="uncode" optional="hide"/>
+                    <field name="qty" optional="hide"/>
+                    <field name="package_size" optional="hide"/>
+                    <field name="weight_per_unit" optional="hide"/>
+                    <field name="gross_weight" optional="hide"/>
+                    <field name="class_no" optional="hide"/>
+                    <field name="remark" optional="hide"/>
+                    <field name="quote" readonly="1" optional="hide"/>
+                    <field name="state" readonly="1" optional="hide"/>
+                    <field name="delivery_order_id" readonly="1" optional="hide"/>
                 </tree>
             </field>
         </record>

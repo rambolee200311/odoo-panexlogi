@@ -11,46 +11,7 @@
                 </p>
             </field>
         </record>
-        <!-- Email View -->
-        <record id="email_template_transport_order" model="mail.template">
-            <field name="name">Transport Order Email</field>
-            <field name="model_id" ref="panexLogi.model_panexlogi_transport_order"/>
-            <field name="subject">Transport Order</field>
-            <field name="email_from">{{ user.email_formatted }}</field>
-            <field name="email_to">{{ object.truckco.email }}</field>
-            <field name="body_html" type="html">
-                <div>
-                    Dear <t t-out="object.truckco.name or ''">  </t>,<br/><br/>
-                    please collect from: <t t-out="object.collterminal.terminal_name or ''">  </t><br/><br/>
-                </div>
-                <div>
-                    <table border="1" cellpadding="5" cellspacing="0" width="100%">
-                        <tr>
-                            <th>container no</th>
-                            <th>collect date</th>
-                            <th>unload warehouse</th>
-                           <!-- <th>unload location</th>-->
-                            <th>drop off</th>
-                        </tr>
-                        <t t-foreach="object.transportorderdetailids" t-as="item">
-                            <tr>
-                                <td><t t-esc="item.cntrno"/></td>
-                                <td><t t-esc="item.coldate"/></td>
-                                <td><t t-esc="item.warehouse_code"/><!--</td>
-                                <td>--><t t-esc="item.unlolocation"/></td>
-                                <td><t t-esc="item.dropterminal_code"/></td>
-                            </tr>
-                        </t>
-                    </table>
-                </div>
-                <div>
-                    <br/>Best Regards<br/><br/>
-                    <t t-out="user.name or ''">   </t><br/><br/>
-                    <img t-attf-src="/logo.png?company={{ user.company_id.id }}" style="padding: 0px; margin: 0px; height: 48px;" t-att-alt="user.company_id.name"/>
 
-                </div>
-            </field>
-        </record>
 
         <!-- Form View -->
         <record id="view_transport_order_form" model="ir.ui.view">

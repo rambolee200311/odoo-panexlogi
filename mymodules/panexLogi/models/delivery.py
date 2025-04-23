@@ -429,6 +429,7 @@ class Delivery(models.Model):
             dts = []
             for rec in recs:
                 dts.append({
+                    'stackable': rec.stackable,
                     'cntrno': rec.cntrno,
                     'product': rec.product.id,
                     'pallets': rec.pallets,
@@ -595,6 +596,7 @@ class DeliveryDetail(models.Model):
     deliveryid = fields.Many2one('panexlogi.delivery', 'Delivery ID')
     # 2025018 wangpeng 是否是ADR goods. 点是的话，就必须要填Uncode。 点选否的话，就不用必填UN code.
     adr = fields.Boolean(string='ADR')
+    stackable = fields.Boolean(string='Stackable') 
     remark = fields.Text('Remark')
     quote = fields.Float('Quote', default=0)  # 报价
     additional_cost = fields.Float('Additional Cost', default=0)  # 额外费用
@@ -907,6 +909,18 @@ class DeliveryDetailCmrWizard(models.TransientModel):
             # Black font
             ARIAL_10 = Font(name='Arial', size=10, color='000000')
 
+            load_address = []
+            if self.detail_ids[0].load_address.company_name:
+                load_address.append(self.detail_ids[0].load_address.company_name)
+            if self.detail_ids[0].load_address.street:
+                load_address.append(self.detail_ids[0].load_address.street)
+            if self.detail_ids[0].load_address.postcode:
+                load_address.append(self.detail_ids[0].load_address.postcode)
+            if self.detail_ids[0].load_address.city:
+                load_address.append(self.detail_ids[0].load_address.city)
+            if self.detail_ids[0].load_address.country:
+                load_address.append(self.detail_ids[0].load_address.country.name)
+
             unload_address = []
             if self.detail_ids[0].unload_address.company_name:
                 unload_address.append(self.detail_ids[0].unload_address.company_name)
@@ -914,8 +928,16 @@ class DeliveryDetailCmrWizard(models.TransientModel):
                 unload_address.append(self.detail_ids[0].unload_address.street)
             if self.detail_ids[0].unload_address.postcode:
                 unload_address.append(self.detail_ids[0].unload_address.postcode)
+            if self.detail_ids[0].unload_address.city:
+                unload_address.append(self.detail_ids[0].unload_address.city)
             if self.detail_ids[0].unload_address.country:
                 unload_address.append(self.detail_ids[0].unload_address.country.name)
+
+            worksheet['B6'] = ''
+            worksheet['B6'] = self.delivery_id.project.project_name
+
+            worksheet['B7'] = ''
+            worksheet['B7'] = ', '.join(load_address)
 
             worksheet['B13'] = ''
             worksheet['B13'] = ', '.join(unload_address)
@@ -940,20 +962,43 @@ class DeliveryDetailCmrWizard(models.TransientModel):
             cell.font = ARIAL_10
 
             # Fix 2: Convert container numbers
-            cntrnos = [
-                str(detail.cntrno) if detail.cntrno and str(detail.cntrno).lower() != 'false'
+            #cntrnos = [
+            #    str(detail.cntrno) if detail.cntrno and str(detail.cntrno).lower() != 'false'
+            #    else ''
+            #    for detail in self.detail_ids
+            #]
+            #load_refs = [
+            #        str(detail.loading_ref) if detail.loading_ref and str(detail.loading_ref).lower() != 'false'
+            #        else ''
+            #        for detail in self.detail_ids
+            #]
+            cntrnos_load_refs = [
+                f"-{str(detail.loading_ref)}" if not detail.cntrno and detail.loading_ref and str(
+                    detail.loading_ref).lower() != 'false'
+                else f"{str(detail.cntrno)}-" if not detail.loading_ref and detail.cntrno and str(
+                    detail.cntrno).lower() != 'false'
+                else f"{str(detail.cntrno)}-{str(detail.loading_ref)}" if detail.cntrno and detail.loading_ref and str(
+                    detail.cntrno).lower() != 'false' and str(detail.loading_ref).lower() != 'false'
                 else ''
                 for detail in self.detail_ids
             ]
             worksheet['D29'] = ''
-            worksheet['D29'] = '\n'.join(cntrnos) if cntrnos else ''
+            worksheet['D29'] = '\n'.join(cntrnos_load_refs)
             cell = worksheet['D29']
             cell.alignment = ALIGN_TOP_LEFT
             cell.font = ARIAL_10
 
             # Fix 3: Convert model types
+            #model_types = [
+            #    str(detail.model_type) if detail.model_type and str(detail.model_type).lower() != 'false'
+            #    else ''
+            #    for detail in self.detail_ids
+            #]
             model_types = [
-                str(detail.model_type) if detail.model_type and str(detail.model_type).lower() != 'false'
+                str(detail.model_type) if not detail.product and detail.model_type and str(
+                    detail.model_type).lower() != 'false'
+                else detail.product.name if detail.product and (
+                            not detail.model_type or str(detail.model_type).lower() == 'false')
                 else ''
                 for detail in self.detail_ids
             ]

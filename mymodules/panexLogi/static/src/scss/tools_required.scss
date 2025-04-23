@@ -1,8 +1,7 @@
-.o_required_field::before{
-    content : '*';
-    color : red;
-}
-
-.o_star{
-    color : red
+.o_form_view .o_form_label.o_required_blue_label {
+    color: #3040D0 !important;
+    font-weight: bold;
+    + div .o_input_dropdown::after {
+        color: #3040D0 !important;
+    }
 }

@@ -302,7 +302,7 @@ class Waybill(models.Model):
                         rec.waybll_detail_id = details.id
 
             # check if waybill has container details set to inbound
-            if not record.details_ids.search([('truck_type', '=', 'inbound')]):
+            if not record.details_ids.search([('truck_type', '=', 'inbound'), ('waybill_billno', '=', record.id)]):
                 raise UserError(_("Please set container details to inbound first!"))
 
             if self.env['panexlogi.transport.order'].search(
@@ -420,7 +420,7 @@ class Waybill(models.Model):
                 terminal_full_address = ''
 
                 # check if waybill has container details set to delivery
-                if not rec.details_ids.search([('truck_type', '=', 'delivery')]):
+                if not rec.details_ids.search([('truck_type', '=', 'delivery'), ('waybill_billno', '=', rec.id)]):
                     raise UserError(_("Please set container details to delivery first!"))
 
                 # check if delivery request already exists
@@ -429,8 +429,9 @@ class Waybill(models.Model):
                 if existing_delivery:
                     raise UserError(_("Delivery request already exists"))
 
-                for detail in rec.details_ids.search([('truck_type', '=', 'delivery')]):
-                    """动态合并地址字段，自动跳过空值"""
+                for detail in rec.details_ids.search([('truck_type', '=', 'delivery'), ('waybill_billno', '=', rec.id)]):
+
+                    """动态合并地址字段，自动跳过空值
                     address_parts = []
                     if rec.terminal_a.address.street:
                         address_parts.append(rec.terminal_a.address.street)
@@ -441,7 +442,7 @@ class Waybill(models.Model):
 
                     # 用逗号+空格分隔非空字段（例如：Street, 12345 City, State）
                     terminal_full_address = ', '.join(address_parts) if address_parts else ''
-
+                    
                     # 生成唯一地址标识
                     address_key = (
                         detail.delivery_address,
@@ -451,6 +452,10 @@ class Waybill(models.Model):
                         detail.delivery_contact_phone,
                         detail.delivery_address_timeslot,
                     )
+                    """
+                    terminal_address = self.env['panexlogi.address'].search([('terminal', '=', rec.terminal_a.id)])
+
+                    address_key = (detail.unload_address)
                     if address_key not in address_groups:
                         address_groups[address_key] = []
                     address_groups[address_key].append(detail)
@@ -466,22 +471,24 @@ class Waybill(models.Model):
                             'adr': rec.adr,
                             'uncode': detail_address.uncode,
                             'waybill_detail_id': detail_address.id,
+                            'load_address': terminal_address.id,
+                            'unload_address': detail_address.unload_address.id,
                         }))
                         # 创建或更新 Delivery 记录
                         delivery_vals = {
                             'delivery_type': detail_address.delivery_type.id,
-                            'unload_address': addr_key[0],
-                            'unload_company_name': addr_key[1],
-                            'unload_postcode': addr_key[2],
-                            'unload_country': addr_key[3],
-                            'unload_contact_phone': addr_key[4],
-                            'unload_address_timeslot': addr_key[5],
+                            # 'unload_address': addr_key[0],
+                            # 'unload_company_name': addr_key[1],
+                            # 'unload_postcode': addr_key[2],
+                            # 'unload_country': addr_key[3],
+                            # 'unload_contact_phone': addr_key[4],
+                            # 'unload_address_timeslot': addr_key[5],
                             'project': rec.project.id,
-                            'load_address': terminal_full_address,
+                            # 'load_address': terminal_full_address,
                             # 'load_company_name': rec.shipping.name,
-                            'load_contact_phone': rec.terminal_a.address.phone,
-                            'load_postcode': rec.terminal_a.address.zip,
-                            'load_country': rec.terminal_a.address.country_id.id,
+                            # 'load_contact_phone': rec.terminal_a.address.phone,
+                            # 'load_postcode': rec.terminal_a.address.zip,
+                            # 'load_country': rec.terminal_a.address.country_id.id,
                             'deliverydetatilids': details_vals,
                         }
                         delivery_new = self.env['panexlogi.delivery'].create(delivery_vals)
@@ -835,8 +842,6 @@ class Waybill(models.Model):
                         packlist_lines.append((0, 0, packlist_vals))
                     new_detail.write({'waybill_packlist_id': packlist_lines})
 
-
-
                 # Update records
                 """
                 if detail:
@@ -858,6 +863,10 @@ class Waybill(models.Model):
                     'message': 'Portbase data fetched successfully!',
                     'type': 'success',
                     'sticky': False,
+                    'next': {
+                        'type': 'ir.actions.client',
+                        'tag': 'reload',
+                    }
                 }
             }
         except Exception as e:

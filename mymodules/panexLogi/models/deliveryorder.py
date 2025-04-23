@@ -42,6 +42,14 @@ class DeliveryOrder(models.Model):
         ('other', 'Other'),
         ('complete', 'Complete'),
     ], string='Delivery State', related='delivery_detail_id.state', readonly=True, default='none')
+
+    # outside_eu, import_file,export_file, transit_file
+    outside_eu = fields.Boolean(string='Outside of EU')
+    import_file = fields.Binary(string='Import File')
+    import_filename = fields.Char(string='Import File Name')
+    export_file = fields.Binary(string='Export File')
+    export_filename = fields.Char(string='Export File Name')
+
     # load type
     load_type = fields.Selection(
         selection=[
@@ -126,6 +134,11 @@ class DeliveryOrder(models.Model):
     delivery_order_cmr_line_ids = fields.One2many('panexlogi.delivery.order.cmr.line',
                                                   'delivery_order_id',
                                                   string='Delivery Order CMR Line')
+    delivery_order_change_log_ids = fields.One2many(
+        'delivery.order.change.log',
+        'delivery_order_id',
+        string='Change Logs'
+    )
 
     @api.onchange('load_warehouse')
     def _onchange_load_warehouse(self):
@@ -469,6 +482,7 @@ class DeliveryOrderLine(models.Model):
     uncode = fields.Char('UN CODE')
     class_no = fields.Char('Class')
     adr = fields.Boolean(string='ADR')
+    stackable = fields.Boolean(string='Stackable')
     remark = fields.Text('Remark')
     order_remark = fields.Text('Order Remark', tracking='1')
     load_remark = fields.Text('Load Remark', tracking='1')

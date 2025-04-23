@@ -20,7 +20,11 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'stock', 'sale', 'fleet', 'portal', 'payment', 'resource', 'web', 'spreadsheet'],
+    'depends': [
+        'web',  # 确保在第一位
+        'base', 'stock', 'sale', 'fleet', 'portal', 'payment',
+        'resource', 'spreadsheet'
+    ],
 
     # always loaded
     'data': [
@@ -91,11 +95,13 @@
         'views/sequence.xml',
         'report/report.xml',
         'views/menus.xml',
-        'views/template_panexlogi.xml',
+        #'views/template_panexlogi.xml',
+        'views/email_template.xml',
+        #'views/tools_required.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
-        'demo/demo.xml', 'data/fitem.xml', 'data/productname.xml',
+        'demo/demo.xml', 'data/fitem.xml','data/productname.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -103,6 +109,14 @@
              # 'static/src/xml/*.xml',
              # 'static/src/xml/samplecollection_barcode_handler.xml'
             #'static/src/scss/styles_panexlogi.scss',
+            #'panexLogi/static/src/js/tools_required.js',# mymodules/panexLogi/static/src/js/tools_required.js
+            #'panexLogi/static/src/scss/tools_required.scss',# mymodules/panexLogi/static/src/scss/tools_required.scss
+            'panexLogi/static/src/scss/address.scss',# mymodules/panexLogi/static/src/scss/address.scss
+
+            # With this:
+            #('js', 'panexLogi/static/src/js/tools_required.js', None),
+            #('scss', 'panexLogi/static/src/scss/tools_required.scss', None),
+            #('scss', 'panexLogi/static/src/scss/address.scss', None),
         ],
     },
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import base64
 from collections import defaultdict
 from datetime import timedelta, datetime, date
 import calendar
@@ -189,6 +189,12 @@ class ResCompany(models.Model):
     # Separate account for allocation of discounts
     account_discount_income_allocation_id = fields.Many2one(comodel_name='account.account', string='Separate account for income discount')
     account_discount_expense_allocation_id = fields.Many2one(comodel_name='account.account', string='Separate account for expense discount')
+
+    logo_web_str = fields.Char(compute='_compute_logo_web_str')
+
+    def _compute_logo_web_str(self):
+        for company in self:
+            company.logo_web_str = base64.b64encode(company.logo).decode('utf-8') if company.logo else ''
 
     def _get_company_root_delegated_field_names(self):
         return super()._get_company_root_delegated_field_names() + [

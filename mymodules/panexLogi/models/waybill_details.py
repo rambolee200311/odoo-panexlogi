@@ -82,11 +82,17 @@ class WaybillDetails(models.Model):
         related='warehouse.partner_id.mobile',
         readonly=True
     )
-    delivery_address = fields.Char(string='Address', tracking=True)
-    delivery_company_name = fields.Char('Company Name', tracking=True)
-    delivery_contact_phone = fields.Char('contact_phone', tracking=True)
-    delivery_postcode = fields.Char(string='Postcode', tracking=True)
-    delivery_country = fields.Many2one('res.country', 'Unload Country', tracking=True)
+    unload_address = fields.Many2one('panexlogi.address', string='Unload Address', tracking=True)
+    delivery_address = fields.Char(string='Street', tracking=True, related='unload_address.street')
+    delivery_company_name = fields.Char('Company Name', tracking=True, related='unload_address.company_name')
+    delivery_contact_phone = fields.Char('contact_phone', tracking=True, related='unload_address.phone')
+    delivery_postcode = fields.Char(string='Postcode', tracking=True, related='unload_address.postcode')
+    delivery_country = fields.Many2one(
+        'res.country',
+        string='Unload Country',
+        tracking=True,
+        related='unload_address.country'
+    )
     delivery_address_timeslot = fields.Char('Timeslot', tracking=True)
     delivery_type = fields.Many2one('panexlogi.deliverytype', 'Delivery Type', tracking=True)
 
@@ -103,6 +109,8 @@ class WaybillDetails(models.Model):
         for rec in self:
             if rec.waybill_billno.adr and not rec.uncode:
                 raise UserError(_("UN Code is required!"))
+
+
 """
     # check if truck_type=inbound then warehouse is required
     @api.constrains('truck_type', 'warehouse')

@@ -42,13 +42,14 @@
                             <group col="2">
                                 <group col="2" readonly="truck_type != 'delivery'">
                                     <field name="delivery_type"/>
-                                    <field name="delivery_address"/>
-                                    <field name="delivery_company_name"/>
+                                    <field name="unload_address"/>
+                                    <field name="delivery_address" readonly="1"/>
+                                    <field name="delivery_company_name" readonly="1"/>
                                 </group>
                                 <group col="2" readonly="truck_type != 'delivery'">
-                                    <field name="delivery_contact_phone"/>
-                                    <field name="delivery_postcode"/>
-                                    <field name="delivery_country"/>
+                                    <field name="delivery_contact_phone" readonly="1"/>
+                                    <field name="delivery_postcode" readonly="1"/>
+                                    <field name="delivery_country" readonly="1"/>
                                     <field name="delivery_address_timeslot"/>
                                 </group>
                             </group>

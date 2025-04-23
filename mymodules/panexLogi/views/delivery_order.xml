@@ -80,6 +80,10 @@
                             type="object"
                             string="Print"
                             class="oe_stat_button" icon="fa-print"/>
+                        <button name="action_open_change_wizard"
+                            type="object"
+                            string="Change"
+                            class="oe_stat_button" icon="fa-camera-retro"/>
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -109,10 +113,21 @@
                             <field name="delivery_state"/>
                             <field name="trailer_type"/>
                             <field name="order_remark" />
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group string="Documents" col="2">
                             <field name="pod_file" filename="pod_filename" widget="binary"/>
                             <field name="pod_filename"/>
                             <field name="order_file" filename="order_filename" widget="binary" readonly="state!='new'"/>
                             <field name="order_filename" readonly="state!='new'"/>
+                        </group>
+                        <group string="Out of EU" col="2">
+                            <field name="outside_eu"/>
+                            <field name="import_file" filename="import_filename"  widget="binary"/>
+                            <field name="import_filename" string="Import Document Filename"/>
+                            <field name="export_file" sfilename="export_filename" widget="binary"/>
+                            <field name="export_filename" string="Order Filename"/>
                         </group>
                     </group>
                     <notebook>
@@ -149,7 +164,7 @@
                             </group>
                         </page>
                         <page string="Good Info">
-                            <field name="delivery_order_line_ids"/>
+                            <field name="delivery_order_line_ids" readonly="state!='new'"/>
                             <!--<group col="2">
                                 <group col="2">
                                     <field name="cntrno" readonly="state!='new'"/>
@@ -172,6 +187,9 @@
                                     <field name="quote" readonly="state!='new'"/>
                                 </group>
                             </group>-->
+                        </page>
+                        <page string="Change Log">
+                            <field name="delivery_order_change_log_ids" readonly="state!='new'"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -247,6 +265,7 @@
                             <field name="loading_ref" string="Loading Ref"/>
                             <field name="consignee_ref" string="Consignee Ref"/>
                             <field name="delivery_type" string="Delivery Type"/>
+                            <field name="stackable"/>
                             <!--<field name="loading_conditon" string="Loading Condition"/>
                             <field name="unloading_conditon" string="Unloading Condition"/>-->
                         </group>
@@ -279,11 +298,14 @@
                         </group>
                     </group>
                     <!-- 文件上传字段 -->
-                    <group string="Documents" col="4">
-                        <field name="pod_file" string="POD File" widget="binary"/>
-                        <field name="pod_filename" string="POD Filename"/>
-                        <field name="order_file" string="Order File" widget="binary"/>
-                        <field name="order_filename" string="Order Filename"/>
+                    <group col="2">
+                        <group string="Documents" col="2">
+                            <field name="pod_file" string="POD File" widget="binary"/>
+                            <field name="pod_filename" string="POD Filename"/>
+                            <field name="order_file" string="Order File" widget="binary"/>
+                            <field name="order_filename" string="Order Filename"/>
+                        </group>
+
                     </group>
                 </sheet>
             </form>
@@ -332,6 +354,75 @@
                 <field name="planned_for_loading" string="Planned Loading" optional="show"/>
                 <field name="planned_for_unloading" string="Planned Unloading" optional="show"/>
             </tree>
+        </field>
+    </record>
+    <!-- Delivery Order change wizard view -->
+    <record id="view_delivery_order_change_wizard_form" model="ir.ui.view">
+        <field name="name">delivery.order.change.wizard.form</field>
+        <field name="model">delivery.order.change.wizard</field>
+        <field name="arch" type="xml">
+            <form>  <!-- 移除 string 属性 -->
+                <header>
+                    <h2>Delivery Order</h2>  <!-- 添加副标题 -->
+                    <h3><field name="delivery_order_id"/></h3>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="extra_cost" string="Extra Cost (add)"/>
+                        <field name="charge" string="Charge (add)"/>
+                        <field name="reason"/>
+                        <field name="remark"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_record_change" string="Change" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!-- Delivery Order change wizard action -->
+    <!-- 修改 XML 动作定义 -->
+    <record id="action_open_change_wizard" model="ir.actions.act_window">
+        <field name="name">Change Log</field>  <!-- 设置窗口标题 -->
+        <field name="res_model">delivery.order.change.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" eval="ref('panexLogi.model_panexlogi_delivery_order')"/>  <!-- 绑定到配送订单模型 -->
+    </record>
+
+    <!-- Delivery Order change log tree view -->
+    <record id="view_delivery_order_change_log_tree" model="ir.ui.view">
+        <field name="name">delivery.order.change.log.tree</field>
+        <field name="model">delivery.order.change.log</field>
+        <field name="arch" type="xml">
+            <tree string="Delivery Order Change Logs" create="false">
+               <!-- <field name="delivery_order_id"/>-->
+                <field name="extra_cost"/>
+                <field name="charge"/>
+                <field name="reason"/>
+                <field name="remark"/>
+                <field name="change_time"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Delivery Order change log form view -->
+    <record id="view_delivery_order_change_log_form" model="ir.ui.view">
+        <field name="name">delivery.order.change.log.form</field>
+        <field name="model">delivery.order.change.log</field>
+        <field name="arch" type="xml">
+            <form string="Delivery Order Change Log">
+                <sheet>
+                    <group>
+                        <!--<field name="delivery_order_id" readonly="1"/>-->
+                        <field name="extra_cost"/>
+                        <field name="charge"/>
+                        <field name="reason"/>
+                        <field name="remark"/>
+                        <field name="change_time" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>

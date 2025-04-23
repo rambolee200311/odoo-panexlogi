@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+    <template id="form_label_required" inherit_id="web.FormLabel">
+      <xpath expr="//label[contains(@class, 'o_form_label')]" position="attributes">
+        <attribute name="t-att-class">
+          existing_class + (hasRequired ? ' o_required_blue_label' : '')
+        </attribute>
+      </xpath>
+    </template>
+  </data>
+</odoo>
