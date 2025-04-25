@@ -1,0 +1,69 @@
+<odoo>
+    <data>
+        <!-- Transport Order Email View -->
+        <record id="email_template_transport_order" model="mail.template">
+            <field name="name">Transport Order Email</field>
+            <field name="model_id" ref="panexLogi.model_panexlogi_transport_order"/>
+            <field name="subject">Transport Order</field>
+            <field name="email_from">{{ user.email_formatted }}</field>
+            <field name="email_to">{{ object.truckco.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    Dear <t t-out="object.truckco.name or ''"/>,<br/><br/>
+                    Please collect from:
+                    <t t-if="object.collterminal">
+                        <t t-out="object.collterminal.terminal_code or ''"/>,
+                        <t t-out="object.collterminal.address.street or ''"/>
+                        <t t-out="object.collterminal.address.zip or ''"/>
+                        <t t-out="object.collterminal.address.city or ''"/>,
+                        <t t-out="object.collterminal.address.country_id.name or ''"/>
+                    </t>
+                    <br/><br/>
+                    Reference: <t t-out="object.billno or ''"/><br/><br/>
+                </div>
+                <div>
+                    <table border="1" cellpadding="5" cellspacing="0" width="100%">
+                        <tr>
+                            <th>Container No</th>
+                            <th>Collect Date</th>
+                            <th>Unload Warehouse</th>
+                            <th>Drop Off</th>
+                        </tr>
+                        <t t-foreach="object.transportorderdetailids" t-as="item">
+                            <tr>
+                                <td><t t-out="item.cntrno"/></td>
+                                <td><t t-out="item.coldate.strftime('%d/%m/%Y') if item.coldate else ''"/></td>
+                                <td>
+                                    <t t-if="item.warehouse">
+                                        <t t-out="item.warehouse.name or ''"/>,
+                                        <t t-out="item.warehouse.partner_id.street or ''"/>,<br/>
+                                        <t t-out="item.warehouse.partner_id.zip or ''"/>
+                                        <t t-out="item.warehouse.partner_id.city or ''"/>,
+                                        <t t-out="item.warehouse.partner_id.country_id.name or ''"/>
+                                    </t>
+                                </td>
+                                <td>
+                                    <t t-if="item.dropterminal">
+                                        <t t-out="item.dropterminal.terminal_code or ''"/>,
+                                        <t t-out="item.dropterminal.address.street or ''"/>,<br/>
+                                        <t t-out="item.dropterminal.address.zip or ''"/>
+                                        <t t-out="item.dropterminal.address.city or ''"/>,
+                                        <t t-out="item.dropterminal.address.country_id.name or ''"/>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                    <img t-if="user.company_id.logo"
+                         t-att-src="'data:image/png;base64,' + user.company_id.logo"
+                         style="height: 48px; margin-right: 10px;"/>
+                    <strong style="color: #2B2B2B;">
+                        <t t-out="user.company_id.name or ''"/>
+                    </strong>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

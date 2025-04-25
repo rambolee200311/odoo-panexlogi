@@ -56,23 +56,23 @@
                         </group>
                         <group col="2">
                             <group  col="2" string="product">
-                                <field name="cntrno" readonly="state!='new'"/>
-                                <field name="product" readonly="state!='new'"/>
-                                <field name="product_name" readonly="state!='new'"/>
-                                <field name="adr" readonly="state!='new'"/>
-                                <field name="uncode" readonly="state!='new'"/>
-                                <field name="pallets" readonly="state!='new'"/>
-                                <field name="qty" readonly="state!='new'"/>
-                                <field name="batch_no" readonly="state!='new'"/>
+                                <field name="cntrno" readonly="state!='new' and state!='approve'"/>
+                                <field name="product" readonly="state!='new' and state!='approve'"/>
+                                <field name="product_name" readonly="state!='new' and state!='approve'"/>
+                                <field name="adr" readonly="state!='new' and state!='approve'"/>
+                                <field name="uncode" readonly="state!='new' and state!='approve'"/>
+                                <field name="pallets" readonly="state!='new' and state!='approve'"/>
+                                <field name="qty" readonly="state!='new' and state!='approve'"/>
+                                <field name="batch_no" readonly="state!='new' and state!='approve'"/>
                             </group>
                             <group col="2" string="Details">
                                 <field name="stackable"/>
-                                <field name="model_type" readonly="state!='new'"/>
-                                <field name="package_size" readonly="state!='new'"/>
-                                <field name="weight_per_unit" readonly="state!='new'"/>
-                                <field name="gross_weight" readonly="state!='new'"/>
-                                <field name="class_no" readonly="state!='new'"/>
-                                <field name="remark" readonly="state!='new'"/>
+                                <field name="model_type" readonly="state!='new' and state!='approve'"/>
+                                <field name="package_size" readonly="state!='new' and state!='approve'"/>
+                                <field name="weight_per_unit" readonly="state!='new' and state!='approve'"/>
+                                <field name="gross_weight" readonly="state!='new' and state!='approve'"/>
+                                <field name="class_no" readonly="state!='new' and state!='approve'"/>
+                                <field name="remark" readonly="state!='new' and state!='approve'"/>
                                 <field name="quote" readonly="1"/>
                                 <field name="delivery_order_id" readonly="1"/>
                             </group>

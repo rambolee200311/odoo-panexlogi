@@ -134,8 +134,8 @@
                             <field name="notes"/>
                         </group>-->
                     </group>
-                    <group string="Inform" col="2">
-                        <group>
+                    <group string="Send Quote" col="2" groups="panexLogi.group_SendQuote">
+                        <!--<group>
                             <field name="need_inform"/>
                             <field name="inform_date"/>
                         </group>
@@ -151,6 +151,21 @@
                                 <button name="send_delivery_emails"
                                                 type="object"
                                                 string="Inform"
+                                                class="oe_stat_button" icon="fa-envelope"/>
+                            </div>
+                        </group>-->
+                        <group>
+                            <field name="quote_content"/>
+                        </group>
+                        <group>
+                            <field name="quote_receiver" widget="many2many_tags"/>
+                            <field name="quote_receiver_email"/>
+                        </group>
+                        <group>
+                            <div class="oe_button_box" name="button_box">
+                                <button name="action_send_quotes"
+                                                type="object"
+                                                string="Send Quote"
                                                 class="oe_stat_button" icon="fa-envelope"/>
                             </div>
                         </group>
@@ -247,6 +262,9 @@
                                     <field name="state"/>
                                 </tree>
                             </field>
+                        </page>
+                        <page string="Email Log">
+                            <field name="delivery_quote_email_log_ids"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -617,5 +635,18 @@
             </tree>
         </field>
     </record>
-
+    <!-- Delivery Quote Email Log Tree View -->
+    <record id="view_delivery_quote_email_log_tree" model="ir.ui.view">
+        <field name="name">delivery.quote.email.log.tree</field>
+        <field name="model">delivery.quote.email.log</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false">
+                <field name="email_date" string="Date"/>
+                <field name="delivery_id" string="Delivery Request"/>
+                <field name="email_to" string="Recipient"/>
+                <field name="email_sent" string="Status"/>
+                <field name="email_result" string="Result"/>
+            </tree>
+        </field>
+    </record>
 </odoo>

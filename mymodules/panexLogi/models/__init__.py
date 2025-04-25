@@ -58,3 +58,5 @@ from . import transport_order_extended
 from . import excel_template
 from . import delivery_order_extended
 from . import address
+from . import delivery_request_extended
+from . import irsequence

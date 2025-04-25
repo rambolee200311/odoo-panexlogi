@@ -21,7 +21,8 @@
 
     # any module necessary for this one to work correctly
     'depends': [
-        'web',  # 确保在第一位
+        'web',  # assuming you have a web module
+        'mail',  # assuming you have a mail module
         'base', 'stock', 'sale', 'fleet', 'portal', 'payment',
         'resource', 'spreadsheet'
     ],
@@ -96,7 +97,8 @@
         'report/report.xml',
         'views/menus.xml',
         #'views/template_panexlogi.xml',
-        'views/email_template.xml',
+        'views/email_template_transport_order.xml',
+        'views/email_template_delivery_quote.xml',
         #'views/tools_required.xml',
     ],
     # only loaded in demonstration mode

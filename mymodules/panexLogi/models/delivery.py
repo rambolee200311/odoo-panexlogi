@@ -87,7 +87,11 @@ class Delivery(models.Model):
     need_inform = fields.Boolean(string='Need', default=False)
     inform_date = fields.Date(string='Date')
     inform_content = fields.Text(string='Content')
-    inform_receiver = fields.Many2many('res.partner', string='Receivers',
+    inform_receiver = fields.Many2many('res.partner',
+                                       relation='delivery_inform_receiver_rel',  # Unique table name
+                                       column1='delivery_id',  # This record's ID
+                                       column2='partner_id',  # Partner's ID
+                                       string='Receivers',
                                        domain=[('user_ids', '!=', False), ('email', '!=', False)])
     inform_email_to = fields.Char(compute='_compute_email_to', string="Email To", store=True)
     delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order')
@@ -908,6 +912,13 @@ class DeliveryDetailCmrWizard(models.TransientModel):
 
             # Black font
             ARIAL_10 = Font(name='Arial', size=10, color='000000')
+
+            # check detail_ids if combination of load_address and unload_address is same
+            load_address = self.detail_ids[0].load_address
+            unload_address = self.detail_ids[0].unload_address
+            for detail in self.detail_ids:
+                if detail.load_address != load_address or detail.unload_address != unload_address:
+                    raise UserError(_("Please select details with the same load and unload addresses."))
 
             load_address = []
             if self.detail_ids[0].load_address.company_name:
