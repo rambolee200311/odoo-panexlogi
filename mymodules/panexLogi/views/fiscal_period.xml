@@ -1,0 +1,119 @@
+<odoo>
+    <record id="view_fiscal_year_tree" model="ir.ui.view">
+        <field name="name">fiscal.year.tree</field>
+        <field name="model">fiscal.year</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_fiscal_year_form" model="ir.ui.view">
+        <field name="name">fiscal.year.form</field>
+        <field name="model">fiscal.year</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                    <notebook>
+                        <page string="Quarters">
+                            <field name="quarter_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_fiscal_quarter_tree" model="ir.ui.view">
+        <field name="name">fiscal.quarter.tree</field>
+        <field name="model">fiscal.quarter</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_fiscal_quarter_form" model="ir.ui.view">
+        <field name="name">fiscal.quarter.form</field>
+        <field name="model">fiscal.quarter</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                        <field name="year_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Months">
+                            <field name="month_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_fiscal_month_tree" model="ir.ui.view">
+        <field name="name">fiscal.month.tree</field>
+        <field name="model">fiscal.month</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="year_id"/>
+                <field name="quarter_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_fiscal_month_form" model="ir.ui.view">
+        <field name="name">fiscal.month.form</field>
+        <field name="model">fiscal.month</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                        <field name="year_id"/>
+                        <field name="quarter_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Action for Fiscal Year -->
+    <record id="action_fiscal_year" model="ir.actions.act_window">
+        <field name="name">Fiscal Years</field>
+        <field name="res_model">fiscal.year</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_create">
+                Create your first Fiscal Year
+            </p>
+        </field>
+    </record>
+</odoo>

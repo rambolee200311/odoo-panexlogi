@@ -305,7 +305,6 @@
                             <field name="order_file" string="Order File" widget="binary"/>
                             <field name="order_filename" string="Order Filename"/>
                         </group>
-
                     </group>
                 </sheet>
             </form>

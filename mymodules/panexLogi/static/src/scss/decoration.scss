@@ -1,0 +1,35 @@
+@charset "utf-8";
+
+@keyframes status-pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
+.o_table {
+    tr.decoration-info > td {
+        background: rgba(0, 123, 255, 0.1) !important; /* Light blue */
+        border-left: 3px solid #007bff !important;
+        color: #0056b3 !important;
+    }
+
+    tr.decoration-primary > td {
+        background: rgba(255, 193, 7, 0.12) !important; /* Light yellow */
+        color: #856404 !important;
+        &:hover {
+            background: rgba(255, 193, 7, 0.18) !important;
+        }
+    }
+
+    tr.decoration-success > td {
+        background: rgba(40, 167, 69, 0.1) !important; /* Light green */
+        border-left: 3px solid #28a745 !important;
+        font-weight: 500 !important;
+    }
+
+    tr.decoration-warning > td {
+        background: rgba(220, 53, 69, 0.1) !important; /* Light red */
+        color: #dc3545 !important;
+        animation: status-pulse 1.5s infinite !important;
+    }
+}

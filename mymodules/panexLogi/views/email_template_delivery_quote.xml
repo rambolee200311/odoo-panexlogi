@@ -1,72 +1,73 @@
 <odoo>
     <data>
-        <!-- Delivery Quote Email Template -->
         <record id="email_template_delivery_quote" model="mail.template">
-            <field name="name">Delivery Quote Email</field>
-            <field name="model_id" ref="panexLogi.model_panexlogi_delivery"/>
-            <field name="subject">Delivery Quote Request</field>
-            <field name="email_from">{{ user.email_formatted }}</field>
-            <field name="email_to" type="html">
-                <div><t t-out="receiver_email"/></div>
-            </field>
             <field name="body_html" type="html">
-               <div>
-                   <p>Dear <t t-out="receiver_name or 'Valued Partner'"/></p>
-                   <p><t t-out="quote_content or ''"/></p>
-                   <p>Reference No:<t t-out="billno"/></p>
-                   <p>Type:<t t-out="delivery_type"/></p>
-                   <t t-set="counter" t-value="1"/>
-                   <t t-foreach="grouped_requests" t-as="group"  t-enumerate="index">
-                       <t t-if="group and group[0]">
-                           <p>-<t t-esc="'%03d' % (counter)"/></p>
-                           <t t-set="counter" t-value="counter + 1"/>
-                           <p>Load Address:</p>
-                           <p>
-                               <t t-out="(group[0].load_address.street or '') + ', ' + (group[0].load_address.city or '') if group[0].load_address else 'Not specified'"/>
-                           </p>
-                           <p>Unload Address:</p>
-                           <p>
-                               <t t-out="(group[0].unload_address.street or '') + ', ' + (group[0].unload_address.city or '') if group[0].unload_address else 'Not specified'"/>
-                           </p>
-                           <table border="1" cellpadding="5" cellspacing="0" width="100%">
-                               <thead>
-                                   <tr>
-                                       <!--<th>Cantainer No</th>-->
-                                       <th>Product</th>
-                                       <th>Palltes</th>
-                                       <th>Pcs</th>
-                                       <th>Gross Weight</th>
-                                       <th>ADR</th>
-                                       <th>stackable</th>
-                                   </tr>
-                               </thead>
-                               <tbody>
-                                   <t t-foreach="group" t-as="line">
-                                       <tr>
-                                           <!--<td><t t-out="line.cntrno if line.cntrno else '-'"/></td>-->
-                                           <td><t t-out="line.product.name if line.product else '-'"/></td>
-                                           <td><t t-out="line.pallets if line.pallets else '0'"/></td>
-                                           <td><t t-out="line.qty if line.qty else '0'"/></td>
-                                           <td><t t-out="line.gross_weight if line.gross_weight else '0'"/> kg</td>
-                                           <td><t t-out="line.adr if line.adr else 'False'"/></td>
-                                           <td><t t-out="line.stackable if line.stackable else 'False'"/></td>
-                                       </tr>
-                                   </t>
-                               </tbody>
-                           </table>
-                       </t>
-                   </t>
-                   <!--<div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
-                       <img t-if="company_logo" t-att-src="'data:image/png;base64,' + company_logo" style="height: 48px; margin-right: 10px;"/>
-                       <strong style="color: #2B2B2B;">
-                           <t t-out="user.company_id.name or ''"/>
-                       </strong>
-                   </div>-->
-                   <p style="margin-top: 20px;">Best regards,</p>
-                     <p style="margin-top: 20px;"><t t-out="user.name or ''"/></p>
-                     <p style="margin-top: 20px;"><t t-out="user.company_id.name or ''"/></p>
-                     <p style="margin-top: 20px;"><t t-out="user.company_id.phone or ''"/></p>
-               </div>
+                <div>
+                    <p>Dear <t t-out="receiver_name or 'Valued Partner'"/></p>
+                    <p><t t-out="quote_content or ''"/></p>
+                    <p>Reference No:<t t-out="billno"/></p>
+                    <p>Type:<t t-out="delivery_type"/></p>
+
+                    <!-- 全局分组计数器 -->
+                    <t t-set="group_counter" t-value="{'value': 1}"/>
+
+                    <t t-foreach="grouped_requests" t-as="group">
+                        <t t-if="group and group[0]">
+                            <div style="margin: 20px 0; padding: 15px; border: 1px solid #eee;">
+                                <h3>#<t t-esc="group_counter['value']"/></h3>
+
+                                <!-- 地址信息 -->
+                                <div style="margin: 10px 0;">
+                                    <p>Load Address:
+                                        <t t-out="(group[0].load_address.street or '') + ', ' +
+                                            (group[0].load_address.city or '') if group[0].load_address
+                                            else 'Not specified'"/>
+                                    </p>
+                                    <p>Unload Address:
+                                        <t t-out="(group[0].unload_address.street or '') + ', ' +
+                                            (group[0].unload_address.city or '') if group[0].unload_address
+                                            else 'Not specified'"/>
+                                    </p>
+                                </div>
+
+                                <!-- 项目表格 -->
+                                <table border="1" cellpadding="5" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Seq</th>
+                                            <th>Product</th>
+                                            <th>Pallets</th>
+                                            <th>Pcs</th>
+                                            <th>Gross Weight</th>
+                                            <th>ADR</th>
+                                            <th>stackable</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- 项目计数器 -->
+                                        <t t-set="item_counter" t-value="{'value': 1}"/>
+
+                                        <t t-foreach="group" t-as="line">
+                                            <tr>
+                                                <td><t t-esc="item_counter['value']"/></td>
+                                                <td><t t-out="line.product.name"/></td>
+                                                <td><t t-out="line.pallets"/></td>
+                                                <td><t t-out="line.qty"/></td>
+                                                <td><t t-out="line.gross_weight"/> kg</td>
+                                                <td><t t-out="line.adr if line.adr else 'False'"/></td>
+                                                <td><t t-out="line.stackable if line.stackable else 'False'"/></td>
+                                            </tr>
+                                            <t t-set="item_counter" t-value="{'value': item_counter['value'] + 1}"/>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 更新分组计数器 -->
+                            <t t-set="group_counter" t-value="{'value': group_counter['value'] + 1}"/>
+                        </t>
+                    </t>
+                </div>
             </field>
         </record>
     </data>

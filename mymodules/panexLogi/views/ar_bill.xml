@@ -1,0 +1,166 @@
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_ar_bill_tree" model="ir.ui.view">
+            <field name="name">ar.bill.tree</field>
+            <field name="model">panexlogi.ar.bill</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="status == 'invoiced'"
+                      decoration-primary="status == 'part received'"
+                      decoration-success="status == 'full received'"
+                      decoration-warning="status == 'other'">
+                      <!--class="o_table"-->
+                    <field name="billno" optional="show"/>
+                    <field name="date" optional="show"/>
+                    <field name="fiscal_year" optional="show"/>
+                    <field name="fiscal_month" optional="show"/>
+                    <field name="project" optional="show"/>
+                    <field name="project_manager" optional="show"/>
+                    <field name="currency_id" optional="show"/>
+                    <field name="amount" optional="show"/>
+                    <field name="vat" optional="show"/>
+                    <field name="amount_with_vat" optional="show"/>
+                    <field name="state" optional="show"/>
+                    <field name="customer" optional="show"/>
+                    <field name="ar_invoice_id" optional="show"/>
+                    <field name="invoice_amount" optional="show"/>
+                    <field name="invoice_vat" optional="show"/>
+                    <field name="invoice_amount_with_vat" optional="show"/>
+                    <field name="receive_amount" optional="show"/>
+                    <field name="remark" optional="show"/>
+                    <field name="status" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_ar_bill_form" model="ir.ui.view">
+            <field name="name">ar.bill.form</field>
+            <field name="model">panexlogi.ar.bill</field>
+            <field name="arch" type="xml">
+                <form string="AR Bill">
+                    <header>
+                        <!-- groups="panexLogi.groups_panex_finance_manager"-->
+                        <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state!='new'"/>
+                        <button name="action_unconfirm" type="object" string="UnConfirm" class="btn-primary" invisible="state!='confirm'"/>
+                        <button name="action_cancel" type="object" string="Cancel" class="btn-secondary" invisible="state!='new'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="new,confirm"/>
+                        <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                A/R Bill
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="generate_ar_invoice"
+                                    type="object"
+                                    string="Create A/R Invoice"
+                                    class="oe_stat_button" icon="fa-money"
+                                    groups="panexLogi.groups_panex_finance_manager"/>
+                        </div>
+                        <group col="2">
+                            <group col="2" string="Information">
+                                <field name="date" readonly="state!='new'"/>
+                                <field name="fiscal_year" readonly="state!='new'"/>
+                                <field name="fiscal_month" readonly="state!='new'"/>
+                                <field name="occurred_month" readonly="state!='new'"/>
+                                <field name="project" readonly="state!='new'"/>
+                                <field name="project_manager" readonly="state!='new'"/>
+                                <field name="customer" readonly="state!='new'"/>
+                            </group>
+                            <group col="2" string="Amount">
+                                <field name="currency_id" readonly="state!='new'"/>
+                                <field name="amount" readonly="1"/>
+                                <field name="vat" readonly="1"/>
+                                <field name="amount_with_vat" readonly="1"/>
+                                <field name="remark" readonly="state!='new'"/>
+                            </group>
+                        </group>
+                        <group col="2">
+                            <group col="2" string="Invoice">
+                                <field name="ar_invoice_id"/>
+                                <field name="invoice_amount" readonly="1"/>
+                                <field name="invoice_vat" readonly="1"/>
+                                <field name="invoice_amount_with_vat" readonly="1"/>
+                            </group>
+                            <group col="2" string="Payment">
+                                <field name="receive_amount" readonly="1"/>
+                                <field name="status" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Bill Lines">
+                                <field name="bill_line_ids" readonly="state!='new'">
+                                    <tree editable="bottom">
+                                        <field name="fitem"/>
+                                        <field name="fitem_name"/>
+                                        <field name="amount"/>
+                                        <field name="vat"/>
+                                        <field name="amount_with_vat" readonly="1"/>
+                                        <field name="remark"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Documents">
+                                <field name="bill_doc_ids">
+                                    <tree editable="bottom">
+                                        <field name="remark"/>
+                                        <field name="file" filename="file_name"/>
+                                        <field name="file_name"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_ar_bill_search" model="ir.ui.view">
+            <field name="name">ar.bill.search</field>
+            <field name="model">panexlogi.ar.bill</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="fiscal_year"/>
+                    <field name="fiscal_month"/>
+                    <field name="project"/>
+                    <field name="project_manager"/>
+                    <field name="customer"/>
+                    <field name="currency_id"/>
+                    <field name="amount"/>
+                    <field name="vat"/>
+                    <field name="amount_with_vat"/>
+                    <field name="state"/>
+                    <field name="invoice_amount"/>
+                    <field name="invoice_vat"/>
+                    <field name="invoice_amount_with_vat"/>
+                    <field name="receive_amount"/>
+                    <field name="remark"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_ar_bill" model="ir.actions.act_window">
+            <field name="name">AR Bills</field>
+            <field name="res_model">panexlogi.ar.bill</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_ar_bill_tree"/>
+        </record>
+
+
+    </data>
+</odoo>

@@ -65,6 +65,10 @@
         <menuitem id="settle_shipping_menu" name="Settle Shipping" parent="settle_menu" sequence="401" action="action_settle_shipping"/>
         <menuitem id="settle_clearance_menu" name="Settle Clearance" parent="settle_menu" sequence="402" action="action_settle_clearance"/>
 
+        <menuitem id="ar_menu" name="A / R" sequence="450" parent="panex_logi_menu"/>
+        <menuitem id="menu_ar_bill" name="Bills" parent="ar_menu" action="action_ar_bill" sequence="451"/>
+        <menuitem id="menu_ar_invoice" name="Invoices" parent="ar_menu" action="action_ar_invoice" sequence="452"/>
+        <menuitem id="menu_ar_receive" name="Receives" parent="ar_menu" action="action_ar_receive" sequence="453"/>
 
         <menuitem id="wms_menu" name="WMS" parent="panex_logi_menu" sequence="500" />
         <menuitem id="inbound_menu" name="Inbound" parent="wms_menu" sequence="501" />
@@ -77,6 +81,9 @@
         <menuitem id="warehouse_invoice_menu" name="Invoice" parent="wms_menu" sequence="521" />
         <menuitem id="panexlogi_warehouse_invoice_menu" name="Warehouse Invoices"  parent="warehouse_invoice_menu"  action="action_warehouse_invoice" sequence="522"/>
         <menuitem id="panexlogi_warehouse_invoice_detail_menu" name="Warehouse Invoice Details"  parent="warehouse_invoice_menu"  action="action_warehouse_invoice_detail" sequence="523"/>
+
+        <!-- Menu -->
+
 
         <menuitem id="configuration_menu" name="Configuration" parent="panex_logi_menu" sequence="900" />
         <menuitem id="partner_menu" name="Partners" parent="configuration_menu" sequence="901" action="action_partner"/>
@@ -98,7 +105,8 @@
         <menuitem id="menu_trailertype_type" name="Trailer Types" sequence="914" parent="configuration_menu" action="panexlogi_trailertype_action"/>
         <menuitem id="menu_excel_template_type" name="Excel Templates" sequence="915" parent="configuration_menu" action="action_excel_template"/>
         <menuitem id="menu_address" name="Addresses" sequence="916" parent="configuration_menu" action="action_address_tree"/>
-
+        <menuitem id="menu_fiscal_year" name="Fiscal Years" parent="configuration_menu" action="action_fiscal_year" sequence="917"/>
+        <menuitem id="menu_customer_temp" name="Customer Temp" parent="configuration_menu" action="action_customer_temp" sequence="918"/>
         <!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->
 

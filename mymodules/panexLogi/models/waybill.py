@@ -658,27 +658,29 @@ class Waybill(models.Model):
                 ('waybill_billno', '!=', False),
                 ('cntrno', '!=', False)
             ])
+            if packlists:
+                # Group PackLists by (waybill_billno, cntrno)
+                _logger.info(f"Found {len(packlists)} packlists start to process.")
+                grouped_packs = {}
+                for pack in packlists:
+                    key = (pack.waybill_billno.id, pack.cntrno.strip().upper())  # Normalize cntrno
+                    grouped_packs.setdefault(key, []).append(pack)
 
-            # Group PackLists by (waybill_billno, cntrno)
-            grouped_packs = {}
-            for pack in packlists:
-                key = (pack.waybill_billno.id, pack.cntrno.strip().upper())  # Normalize cntrno
-                grouped_packs.setdefault(key, []).append(pack)
-
-            # Find existing Details records and link PackLists
-            for key, packs in grouped_packs.items():
-                waybill_id, cntrno = key
-                # Search for existing Details with exact match
-                detail = self.env['panexlogi.waybill.details'].search([
-                    ('waybill_billno', '=', waybill_id),
-                    ('cntrno', '=ilike', cntrno)  # Case-insensitive search
-                ], limit=1)
-                # Skip if no matching Details record is found
-                if not detail:
-                    continue
-                # Update all PackLists in the group
-                for pack in packs:
-                    pack.write({'waybll_detail_id': detail.id})
+                # Find existing Details records and link PackLists
+                for key, packs in grouped_packs.items():
+                    waybill_id, cntrno = key
+                    # Search for existing Details with exact match
+                    detail = self.env['panexlogi.waybill.details'].search([
+                        ('waybill_billno', '=', waybill_id),
+                        ('cntrno', '=ilike', cntrno)  # Case-insensitive search
+                    ], limit=1)
+                    # Skip if no matching Details record is found
+                    if not detail:
+                        continue
+                    # Update all PackLists in the group
+                    for pack in packs:
+                        pack.write({'waybll_detail_id': detail.id})
+                _logger.info(f"Linked {len(packlists)} packlists to details successfully.")
         except Exception as e:
             _logger.error(f"Error in cron_link_packlist_details: {str(e)}")
 
@@ -872,6 +874,10 @@ class Waybill(models.Model):
         except Exception as e:
             raise UserError(f"Failed to fetch Portbase data: {e}")
 
+    @api.depends('packlist_ids')
+    def _autolink_detail_auto_link(self):
+        for record in self:
+            record.cron_link_packlist_details()
 
 # 其他附件
 class WaybillOtherDocs(models.Model):

@@ -9,12 +9,13 @@ _logger = logging.getLogger(__name__)
 class Address(models.Model):
     _name = 'panexlogi.address'
     _description = 'panexlogi.address'
+    _inherit = ["mail.thread", "mail.activity.mixin"]
     _rec_name = "address_code"
 
     address_code = fields.Char(string='Code', readonly=True)
-    street = fields.Char(string='Street')
-    latlng = fields.Char(string='LatLng', help='Latitude and Longitude, separated by a comma, like 52.5200,13.4050')
-    postcode = fields.Char(string='Zip', )
+    street = fields.Char(string='Street', tracking=True)
+    latlng = fields.Char(string='LatLng', help='Latitude and Longitude, separated by a comma, like 52.5200,13.4050', tracking=True)
+    postcode = fields.Char(string='Zip')
     city = fields.Char(string='City')
     state = fields.Many2one("res.country.state", string='State', )
     country = fields.Many2one("res.country", string='Country')
@@ -22,13 +23,13 @@ class Address(models.Model):
     longitude = fields.Float(string='Longitude')
     phone = fields.Char(string='Phone')
     mobile = fields.Char(string='Mobile')
-    is_warehouse = fields.Boolean(string='Is Warehouse', default=False)
-    warehouse = fields.Many2one("stock.warehouse", string='Warehouse')
-    is_terminal = fields.Boolean(string='Is Terminal', default=False)
-    terminal = fields.Many2one("panexlogi.terminal", string='Terminal')
+    is_warehouse = fields.Boolean(string='Is Warehouse', default=False, tracking=True)
+    warehouse = fields.Many2one("stock.warehouse", string='Warehouse', tracking=True)
+    is_terminal = fields.Boolean(string='Is Terminal', default=False, tracking=True)
+    terminal = fields.Many2one("panexlogi.terminal", string='Terminal', tracking=True)
     company_name = fields.Char(string='Company Name')
     timeslot = fields.Char('Timeslot')
-    remark = fields.Text(string='Remark')
+    remark = fields.Text(string='Remark', tracking=True)
 
     @api.constrains('address_code')
     def _check_address(self):

@@ -1,6 +1,6 @@
 from odoo import models, fields, api
-
-
+import logging
+_logger = logging.getLogger(__name__)
 # 装船清单
 
 
@@ -14,7 +14,7 @@ class WaybillPackList(models.Model):
     batch = fields.Char(string='Batch')
     interpono = fields.Char(string='Inter-Company PO Number')
     product_id = fields.Many2one('product.product', string='Product')
-    portbase_product_code = fields.Char( string='Portbase Product Code')
+    portbase_product_code = fields.Char(string='Portbase Product Code')
     portbase_product = fields.Char(string='Portbase Product')
     sn = fields.Char(string='Serial Number')
     powerperpc = fields.Integer(string='Power Per Piece')
@@ -43,7 +43,18 @@ class WaybillPackList(models.Model):
         """
         times = fields.Date.today()
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.waybill.packlinglist', times)
-        return super(WaybillPackList, self).create(values)
+        record = super(WaybillPackList, self).create(values)
+        if record.waybill_billno:
+            record.waybill_billno.cron_link_packlist_details()
+        return record
+
+    @api.model
+    def write(self, vals):
+        result = super(WaybillPackList, self).write(vals)
+        for record in self:
+            if record.waybill_billno:
+                record.waybill_billno.cron_link_packlist_details()
+        return result
 
     @api.depends('waybill_billno')
     def _get_blno(self):

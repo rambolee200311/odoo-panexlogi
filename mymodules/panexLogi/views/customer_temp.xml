@@ -1,0 +1,139 @@
+<odoo>
+    <data>
+        <!-- Action for Batch Update -->
+        <record id="action_batch_update_google_maps_details" model="ir.actions.server">
+            <field name="name">Batch Update Maps</field>
+            <field name="model_id" ref="model_panexlogi_customer_temp"/>
+            <field name="binding_model_id" ref="model_panexlogi_customer_temp"/>
+            <field name="binding_view_types">list</field>
+            <!--<field name="groups_id" eval="[(4, ref('base.group_system'))]"/>-->
+            <field name="state">code</field>
+            <field name="code">
+                action = env['panexlogi.customer.temp'].browse(env.context.get('active_ids')).action_batch_update_google_maps_details()
+            </field>
+        </record>
+        <!-- Tree View -->
+        <record id="view_customer_temp_tree" model="ir.ui.view">
+            <field name="name">panexlogi.customer.temp.tree</field>
+            <field name="model">panexlogi.customer.temp</field>
+            <field name="arch" type="xml">
+                <tree>
+                     <header>
+                       <!-- <button name="action_batch_update_google_maps_details"
+                                type="action"
+                                string="Batch Update Maps"
+                                class="btn-primary"
+                                icon="fa-map-marker"/>-->
+                         <button name="%(action_batch_update_google_maps_details)d"
+                                 type="action"
+                                 string="Batch Update Maps"
+                                 class="btn-primary"
+                                 icon="fa-map-marker"/>
+                         <button name="action_update_partner"
+                                 type="object"
+                                 string="Update Partner"
+                                 class="btn-primary"/>
+                         <button name="action_update_partner_new"
+                                 type="object"
+                                 string="Update Partner New"
+                                 class="btn-primary"/>
+                    </header>
+                    <field name="customer_name"/>
+                    <field name="kvknr"/>
+                    <field name="street"/>
+                    <field name="zip"/>
+                    <field name="city"/>
+                    <field name="country_name"/>
+                    <field name="state"/>
+                    <field name="country"/>
+                    <field name="phone"/>
+                    <field name="mobile"/>
+                    <field name="fax"/>
+                    <field name="email"/>
+                    <field name="website"/>
+                    <field name="vat"/>
+                    <field name="iban"/>
+                    <field name="bic"/>
+                    <field name="processed"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_customer_temp_search" model="ir.ui.view">
+            <field name="name">panexlogi.customer.temp.search</field>
+            <field name="model">panexlogi.customer.temp</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="customer_name"/>
+                    <field name="kvknr"/>
+                    <field name="street"/>
+                    <field name="zip"/>
+                    <field name="city"/>
+                    <field name="country_name"/>
+                    <field name="state"/>
+                    <field name="country"/>
+                    <field name="phone"/>
+                    <field name="mobile"/>
+                    <field name="fax"/>
+                    <field name="email"/>
+                    <field name="website"/>
+                    <field name="vat"/>
+                    <field name="iban"/>
+                    <field name="bic"/>
+                    <!--<filter string="Processed" domain="[('processed', '=', True)]"/>
+                    <filter string="Unprocessed" domain="[('processed', '=', False)]"/>-->
+                </search>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_customer_temp_form" model="ir.ui.view">
+            <field name="name">panexlogi.customer.temp.form</field>
+            <field name="model">panexlogi.customer.temp</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="customer_name"/>
+                            <field name="kvknr"/>
+                            <field name="street"/>
+                            <field name="zip"/>
+                            <field name="city"/>
+                            <field name="country_name"/>
+                            <field name="state"/>
+                            <field name="country"/>
+                        </group>
+                        <group>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+                            <field name="fax"/>
+                            <field name="email"/>
+                            <field name="website"/>
+                        </group>
+                        <group>
+                            <field name="vat"/>
+                            <field name="iban"/>
+                            <field name="bic"/>
+                            <field name="processed"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action for Customer Temp -->
+        <record id="action_customer_temp" model="ir.actions.act_window">
+            <field name="name">Customer Temp</field>
+            <field name="res_model">panexlogi.customer.temp</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_create">
+                    Create your first temporary customer record.
+                </p>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

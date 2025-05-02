@@ -1,0 +1,72 @@
+<odoo>
+    <record id="report_ar_invoice_template" model="ir.actions.report">
+        <field name="name">AR Invoice Report</field>
+        <field name="model">panexlogi.ar.invoice</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">panexlogi.report_ar_invoice_template_view</field>
+        <field name="file">panexlogi.report_ar_invoice_template_view</field>
+    </record>
+
+    <template id="report_ar_invoice_template_view">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <div class="page" style="font-family: Arial; padding: 20px;">
+                    <!-- Company Information -->
+                    <div style="margin-bottom: 30px;">
+                        <h2><span t-field="doc.ar_company.name"/></h2>
+                        <p><span t-field="doc.ar_company.street"/></p>
+                        <p><span t-field="doc.ar_company.city"/></p>
+                        <p t-field="doc.ar_company.country_id.name"/>
+                        <p>VAT: <span t-field="doc.ar_company.vat"/></p>
+                    </div>
+
+                    <!-- Customer Information -->
+                    <div style="margin-bottom: 30px;">
+                        <h3>Bill To:</h3>
+                        <p t-field="doc.customer.name"/>
+                        <p t-field="doc.customer.street"/>
+                        <p t-field="doc.customer.city"/>,
+                        <p t-field="doc.customer.country_id.name"/>
+                        <p>VAT: <span t-field="doc.customer.vat"/></p>
+                    </div>
+
+                    <!-- Invoice Table -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <thead>
+                            <tr style="background-color: #f5f5f5;">
+                                <th style="padding: 10px; border: 1px solid #ddd;">NO</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">SERVICE</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">DESCRIPTION</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="doc.invoice_line_ids" t-as="line" t-enumerate="loop">
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;"><span t-esc="loop.index"/></td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;" t-field="line.fitem_name"/>
+                                    <td style="padding: 10px; border: 1px solid #ddd;" t-field="line.remark"/>
+                                    <td style="padding: 10px; border: 1px solid #ddd;" t-field="line.invoice_amount"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- Totals -->
+                    <div style="float: right; width: 300px;">
+                        <p style="border-top: 2px solid #000; padding-top: 10px;">
+                            Amount: <span t-field="doc.invoice_amount"/> EUR
+                        </p>
+                        <p style="border-top: 2px solid #000; padding-top: 10px;">
+                            VAT: <span t-field="doc.invoice_vat"/> EUR
+                        </p>
+                        <p style="border-top: 2px solid #000; padding-top: 10px;">
+                            Amount with VAT: <span t-field="doc.invoice_amount_with_vat"/> EUR
+                        </p>
+                        <p>Payment Due: <span t-field="doc.invoice_due_date"/></p>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

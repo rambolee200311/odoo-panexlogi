@@ -1,0 +1,175 @@
+<odoo>
+    <data>
+        <!-- reports/ar_invoice_report.xml
+        <record id="report_ar_invoice_action" model="ir.actions.report">
+            <field name="name">AR Invoice Report</field>
+            <field name="model">panexlogi.ar.invoice</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">panexLogi.report_ar_invoice_template</field>
+        </record> -->
+        <!-- Tree View -->
+        <record id="view_ar_invoice_tree" model="ir.ui.view">
+            <field name="name">ar.invoice.tree</field>
+            <field name="model">panexlogi.ar.invoice</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="billno" optional="show"/>
+                    <field name="invoice_number"/>
+                    <field name="invoice_date"/>
+                    <field name="invoice_due_date"/>
+                    <field name="invoice_amount_with_vat"/>
+                    <field name="receive_amount"/>
+                    <field name="invoice_amount_balance"/>
+                    <field name="date" optional="show"/>
+                    <field name="fiscal_year" optional="show"/>
+                    <field name="fiscal_month" optional="show"/>
+                    <field name="project" optional="show"/>
+                    <field name="customer" optional="show"/>
+                    <field name="currency_id" optional="show"/>
+                    <field name="invoice_amount" optional="show"/>
+                    <field name="invoice_vat" optional="show"/>
+                    <field name="invoice_number" optional="show"/>
+                    <field name="invoice_pdf" filename="invoice_pdf_name" optional="show"/>
+                    <field name="invoice_pdf_name" readonly="1" optional="show"/>
+                    <field name="remark" optional="show"/>
+                    <field name="ar_bill_id" optional="show"/>
+                    <field name="state" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_ar_invoice_form" model="ir.ui.view">
+            <field name="name">ar.invoice.form</field>
+            <field name="model">panexlogi.ar.invoice</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <!-- groups="panexLogi.groups_panex_finance_manager"-->
+                        <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state!='new'"/>
+                        <button name="action_unconfirm" type="object" string="UnConfirm" class="btn-primary" invisible="state!='confirm'"/>
+                        <button name="action_cancel" type="object" string="Cancel" class="btn-secondary" invisible="state!='new'"/>
+                        <button name="action_renew" type="object" string="Renew" class="btn-primary" invisible="state!='cancel'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="new,confirm"/>
+                        <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                A/R Invoice
+                            </h1>
+                            <h2>
+                                <field name="billno" readonly="1"/>
+                            </h2>
+                        </div>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_print_pdf"
+                                    type="object"
+                                    string="Print Invoice PDF"
+                                    class="oe_stat_button" icon="fa-print"/>
+                        </div>
+                        <group col="2">
+                            <group col="2" string=" Information">
+                                <field name="date" readonly="state!='new'"/>
+                                <field name="fiscal_year" readonly="state!='new'"/>
+                                <field name="fiscal_month" readonly="state!='new'"/>
+                                <field name="occurred_month" readonly="state!='new'"/>
+                                <field name="project" readonly="state!='new'"/>
+                                <field name="project_manager" readonly="state!='new'"/>
+                                <field name="customer" readonly="state!='new'"/>
+                                <field name="remark" readonly="state!='new'"/>
+                            </group>
+                            <group col="2" string="Amount">
+                                <field name="currency_id" readonly="state!='new'"/>
+                                <field name="invoice_amount" readonly="1"/>
+                                <field name="invoice_vat" readonly="1"/>
+                                <field name="invoice_amount_with_vat" readonly="1"/>
+                                <field name="ar_company" readonly="state!='new'"/>
+                                <field name="ar_bill_id"/>
+                            </group>
+                        </group>
+                        <group col="2">
+                            <group col="2" string="Invoice">
+                                <field name="invoice_date" readonly="state!='new'"/>
+                                <field name="invoice_due_date" readonly="state!='new'"/>
+                                <field name="invoice_number" readonly="state!='new'"/>
+                                <field name="invoice_pdf" filename="invoice_pdf_name"/>
+                                <field name="invoice_pdf_name" readonly="1"/>
+                            </group>
+                            <group col="2" string="Receive">
+                                <field name="receive_amount" readonly="1"/>
+                                <field name="invoice_amount_balance" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Invoice Lines">
+                                <field name="invoice_line_ids" readonly="state!='new'">
+                                    <tree editable="bottom">
+                                        <field name="fitem"/>
+                                        <field name="invoice_amount"/>
+                                        <field name="invoice_vat"/>
+                                        <field name="invoice_amount_with_vat" readonly="1"/>
+                                        <field name="remark"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Receive Details">
+                                <field name="invoice_receive_details_ids" readonly="1">
+                                    <tree readonly="1">
+                                        <field name="ar_receive_id"/>
+                                        <field name="receive_date"/>
+                                        <field name="receive_amount"/>
+                                        <field name="remark"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_ar_invoice_search" model="ir.ui.view">
+            <field name="name">ar.invoice.search</field>
+            <field name="model">panexlogi.ar.invoice</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="fiscal_year"/>
+                    <field name="fiscal_month"/>
+                    <field name="project"/>
+                    <field name="customer"/>
+                    <field name="invoice_number"/>
+                    <field name="invoice_date"/>
+                    <field name="invoice_due_date"/>
+                    <field name="currency_id"/>
+                    <field name="invoice_amount"/>
+                    <field name="invoice_vat"/>
+                    <field name="invoice_amount_with_vat"/>
+                    <field name="receive_amount"/>
+                    <field name="remark"/>
+                    <field name="invoice_amount_balance"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_ar_invoice" model="ir.actions.act_window">
+            <field name="name">AR Invoices</field>
+            <field name="res_model">panexlogi.ar.invoice</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_create">
+                    Click to create a new AR Invoice.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

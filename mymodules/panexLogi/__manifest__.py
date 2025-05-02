@@ -95,15 +95,24 @@
         'data/ir_cron_data.xml',
         'views/sequence.xml',
         'report/report.xml',
-        'views/menus.xml',
         #'views/template_panexlogi.xml',
         'views/email_template_transport_order.xml',
         'views/email_template_delivery_quote.xml',
+        'views/fiscal_period.xml',
+        'views/ar_bill.xml',
+        'views/ar_invoice.xml',
+        #'report/ar_invoice_report.xml',
+        'views/ar_receive.xml',
+        'views/customer_temp.xml',
+        'views/menus.xml',
         #'views/tools_required.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
-        'demo/demo.xml', 'data/fitem.xml','data/productname.xml',
+        'demo/demo.xml',
+        'data/fitem.xml',
+        'data/productname.xml',
+        #'data/fiscal_period.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -114,11 +123,13 @@
             #'panexLogi/static/src/js/tools_required.js',# mymodules/panexLogi/static/src/js/tools_required.js
             #'panexLogi/static/src/scss/tools_required.scss',# mymodules/panexLogi/static/src/scss/tools_required.scss
             'panexLogi/static/src/scss/address.scss',# mymodules/panexLogi/static/src/scss/address.scss
+            #'panexLogi/static/src/scss/decoration.scss',# mymodules/panexLogi/static/src/scss/address.scss
 
             # With this:
             #('js', 'panexLogi/static/src/js/tools_required.js', None),
             #('scss', 'panexLogi/static/src/scss/tools_required.scss', None),
             #('scss', 'panexLogi/static/src/scss/address.scss', None),
+            #'panexLogi/static/src/js/ar_receiver.js'
         ],
     },
 

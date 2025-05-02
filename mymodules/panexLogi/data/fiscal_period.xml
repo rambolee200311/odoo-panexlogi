@@ -1,0 +1,52 @@
+<odoo>
+    <!-- Define fiscal years from 2025 to 2030 -->
+    <record id="fiscal_year_2025" model="fiscal.year">
+        <field name="name">2025</field>
+        <field name="start_date">2025-01-01</field>
+        <field name="end_date">2025-12-31</field>
+    </record>
+    <record id="fiscal_year_2026" model="fiscal.year">
+        <field name="name">2026</field>
+        <field name="start_date">2026-01-01</field>
+        <field name="end_date">2026-12-31</field>
+    </record>
+    <record id="fiscal_year_2027" model="fiscal.year">
+        <field name="name">2027</field>
+        <field name="start_date">2027-01-01</field>
+        <field name="end_date">2027-12-31</field>
+    </record>
+    <record id="fiscal_year_2028" model="fiscal.year">
+        <field name="name">2028</field>
+        <field name="start_date">2028-01-01</field>
+        <field name="end_date">2028-12-31</field>
+    </record>
+    <record id="fiscal_year_2029" model="fiscal.year">
+        <field name="name">2029</field>
+        <field name="start_date">2029-01-01</field>
+        <field name="end_date">2029-12-31</field>
+    </record>
+    <record id="fiscal_year_2030" model="fiscal.year">
+        <field name="name">2030</field>
+        <field name="start_date">2030-01-01</field>
+        <field name="end_date">2030-12-31</field>
+    </record>
+
+    <!-- Automatically create quarters and months for each fiscal year -->
+    <function model="fiscal.year" name="create_quarters" eval="[ref('fiscal_year_2025')]"/>
+    <function model="fiscal.year" name="generate_months" eval="[ref('fiscal_year_2025')]"/>
+
+    <function model="fiscal.year" name="create_quarters" eval="[ref('fiscal_year_2026')]"/>
+    <function model="fiscal.year" name="generate_months" eval="[ref('fiscal_year_2026')]"/>
+
+    <function model="fiscal.year" name="create_quarters" eval="[ref('fiscal_year_2027')]"/>
+    <function model="fiscal.year" name="generate_months" eval="[ref('fiscal_year_2027')]"/>
+
+    <function model="fiscal.year" name="create_quarters" eval="[ref('fiscal_year_2028')]"/>
+    <function model="fiscal.year" name="generate_months" eval="[ref('fiscal_year_2028')]"/>
+
+    <function model="fiscal.year" name="create_quarters" eval="[ref('fiscal_year_2029')]"/>
+    <function model="fiscal.year" name="generate_months" eval="[ref('fiscal_year_2029')]"/>
+
+    <function model="fiscal.year" name="create_quarters" eval="[ref('fiscal_year_2030')]"/>
+    <function model="fiscal.year" name="generate_months" eval="[ref('fiscal_year_2030')]"/>
+</odoo>

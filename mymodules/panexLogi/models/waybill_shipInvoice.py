@@ -49,7 +49,7 @@ class WaybillShipInvoice(models.Model):
     @api.model
     def create(self, values):
         """
-        生成跟踪单号
+        generate bill number
         """
         times = fields.Date.today()
         values['billno'] = self.env['ir.sequence'].next_by_code('seq.waybill.shipinvoice', times)

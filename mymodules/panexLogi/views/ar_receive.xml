@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_ar_receive_tree" model="ir.ui.view">
+            <field name="name">ar.receive.tree</field>
+            <field name="model">panexlogi.ar.receive</field>
+            <field name="arch" type="xml">
+                <tree limit="50">
+                    <field name="billno" optional="show"/>
+                    <field name="receive_date" optional="show"/>
+                    <field name="invoice_number" optional="show"/>
+                    <field name="payer" optional="show"/>
+                    <field name="payer_account" optional="show"/>
+                    <field name="payer_account_partner" optional="show"/>
+                    <field name="payer_account_number" optional="show"/>
+                    <field name="payer_bank_bic" optional="show"/>
+                    <field name="payee_company" optional="show"/>
+                    <field name="payee_bank" optional="show"/>
+                    <field name="payee_account" optional="show"/>
+                    <field name="payment_method" optional="show"/>
+                    <field name="currency_id" optional="show"/>
+                    <field name="receive_amount" optional="show"  sum="Page Total: %s"/>
+                    <field name="cost" optional="show"  sum="Page Total: %s"/>
+                    <field name="pdffile" widget="binary_filename" filename="pdffilename" optional="show"/>
+                    <field name="pdffilename" optional="show"/>
+                    <field name="state" optional="show"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_ar_receive_form" model="ir.ui.view">
+            <field name="name">ar.receive.form</field>
+            <field name="model">panexlogi.ar.receive</field>
+            <field name="arch" type="xml">
+                <form string="AR Receive">
+                    <header>
+                        <!-- groups="panexLogi.groups_panex_finance_manager"-->
+                        <button name="action_confirm" type="object" string="Confirm" class="btn-primary" invisible="state!='new'"/>
+                        <button name="action_unconfirm" type="object" string="UnConfirm" class="btn-primary" invisible="state!='confirm'"/>
+                        <button name="action_cancel" type="object" string="Cancel" class="btn-secondary" invisible="state!='new'"/>
+                        <button name="action_renew" type="object" string="Renew" class="btn-primary" invisible="state!='cancel'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="new,confirm"/>
+                        <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                A/R Receive
+                            </h1>
+                            <h2>
+                                <field name="billno" readonly="1"/>
+                            </h2>
+                        </div>
+                        <group col="2">
+                            <group col="2" string=" Information">
+                                <field name="receive_date" readonly="state!='new'"/>
+                                <field name="payment_method" readonly="state!='new'"/>
+                                <field name="currency_id" optional="show"/>
+                                <field name="receive_amount" readonly="state!='new'"/>
+                                <field name="cost" readonly="state!='new'"/>
+                                <field name="payee_company"  readonly="state!='new'"/>
+                                <field name="payee_company_account" readonly="state!='new'"/>
+                                <field name="payee_bank" readonly="state!='new'"/>
+                                <field name="payee_account"  readonly="state!='new'"/>
+                            </group>
+                            <group col="2" string=" Payer">
+                                <field name="payer" readonly="state!='new'"/>
+                                <!--<field name="payer_account" readonly="state!='new'"/>-->
+                                <field name="payer_account_partner" readonly="state!='new'"/>
+                                <field name="payer_account_number" readonly="state!='new'"/>
+                                <field name="payer_bank_bic" readonly="state!='new'"/>
+                            </group>
+                        </group>
+                        <group col="2">
+                            <group col="2">
+                                <field name="pdffile" widget="binary_filename" filename="pdffilename"/>
+                                <field name="pdffilename" />
+                            </group>
+                            <group col="2">
+                                <field name="invoice_number" readonly="state!='new'"/>
+                                <field name="remark" readonly="state!='new'"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Receive Lines">
+                                <field name="ar_receive_line_ids" readonly="state!='new'">
+                                    <tree editable="bottom">
+                                        <field name="ar_invoice_id"/>
+                                        <field name="invoice_date"/>
+                                        <field name="invoice_due_date"/>
+                                        <field name="invoice_number"/>
+                                        <field name="invoice_amount_with_vat"  sum="Total Amount with Vat"/>
+                                        <field name="receive_amount" sum="Total Receive"/>
+                                         <field name="invoice_amount_balance" sum="Total Balance"/>
+                                        <field name="amount" sum="Total Amount"/>
+                                        <field name="remark"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_ar_receive_search" model="ir.ui.view">
+            <field name="name">ar.receive.search</field>
+            <field name="model">panexlogi.ar.receive</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno" />
+                    <field name="receive_date" />
+                    <field name="invoice_number" />
+                    <field name="payer" />
+                    <field name="payer_account" />
+                    <field name="payer_account_partner" />
+                    <field name="payer_account_number" />
+                    <field name="payer_bank_bic" />
+                    <field name="payee_company" />
+                    <field name="payee_bank" />
+                    <field name="payee_account" />
+                    <field name="payment_method" />
+                    <field name="receive_amount" />
+                    <field name="cost" />
+                    <field name="currency_id" />
+                    <field name="state" />
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_ar_receive" model="ir.actions.act_window">
+            <field name="name">AR Receive</field>
+            <field name="res_model">panexlogi.ar.receive</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>
