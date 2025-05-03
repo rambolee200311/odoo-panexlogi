@@ -62,6 +62,10 @@
                                     string="Create A/R Invoice"
                                     class="oe_stat_button" icon="fa-money"
                                     groups="panexLogi.groups_panex_finance_manager"/>
+                            <button name="action_credit_note"
+                                    type="object"
+                                    string="Credit Note"
+                                    class="oe_stat_button" icon="fa-clone"/>
                         </div>
                         <group col="2">
                             <group col="2" string="Information">
@@ -79,6 +83,8 @@
                                 <field name="vat" readonly="1"/>
                                 <field name="amount_with_vat" readonly="1"/>
                                 <field name="remark" readonly="state!='new'"/>
+                                <field name="original_ar_bill_id" readonly="1"/>
+                                <field name="credit_note_ar_bill_id" readonly="1"/>
                             </group>
                         </group>
                         <group col="2">

@@ -65,3 +65,4 @@ from . import ar_bill
 from . import ar_invoice
 from . import ar_receive
 from . import customer_temp
+from . import delivery_order_new

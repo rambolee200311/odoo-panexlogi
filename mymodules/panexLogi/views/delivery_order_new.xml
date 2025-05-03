@@ -1,0 +1,187 @@
+<odoo>
+    <data>
+        <record id="action_delivery_order_new_wizard" model="ir.actions.act_window">
+            <field name="name">Create Delivery Order New</field>
+            <field name="res_model">delivery.order.new.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Tree View for DeliveryOrderNew -->
+        <record id="view_delivery_order_new_tree" model="ir.ui.view">
+            <field name="name">delivery.order.new.tree</field>
+            <field name="model">panexlogi.delivery.order.new</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="project"/>
+                    <field name="truckco"/>
+                    <field name="state"/>
+                    <field name="delivery_state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View for DeliveryOrderNew -->
+        <record id="view_delivery_order_new_form" model="ir.ui.view">
+            <field name="name">delivery.order.new.form</field>
+            <field name="model">panexlogi.delivery.order.new</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                         <button name="action_confirm_order"
+                                type="object"
+                                string="Confirm"
+                                invisible="state == 'confirm' or state == 'cancel' or state == 'order'"
+                                class="btn-danger"/>
+                         <button name="action_unconfirm_order"
+                                type="object"
+                                string="Unconfirm"
+                                invisible="state == 'new' or state == 'cancel' or state == 'order'"
+                                class="btn-primary"/>
+                         <button name="action_cancel_order"
+                                type="object"
+                                string="Cancel"
+                                invisible="state == 'confirm' or state == 'cancel' or state == 'order'"
+                                class="btn-warning"/>
+                         <field
+                                name="state"
+                                widget="statusbar"
+                                statusbar_visible="new,confirm,order"/>
+                         <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                        <h1>
+                            Delivery Order
+                        </h1>
+                        <h2>
+                            <field name="billno"/>
+                        </h2>
+                    </div>
+                        <group col="2">
+                            <group>
+                                <field name="date"/>
+                                <field name="project"/>
+                                <field name="truckco"/>
+                                <field name="state" readonly="1"/>
+                                <field name="delivery_state" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="outside_eu"/>
+                                <field name="import_file" filename="import_filename"/>
+                                <field name="export_file" filename="export_filename"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="quote"/>
+                            <field name="additional_cost"/>
+                            <field name="extra_cost"/>
+                        </group>
+                        <notebook>
+                            <page>
+                                <field name="delivery_detail_cmr_ids">
+                                    <tree>
+                                        <field name="billno" optional="show"/>
+                                        <field name="delivery_id" optional="show"/>
+                                        <field name="loading_refs" optional="show"/>
+                                        <field name="load_date" optional="show"/>
+                                        <field name="consignee_refs" optional="show"/>
+                                        <field name="unload_date" optional="show"/>
+                                        <field name="cntrnos" optional="show"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page>
+                                <field name="delivery_detail_ids">
+                                    <tree>
+                                        <field name="loading_ref"/>
+                                        <field name="load_condition"/>
+                                        <field name="load_address"/>
+                                        <field name="load_date"/>
+                                        <field name="load_timeslot"/>
+                                        <field name="consignee_ref"/>
+                                        <field name="unload_condition"/>
+                                        <field name="unload_address"/>
+                                        <field name="unload_date"/>
+                                        <field name="unload_timeslot"/>
+                                        <field name="cntrno"/>
+                                        <field name="product"/>
+                                        <field name="product_name"/>
+                                        <field name="adr"/>
+                                        <field name="uncode"/>
+                                        <field name="pallets"/>
+                                        <field name="qty"/>
+                                        <field name="batch_no"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="activity_ids" widget="mail_activity" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View for DeliveryOrderNew -->
+        <record id="view_delivery_order_new_search" model="ir.ui.view">
+            <field name="name">delivery.order.new.search</field>
+            <field name="model">panexlogi.delivery.order.new</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="billno"/>
+                    <field name="date"/>
+                    <field name="project"/>
+                    <field name="truckco"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action for DeliveryOrderNew -->
+        <record id="action_delivery_order_new" model="ir.actions.act_window">
+            <field name="name">Delivery Orders</field>
+            <field name="res_model">panexlogi.delivery.order.new</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_delivery_order_new_search"/>
+        </record>
+
+        <!-- Form View for DeliveryOrderNewWizard -->
+        <record id="view_delivery_order_wizard_form" model="ir.ui.view">
+            <field name="name">delivery.order.new.wizard.form</field>
+            <field name="model">delivery.order.new.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Create Delivery Order">
+                    <group>
+                        <field name="delivery_id" invisible="1"/>
+                        <field name="selected_cmr_ids"
+                           widget="many2many"
+                           context="{'tree_view_ref': 'panexlogi.delivery_detail_cmr_view_tree'}">
+                            <tree>
+                                <field name="billno" string="Bill No"/>
+                                <field name="loading_refs" string="Loading Refs"/>
+                                <field name="load_date" string="Loading Date"/>
+                                <field name="consignee_refs" string="Consignee"/>
+                                <field name="cntrnos" string="Container No"/>
+                                <field name="state" string="Status"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <footer>
+                        <button name="create_delivery_order_new"
+                                type="object"
+                                string="Confirm"
+                                class="btn-primary"/>
+                        <button string="Cancel"
+                                class="btn-secondary"
+                                special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

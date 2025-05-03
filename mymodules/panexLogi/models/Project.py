@@ -14,6 +14,9 @@ class Project(models.Model):
     productids = fields.One2many('panexlogi.project.product', 'projectid', string='Product lines')
     group = fields.Many2one('res.groups', string='Group')
     warehouse = fields.Many2many('stock.warehouse', string='Warehouse')
+    payee_company = fields.Many2one('res.partner', string='Company', tracking=True,
+                                    domain="[('is_company', '=', True),('category_id.name', 'ilike', 'company')]")
+    remark = fields.Text(string='Remark')
 
     clearance_price_rule = fields.Boolean(string='Depend on Container Count')
     clearance_entry_price = fields.Float(string='Entry Item', default=0)

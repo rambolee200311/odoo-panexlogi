@@ -25,8 +25,10 @@
                         <field name="project_name"/>
                         <field name="project_code"/>
                         <field name="customer"/>
+                        <field name="payee_company"/>
                         <field name="warehouse" widget="many2many_tags" />
                         <field name="group" groups="panexLogi.groups_panex_logistic_manager" class="oe_inline"/>
+                        <field name="remark"/>
                     </group>
                     <notebook>
                         <page string="Customs Clearance">
@@ -80,7 +82,10 @@
                 <field name="project_name"/>
                 <field name="project_code"/>
                 <field name="customer"/>
+                <field name="payee_company"/>
                 <field name="group"/>
+                <field name="warehouse"/>
+                <field name="remark"/>
             </search>
         </field>
     </record>
@@ -91,11 +96,14 @@
         <field name="model">panexlogi.project</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="project_type"/>
-                <field name="project_name"/>
-                <field name="project_code"/>
-                <field name="customer"/>
-                <field name="group"/>
+                <field name="project_type" optional="show"/>
+                <field name="project_name" optional="show"/>
+                <field name="project_code" optional="show"/>
+                <field name="customer" optional="show"/>
+                <field name="payee_company" optional="show"/>
+                <field name="group" optional="show"/>
+                <field name="warehouse" optional="show"/>
+                <field name="remark" optional="show"/>
             </tree>
         </field>
     </record>
@@ -115,10 +123,24 @@
                             <div clasds="oe_kanban_detail">
                                 <ul>
                                     <li>
-                                        <field name="project_name"/>
+                                        <strong>
+                                        <field name="project_name"/></strong>
                                     </li>
                                     <li>
+                                        <strong>Customer : </strong>
                                         <field name="customer"/>
+                                    </li>
+                                    <li>
+                                        <strong>Group : </strong>
+                                        <field name="group"/>
+                                    </li>
+                                    <li>
+                                        <strong>Warehouse : </strong>
+                                        <field name="warehouse"/>
+                                    </li>
+                                    <li>
+                                        <strong>Remark : </strong>
+                                        <field name="remark"/>
                                     </li>
                                 </ul>
                             </div>

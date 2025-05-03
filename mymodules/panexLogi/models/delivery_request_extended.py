@@ -132,8 +132,20 @@ class DeliveryExtended(models.Model):
                     'email_result': str(e)
                 })
                 _logger.warning('Error sending email to %s: %s', email, str(e))
-
-
+    #    # The method returns an action dictionary that opens the delivery.order.new.wizard in a form view
+    def action_open_delivery_order_new_wizard(self):
+        """Open the wizard to create a new Delivery Order."""
+        return {
+            'name': _('Create Delivery Order New'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'delivery.order.new.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_delivery_id': self.id,
+                'active_id': self.id
+            },
+        }
 class DeliveryQuoteEmailLog(models.Model):
     _name = 'delivery.quote.email.log'
     _description = 'Delivery Quote Email Log'
@@ -149,3 +161,51 @@ class DeliveryQuoteEmailLog(models.Model):
     email_date = fields.Datetime(string='Email Date')
     email_body = fields.Text(string='Email Body')
     email_result = fields.Text(string='Email Result')
+
+class DeliveryOrderNewWizard(models.TransientModel):
+    _name = 'delivery.order.new.wizard'
+    _description = 'Wizard to Create Delivery Order New'
+
+    delivery_id = fields.Many2one(
+        'panexlogi.delivery',
+        string="Related Delivery",
+        default=lambda self: self.env.context.get('active_id')
+    )
+
+    selected_cmr_ids = fields.Many2many(
+        'panexlogi.delivery.detail.cmr',
+        string='Available CMR Records',
+        domain="[('delivery_id', '=', delivery_id), ('state', '=', 'confirm'), ('delivery_order_new_id', '=', False)]"
+    )
+
+    def create_delivery_order_new(self):
+        if not self.selected_cmr_ids:
+            raise UserError(_("Please select at least one CMR Detail."))
+
+        # Prepare values for the new delivery order
+        delivery_order_vals = {
+            'project': self.selected_cmr_ids[0].delivery_id.project.id,
+            'truckco': self.selected_cmr_ids[0].delivery_id.trucker.id,
+            'delivery_id': self.selected_cmr_ids[0].delivery_id.id,
+            'delivery_detail_cmr_ids': [(6, 0, self.selected_cmr_ids.ids)],
+            'delivery_detail_ids': [(6, 0, self.selected_cmr_ids.mapped('delivery_detail_id').ids)],
+        }
+
+        # Create the new delivery order
+        new_delivery_order = self.env['panexlogi.delivery.order.new'].create(delivery_order_vals)
+
+        # Link the selected CMR details to the new delivery order
+        #self.delivery_detail_cmr_ids.write({'delivery_order_new_id': new_delivery_order.id})
+        for line in self.selected_cmr_ids:
+            line.delivery_order_new_id = new_delivery_order.id
+
+
+        # Return an action to open the newly created delivery order
+        return {
+            'name': _('Delivery Order New'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'panexlogi.delivery.order.new',
+            'view_mode': 'form',
+            'res_id': new_delivery_order.id,
+            'target': 'current',
+        }

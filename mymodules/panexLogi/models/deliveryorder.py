@@ -140,6 +140,8 @@ class DeliveryOrder(models.Model):
         string='Change Logs'
     )
 
+
+
     @api.onchange('load_warehouse')
     def _onchange_load_warehouse(self):
         if self.load_warehouse and self.load_type == 'warehouse':

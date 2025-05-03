@@ -48,6 +48,41 @@ class ARBill(models.Model):
     receive_amount = fields.Float(string="Receive Amount", compute="_compute_receive_amount", store=True)
 
     ar_invoice_id = fields.Many2one('panexlogi.ar.invoice', string='AR Invoice', readonly=True)
+    original_ar_bill_id = fields.Many2one('panexlogi.ar.bill', string='Original AR Bill', readonly=True)
+    credit_note_ar_bill_id = fields.Many2one('panexlogi.ar.bill', string='Credit Note AR Bill', readonly=True)
+
+    @api.returns('self', lambda value: value.id if value else None)
+    def copy(self, default=None):
+        """Override copy to generate new bill number for all duplicates"""
+        default = dict(default or {})
+        default.update({
+            'billno': self.env['ir.sequence'].next_by_code('seq.ar.bill'),
+            'state': 'new',
+            'ar_invoice_id': False,
+            'original_ar_bill_id': False,
+            'credit_note_ar_bill_id': False,
+        })
+
+        new_record = super(ARBill, self).copy(default)
+        if not new_record:
+            raise ValidationError("Failed to duplicate the record. Please check the configuration.")
+
+        # Copy the bill lines
+        for line in self.bill_line_ids:
+            line_data = line.copy_data()[0]
+            line_data.update({
+                'ar_bill_id': new_record.id,
+                'ar_invoice_line_id': False,  # Remove invoice line link
+            })
+            self.env['panexlogi.ar.bill.line'].create(line_data)
+
+        # Copy the bill documents
+        for doc in self.bill_doc_ids:
+            doc_data = doc.copy_data()[0]
+            doc_data['ar_bill_id'] = new_record.id
+            self.env['panexlogi.ar.bill.doc'].create(doc_data)
+
+        return new_record
 
     # compute receive amount from ar_invoice
 
@@ -134,6 +169,13 @@ class ARBill(models.Model):
     def action_cancel(self):
         for record in self:
             if record.state == 'new':
+                if self.original_ar_bill_id:
+                    # unlink the original bill
+                    self.original_ar_bill_id.credit_note_ar_bill_id = False
+
+                if self.credit_note_ar_bill_id:
+                    raise UserError("This bill has a credit note, cannot be canceled.")
+
                 record.state = 'cancel'
             else:
                 raise UserError("Only new bills can be canceled.")
@@ -251,6 +293,33 @@ class ARBill(models.Model):
             'res_model': 'panexlogi.ar.invoice',
             'view_mode': 'form',
             'res_id': invoice.id,
+            'target': 'current',
+        }
+
+    # generate credit note
+    def action_credit_note(self):
+        self.ensure_one()
+        new_bill = self.copy({
+            'billno': self.env['ir.sequence'].next_by_code('seq.ar.bill'),
+            'state': 'new',
+            'ar_invoice_id': False,
+            'original_ar_bill_id': False,
+            'credit_note_ar_bill_id': False,
+        })
+        for line in new_bill.bill_line_ids:
+            line.amount = -1 * line.amount
+            line.vat = -1 * line.vat
+
+        # Link the new credit note to the original bill
+        self.credit_note_ar_bill_id = new_bill.id
+        new_bill.original_ar_bill_id = self.id
+
+        return {
+            'name': 'Credit Note',
+            'type': 'ir.actions.act_window',
+            'res_model': 'panexlogi.ar.bill',
+            'view_mode': 'form',
+            'res_id': new_bill.id,
             'target': 'current',
         }
 

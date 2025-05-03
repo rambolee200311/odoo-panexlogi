@@ -98,7 +98,11 @@
                                     type="object"
                                     string="Generate CMR"
                                     class="oe_stat_button" icon="fa-file"/>
-                            <button name="action_create_delivery_order"
+                            <!--<button name="action_create_delivery_order"
+                                    type="object"
+                                    string="Create Order"
+                                    class="oe_stat_button" icon="fa-table"/>-->
+                            <button name="action_open_delivery_order_new_wizard"
                                     type="object"
                                     string="Create Order"
                                     class="oe_stat_button" icon="fa-table"/>

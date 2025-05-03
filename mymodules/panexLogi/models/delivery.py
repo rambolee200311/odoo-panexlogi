@@ -114,6 +114,21 @@ class Delivery(models.Model):
 
     delivery_detail_cmr_ids = fields.One2many('panexlogi.delivery.detail.cmr', 'delivery_id', string='CMR IDs')
 
+    @api.returns('self', lambda value: value.id if value else None)
+    def copy(self, default=None):
+        default = dict(default or {})
+        # Generate a new bill number for the copied delivery
+        default['billno'] = self.env['ir.sequence'].next_by_code('seq.delivery')
+        new_delivery = super(Delivery, self).copy(default)
+
+        # Copy related delivery details
+        for detail in self.deliverydetatilids:
+            detail_data = detail.copy_data()[0]
+            detail_data.update({'deliveryid': new_delivery.id})
+            self.env['panexlogi.delivery.detail'].create(detail_data)
+
+        return new_delivery
+
     @api.onchange('load_warehouse')
     def _onchange_load_warehouse(self):
         if self.load_warehouse and self.load_type == 'warehouse':
@@ -820,6 +835,8 @@ class DeliveryDatailCmr(models.Model):
         selection=[('new', 'New'), ('confirm', 'Confirm'), ('cancel', 'Cancel'), ('order', 'Order')], default='new',
         string="State", tracking=True)
 
+    delivery_order_new_id = fields.Many2one('panexlogi.delivery.order.new', string='Delivery Order')
+
     @api.model
     def create(self, vals):
         if 'delivery_id' in vals:
@@ -1080,14 +1097,20 @@ class DeliveryDetailCmrWizard(models.TransientModel):
                 'delivery_detail_ids': [(6, 0, self.detail_ids.ids)],
                 'loading_refs': ', '.join(str(ref) for ref in set(self.detail_ids.mapped('loading_ref')) if ref),
                 # ', '.join(set(ref for ref in self.detail_ids.mapped('loading_ref') if ref)),
+                #'load_date': min(
+                #    date for date in self.detail_ids.mapped('load_date') if date) if self.detail_ids.mapped(
+                #    'load_date') else False,
                 'load_date': min(
-                    date for date in self.detail_ids.mapped('load_date') if date) if self.detail_ids.mapped(
-                    'load_date') else False,
+                    [date for date in self.detail_ids.mapped('load_date') if date]
+                ) if any(self.detail_ids.mapped('load_date')) else False,
                 'consignee_refs': ', '.join(str(ref) for ref in set(self.detail_ids.mapped('consignee_ref')) if ref),
                 # ', '.join(set(ref for ref in self.detail_ids.mapped('consignee_ref') if ref)),
+                #'unload_date': min(
+                #    date for date in self.detail_ids.mapped('unload_date') if date) if self.detail_ids.mapped(
+                #    'unload_date') else False,
                 'unload_date': min(
-                    date for date in self.detail_ids.mapped('unload_date') if date) if self.detail_ids.mapped(
-                    'unload_date') else False,
+                    [date for date in self.detail_ids.mapped('unload_date') if date]
+                ) if any(self.detail_ids.mapped('unload_date')) else False,
                 'cntrnos': ', '.join(str(cntr) for cntr in set(self.detail_ids.mapped('cntrno')) if cntr),
                 # ', '.join(set(cntr for cntr in self.detail_ids.mapped('cntrno') if cntr)),
                 'cmr_file': base64.b64encode(excel_buffer.getvalue()),

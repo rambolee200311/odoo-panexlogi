@@ -52,7 +52,8 @@
         <menuitem id="delivery_logi_menu" name="Delivery" parent="panex_logi_menu" sequence="200" />
         <menuitem id="delivery_request_menu" name="Requests" parent="delivery_logi_menu" sequence="201" action="delivery_request_action"/>
         <menuitem id="delivery_quote_menu" name="Quotes" parent="delivery_logi_menu"  sequence="202" action="delivery_quote_action"/>
-        <menuitem id="delivery_order_menu" name="Order" parent="delivery_logi_menu"  sequence="203" action="delivery_order_action"/>
+        <!--<menuitem id="delivery_order_menu" name="Order" parent="delivery_logi_menu"  sequence="203" action="delivery_order_action"/>-->
+        <menuitem id="delivery_order_menu" name="Order" parent="delivery_logi_menu"  sequence="203" action="action_delivery_order_new"/>
         <menuitem id="delivery_invoice_menu" name="Invoice" parent="delivery_logi_menu"  sequence="204" action="action_delivery_invoice"/>
         <menuitem id="delivery_invoice_detail_menu" name="Invoice Details" parent="delivery_logi_menu"  sequence="205" action="action_delivery_invoice_detail"/>
 

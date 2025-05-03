@@ -104,6 +104,7 @@
         #'report/ar_invoice_report.xml',
         'views/ar_receive.xml',
         'views/customer_temp.xml',
+        'views/delivery_order_new.xml',
         'views/menus.xml',
         #'views/tools_required.xml',
     ],
