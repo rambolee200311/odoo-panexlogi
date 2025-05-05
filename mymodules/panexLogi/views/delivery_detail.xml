@@ -14,7 +14,22 @@
          -->
         <!-- Menu Item
         <menuitem id="menu_delivery_detail" name="Delivery Details" parent="your_parent_menu_id" action="action_delivery_detail"/>
-         -->
+
+        <record id="view_delivery_detail_map" model="ir.ui.view">
+            <field name="name">delivery.detail.map</field>
+            <field name="model">panexlogi.delivery.detail</field>
+            <field name="arch" type="xml">
+                <map string="Delivery Details Map">
+                    <field name="unload_address" type="geo" options="{'latitude': 'latitude', 'longitude': 'longitude'}"/>
+                </map>
+            </field>
+        </record>
+
+        <record id="action_delivery_detail_map" model="ir.actions.act_window">
+            <field name="name">Delivery Details Map</field>
+            <field name="res_model">panexlogi.delivery.detail</field>
+            <field name="view_mode">map</field>
+        </record>-->
         <!-- Form View -->
         <record id="view_delivery_detail_form" model="ir.ui.view">
             <field name="name">delivery.detail.form</field>

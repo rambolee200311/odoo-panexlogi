@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <record id="view_ar_receive_pie" model="ir.ui.view">
+            <field name="name">ar.receive.pie</field>
+            <field name="model">panexlogi.ar.receive</field>
+            <field name="arch" type="xml">
+                <graph string="AR Receive Distribution" type="pie">
+                    <field name="payer" type="row" string="Customer"/>
+                    <field name="receive_amount" type="measure" string="Amount"/>
+                </graph>
+            </field>
+        </record>
+        <record id="view_ar_receive_dashboard" model="ir.ui.view">
+            <field name="name">ar.receive.dashboard</field>
+            <field name="model">panexlogi.ar.receive</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div>
+                                    <field name="billno"/>
+                                    <field name="payer" string="Customer"/>
+                                    <field name="receive_date"/>
+                                    <field name="receive_amount"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                    <graph string="AR Receive by Customer" type="pie">
+                        <field name="payer" type="row" string="Customer"/>
+                        <field name="receive_amount" type="measure" string="Amount"/>
+                    </graph>
+                    <graph string="AR Receive by Month" type="bar">
+                        <field name="receive_date" type="row" interval="month" string="Month"/>
+                        <field name="receive_amount" type="measure" string="Amount"/>
+                    </graph>
+                </kanban>
+            </field>
+        </record>
         <!-- Tree View -->
         <record id="view_ar_receive_tree" model="ir.ui.view">
             <field name="name">ar.receive.tree</field>
@@ -11,23 +49,70 @@
                     <field name="receive_date" optional="show"/>
                     <field name="invoice_number" optional="show"/>
                     <field name="payer" optional="show"/>
-                    <field name="payer_account" optional="show"/>
-                    <field name="payer_account_partner" optional="show"/>
-                    <field name="payer_account_number" optional="show"/>
-                    <field name="payer_bank_bic" optional="show"/>
-                    <field name="payee_company" optional="show"/>
-                    <field name="payee_bank" optional="show"/>
-                    <field name="payee_account" optional="show"/>
+                    <field name="payer_account_partner" optional="show" string="Payer Account"/>
+                    <field name="payer_account_number" optional="show" string="Payer IBAN"/>
+                    <field name="payer_bank_bic" optional="show" string="Payer BIC"/>
+                    <field name="payee_company"  optional="show"/>
+                    <field name="payee_company_account" optional="show"  string="Payee Account"/>
+                    <field name="payee_account"  optional="show" string="Payee IBAN"/>
+                    <field name="payee_bank" optional="show" string="Payee BIC"/>
                     <field name="payment_method" optional="show"/>
                     <field name="currency_id" optional="show"/>
-                    <field name="receive_amount" optional="show"  sum="Page Total: %s"/>
-                    <field name="cost" optional="show"  sum="Page Total: %s"/>
+                    <field name="receive_amount" optional="show" sum="Page Total: %s"/>
+                    <field name="cost" optional="show" sum="Page Total: %s"/>
                     <field name="pdffile" widget="binary_filename" filename="pdffilename" optional="show"/>
                     <field name="pdffilename" optional="show"/>
                     <field name="state" optional="show"/>
                 </tree>
             </field>
         </record>
+        <!-- inherit tree view -->
+<!--        <record id="view_ar_receive_stats" model="ir.ui.view">
+            <field name="name">ar.receive.stats</field>
+            <field name="model">panexlogi.ar.receive</field>
+            <field name="inherit_id" ref="panexLogi.view_ar_receive_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='receive_amount']" position="attributes">
+                    <attribute name="sum">Page Total</attribute>
+                </xpath>
+                <xpath expr="//field[@name='cost']" position="attributes">
+                    <attribute name="sum">Page Cost</attribute>
+                </xpath>
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="footer">
+                        <field name="receive_amount"
+                               sum="Global Total"
+                               widget="monetary"
+                               options="{'display_currency': currency_id}"/>
+                        <field name="cost"
+                               sum="Global Cost"
+                               widget="monetary"
+                               options="{'display_currency': currency_id}"/>
+                    </attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_ar_receive_stats_footer" model="ir.ui.view">
+            <field name="name">ar.receive.stats.footer</field>
+            <field name="model">panexlogi.ar.receive</field>
+            <field name="inherit_id" ref="view_ar_receive_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="after">
+                    <div class="oe_stat_box">
+                        <div class="oe_stat_content">
+                            <strong>Total Receive Amount:</strong>
+                            <span t-esc="global_total_receive_amount" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                        </div>
+                        <div class="oe_stat_content">
+                            <strong>Total Cost:</strong>
+                            <span t-esc="global_total_cost" t-options="{'widget': 'monetary', 'display_currency': currency_id}"/>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+        -->
 
         <!-- Form View -->
         <record id="view_ar_receive_form" model="ir.ui.view">
@@ -60,27 +145,27 @@
                                 <field name="currency_id" optional="show"/>
                                 <field name="receive_amount" readonly="state!='new'"/>
                                 <field name="cost" readonly="state!='new'"/>
+                            </group>
+                            <group col="2" string="File">
+                                <field name="invoice_number" readonly="state!='new'"/>
+                                <field name="remark" readonly="state!='new'"/>
+                                <field name="pdffile" widget="binary_filename" filename="pdffilename"/>
+                                <field name="pdffilename" />
+                            </group>
+                        </group>
+                        <group col="2">
+                            <group col="2" string=" Payee">
                                 <field name="payee_company"  readonly="state!='new'"/>
                                 <field name="payee_company_account" readonly="state!='new'"/>
-                                <field name="payee_bank" readonly="state!='new'"/>
-                                <field name="payee_account"  readonly="state!='new'"/>
+                                <field name="payee_account"  readonly="state!='new'" string="IBAN"/>
+                                <field name="payee_bank" readonly="state!='new'" string="BIC"/>
                             </group>
                             <group col="2" string=" Payer">
                                 <field name="payer" readonly="state!='new'"/>
                                 <!--<field name="payer_account" readonly="state!='new'"/>-->
                                 <field name="payer_account_partner" readonly="state!='new'"/>
-                                <field name="payer_account_number" readonly="state!='new'"/>
-                                <field name="payer_bank_bic" readonly="state!='new'"/>
-                            </group>
-                        </group>
-                        <group col="2">
-                            <group col="2">
-                                <field name="pdffile" widget="binary_filename" filename="pdffilename"/>
-                                <field name="pdffilename" />
-                            </group>
-                            <group col="2">
-                                <field name="invoice_number" readonly="state!='new'"/>
-                                <field name="remark" readonly="state!='new'"/>
+                                <field name="payer_account_number" readonly="state!='new'" string="IBAN"/>
+                                <field name="payer_bank_bic" readonly="state!='new'" string="BIC"/>
                             </group>
                         </group>
                         <notebook>
@@ -140,7 +225,7 @@
         <record id="action_ar_receive" model="ir.actions.act_window">
             <field name="name">AR Receive</field>
             <field name="res_model">panexlogi.ar.receive</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,graph</field>
         </record>
     </data>
 </odoo>

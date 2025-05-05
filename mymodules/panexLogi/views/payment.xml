@@ -1,4 +1,14 @@
 <odoo>
+    <record id="view_finance_payment_pie" model="ir.ui.view">
+        <field name="name">finance.payment.pie</field>
+        <field name="model">panexlogi.finance.payment</field>
+        <field name="arch" type="xml">
+            <graph string="AP Payment Distribution" type="pie">
+                <field name="payee" type="row" string="Vendor"/>
+                <field name="pay_amount" type="measure" string="Amount"/>
+            </graph>
+        </field>
+    </record>
     <!--Related applictions Action -->
     <record id="action_show_related_payment_applications" model="ir.actions.act_window">
         <field name="name">Related Payment Applications</field>
@@ -10,7 +20,7 @@
     <record id="action_finance_payment" model="ir.actions.act_window">
         <field name="name">Payments</field>
         <field name="res_model">panexlogi.finance.payment</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,graph</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first payment
@@ -51,7 +61,7 @@
                 <field name="payee_bank_bic" optional="show"/>
                 <field name="payment_method" optional="show"/>
                 <field name="pay_date" optional="show"/>
-                <field name="pay_amount" optional="show"/>
+                <field name="pay_amount" optional="show" sum="Page Total: %s"/>
                 <field name="state" optional="show"/>
                 <field name="pay_remark"  optional="show"/>
                 <field name="pay_pdffile" filename="pay_pdffilename" widget="binary_filename"/>

@@ -56,6 +56,7 @@
         <menuitem id="delivery_order_menu" name="Order" parent="delivery_logi_menu"  sequence="203" action="action_delivery_order_new"/>
         <menuitem id="delivery_invoice_menu" name="Invoice" parent="delivery_logi_menu"  sequence="204" action="action_delivery_invoice"/>
         <menuitem id="delivery_invoice_detail_menu" name="Invoice Details" parent="delivery_logi_menu"  sequence="205" action="action_delivery_invoice_detail"/>
+        <!--<menuitem id="delivery_detail_menu" name="Delivery Details" parent="delivery_logi_menu"  sequence="206" action="action_delivery_detail_map"/>-->
 
         <menuitem id="outlay_menu" name="Payments" parent="panex_logi_menu" sequence="300" />
         <menuitem id="import_payment_application_menu" name="Waybill Application" parent="outlay_menu" sequence="301" action="import_payapp_action"/>

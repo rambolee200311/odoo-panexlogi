@@ -130,7 +130,7 @@
             #('js', 'panexLogi/static/src/js/tools_required.js', None),
             #('scss', 'panexLogi/static/src/scss/tools_required.scss', None),
             #('scss', 'panexLogi/static/src/scss/address.scss', None),
-            #'panexLogi/static/src/js/ar_receiver.js'
+            #'panexLogi/static/src/js/custom_pager.js'
         ],
     },
 

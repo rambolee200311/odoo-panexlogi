@@ -26,9 +26,9 @@
                     <field name="project" optional="show"/>
                     <field name="customer" optional="show"/>
                     <field name="currency_id" optional="show"/>
-                    <field name="invoice_amount" optional="show"/>
-                    <field name="invoice_vat" optional="show"/>
-                    <field name="invoice_number" optional="show"/>
+                    <field name="invoice_amount" optional="show" sum="Page Total: %s"/>
+                    <field name="invoice_vat" optional="show" sum="Page Total: %s"/>
+                    <field name="invoice_number" optional="show" sum="Page Total: %s"/>
                     <field name="invoice_pdf" filename="invoice_pdf_name" optional="show"/>
                     <field name="invoice_pdf_name" readonly="1" optional="show"/>
                     <field name="remark" optional="show"/>
@@ -79,17 +79,17 @@
                                 <field name="customer" readonly="state!='new'"/>
                                 <field name="remark" readonly="state!='new'"/>
                             </group>
-                            <group col="2" string="Amount">
-                                <field name="currency_id" readonly="state!='new'"/>
+                            <group col="2" string="Invoice Amount">
+                                <field name="ar_bill_id" readonly="1"/>
+                                <field name="currency_id" readonly="1"/>
                                 <field name="invoice_amount" readonly="1"/>
                                 <field name="invoice_vat" readonly="1"/>
                                 <field name="invoice_amount_with_vat" readonly="1"/>
                                 <field name="ar_company" readonly="state!='new'"/>
-                                <field name="ar_bill_id"/>
                             </group>
                         </group>
                         <group col="2">
-                            <group col="2" string="Invoice">
+                            <group col="2" string="Invoice Info">
                                 <field name="invoice_date" readonly="state!='new'"/>
                                 <field name="invoice_due_date" readonly="state!='new'"/>
                                 <field name="invoice_number" readonly="state!='new'"/>

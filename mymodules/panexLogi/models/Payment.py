@@ -82,8 +82,8 @@ class Payment(models.Model):
                                      string='Payment Method（付款方式）',
                                      domain=[('state', '=', 'active')], tracking=True)
     pay_date = fields.Date(string='Date(付款日期)', tracking=True)
-    pay_amount = fields.Float(string='Amount（欧元金额）', tracking=True, compute='_compute_amount', stock=True)
-    pay_amount_usd = fields.Float(string='Amount（美元金额）', tracking=True, compute='_compute_amount', stock=True)
+    pay_amount = fields.Float(string='Amount（欧元金额）', tracking=True, compute='_compute_amount', store=True)
+    pay_amount_usd = fields.Float(string='Amount（美元金额）', tracking=True, compute='_compute_amount', store=True)
     pay_remark = fields.Text(string='Remark', tracking=True)
     pay_pdffile = fields.Binary(string='File（原件）')
     pay_pdffilename = fields.Char(string='File name')
@@ -134,14 +134,16 @@ class Payment(models.Model):
         # Delete the record
         return super(Payment, self).unlink()
 
-    @api.depends('paymentline_ids')
+    @api.depends('paymentline_ids.pay_amount', 'paymentline_ids.pay_amount_usd')
     def _compute_amount(self):
         for rec in self:
-            rec.pay_amount = 0
-            rec.pay_amount_usd = 0
-            if rec.paymentline_ids:
-                rec.pay_amount = sum(rec.paymentline_ids.mapped('pay_amount'))
-                rec.pay_amount_usd = sum(rec.paymentline_ids.mapped('pay_amount_usd'))
+            rec.pay_amount = sum(rec.paymentline_ids.mapped('pay_amount'))
+            rec.pay_amount_usd = sum(rec.paymentline_ids.mapped('pay_amount_usd'))
+
+    def cron_update_amount(self):
+        for rec in self:
+            rec.pay_amount = sum(rec.paymentline_ids.mapped('pay_amount'))
+            rec.pay_amount_usd = sum(rec.paymentline_ids.mapped('pay_amount_usd'))
 
     def action_confirm_order(self):
         for rec in self:

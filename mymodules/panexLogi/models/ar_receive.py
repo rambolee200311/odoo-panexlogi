@@ -19,22 +19,22 @@ class Receive(models.Model):
                             required=True, tracking=True, readonly=True)
     # payee_bank =fields.Char(string='Bank（收款方银行）', tracking=True)
     payer_account = fields.Char(string='Account（付款方账号）', tracking=True)
-    payer_account_partner = fields.Many2one('res.partner.bank', string='Account（付款方账号）', tracking=True,
+    payer_account_partner = fields.Many2one('res.partner.bank', string='Payer Account', tracking=True,
                                             domain="[('partner_id', '=', payer)]")
-    payer_account_number = fields.Char(string='IBAN（付款方账号IBAN）', related='payer_account_partner.acc_number',
+    payer_account_number = fields.Char(string='Payer IBAN', related='payer_account_partner.acc_number',
                                        readonly=True)
-    payer_bank_bic = fields.Char(string='Bank BIC（付款方银行BIC）', related='payer_account_partner.bank_bic',
+    payer_bank_bic = fields.Char(string='Payer BIC', related='payer_account_partner.bank_bic',
                                  readonly=True)
 
-    payee = fields.Char(string='Payer（收款方）', tracking=True)
+    payee = fields.Char(string='Payee（收款方）', tracking=True)
     payee_company = fields.Many2one('res.partner', string='Payee（收款方）', tracking=True,
                                     domain="[('is_company', '=', True),('category_id.name', 'ilike', 'company')]")
-    payee_company_account = fields.Many2one('res.partner.bank', string='Account（收款方账号）', tracking=True,
+    payee_company_account = fields.Many2one('res.partner.bank', string='Payee Account', tracking=True,
                                             domain="[('partner_id', '=', payee_company)]")
-    payee_bank = fields.Char(string='Bank（收款方银行）', related='payee_company_account.bank_bic', tracking=True)
+    payee_bank = fields.Char(string='Payee BIC', related='payee_company_account.bank_bic', tracking=True)
     currency_id = fields.Many2one('res.currency', string='Currency（币种）', required=True, tracking=True,
                                   default=lambda self: self.env.ref('base.EUR'))
-    payee_account = fields.Char(string='Account（收款方账号）', related='payee_company_account.acc_number', tracking=True)
+    payee_account = fields.Char(string='Payee IBAN', related='payee_company_account.acc_number', tracking=True)
     payment_method = fields.Many2one('panexlogi.finance.payment.method',
                                      string='Payment Method（收款方式）',
                                      domain=[('state', '=', 'active')], tracking=True)
@@ -47,7 +47,7 @@ class Receive(models.Model):
     state = fields.Selection([('new', 'New'),
                               ('confirm', 'Confirm'),
                               ('cancel', 'Cancel'), ],
-                             default='new')
+                             default='new', tracking=True)
     ar_receive_line_ids = fields.One2many('panexlogi.ar.receive.line', 'receive_id', string='Receive Line')
     invoice_number = fields.Char(string="Invoice Number")
     cost = fields.Float(string="Cost", default=0)
@@ -124,6 +124,7 @@ class Receive(models.Model):
                 if not rec.ar_receive_line_ids:
                     raise ValidationError("Please add at least one line to the receive.")
 
+                partners = []
                 for line in rec.ar_receive_line_ids:
                     # Create a new record in panexlogi.ar.invoice.receive.details
                     self.env['panexlogi.ar.invoice.receive.details'].create({
@@ -138,7 +139,44 @@ class Receive(models.Model):
                     if line.ar_invoice_id.ar_bill_id:
                         line.ar_invoice_id.ar_bill_id._compute_receive_amount()
                         line.ar_invoice_id.ar_bill_id._compute_status()
+                        # Add the creator of the invoice to the partners list
+                        creator_partner = line.ar_invoice_id.ar_bill_id.create_uid.partner_id
+                        if creator_partner:
+                            partners.append(creator_partner.id)
                 rec.state = 'confirm'
+
+                # Send Odoo message
+                subject = 'A/R Receive Confirmed'
+                # Get base URL
+                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                # Construct URL to AR Receive record
+                ar_receive_id_url = "{}/web#id={}&model=panexlogi.ar.receive&view_type=form".format(
+                    base_url,
+                    rec.id)
+                # content
+                content = f'''
+                        <p>Hello,</p>
+                        <p>An A/R Receive has been confirmed:</p>
+                        <p><a href="{ar_receive_id_url}" style="color: #1A73E8; text-decoration: none; font-weight: bold;">View A/R Receive</a></p>
+                        <p>Click the link above to access the details.</p>
+                    '''
+                if partners:
+                    # Add the creator as a follower
+                    rec.message_subscribe(partner_ids=partners)
+                    # Send the notification
+                    rec.message_post(
+                        body=content,
+                        subject=subject,
+                        message_type='notification',
+                        subtype_xmlid="mail.mt_comment",  # Correct subtype for notifications
+                        body_is_html=True,  # Render HTML in the email
+                    )
+
+
+
+
+
+
 
             else:
                 raise UserError("The state of the record is not new, cannot be confirmed.")

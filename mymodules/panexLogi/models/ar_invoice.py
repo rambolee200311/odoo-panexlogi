@@ -37,7 +37,7 @@ class ARInvoice(models.Model):
     state = fields.Selection([('new', 'New'),
                               ('confirm', 'Confirm'),
                               ('cancel', 'Cancel'), ],
-                             default='new')
+                             default='new', tracking=True)
 
     receive_amount = fields.Float(string="Receive Amount")
     invoice_amount_balance = fields.Float(string="Invoice Amount Balance", compute="_compute_invoice_amount_balance",
@@ -81,16 +81,36 @@ class ARInvoice(models.Model):
                 if record.ar_bill_id:
                     record.ar_bill_id._compute_receive_amount()
                     record.ar_bill_id._compute_status()
+                    # Send Odoo message
+                    subject = 'A/R Invoice Confirmed'
+                    # Get base URL
+                    base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                    # Construct URL to the A/R Invoice
+                    ar_invoice_url = "{}/web#id={}&model=panexlogi.ar.invoice&view_type=form".format(
+                        base_url,
+                        record.id
+                    )
+                    # HTML content
+                    content = f'''
+                        <p>Hello,</p>
+                        <p>An A/R Invoice has been confirmed:</p>
+                        <p><a href="{ar_invoice_url}" style="color: #1A73E8; text-decoration: none; font-weight: bold;">View A/R Invoice</a></p>
+                        <p>Click the link above to access the details.</p>
+                    '''
+                    # Notify the creator of the AR Bill
+                    creator_partner = record.ar_bill_id.create_uid.partner_id
+                    if creator_partner:
+                        # Add the creator as a follower
+                        record.message_subscribe(partner_ids=[creator_partner.id])
+                        # Send the notification
+                        record.message_post(
+                            body=content,
+                            subject=subject,
+                            message_type='notification',
+                            subtype_xmlid="mail.mt_comment",  # Correct subtype for notifications
+                            body_is_html=True,  # Render HTML in the email
+                        )
             else:
-                '''
-                for line in record.invoice_line_ids:
-                    
-                    ar_bill_line = self.env['panexlogi.ar.bill.line'].search([('ar_invoice_line_id', '=', line.id)])
-                    if ar_bill_line:
-                        ar_bill_line.invoice_amount += line.invoice_amount
-                        ar_bill_line.invoice_vat += line.invoice_vat
-                        ar_bill_line.invoice_amount_with_vat += line.invoice_amount_with_vat
-                '''
                 raise UserError("Only new invoices can be confirmed.")
 
     def action_renew(self):

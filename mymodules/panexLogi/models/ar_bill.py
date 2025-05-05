@@ -28,7 +28,7 @@ class ARBill(models.Model):
     state = fields.Selection([('new', 'New'),
                               ('confirm', 'Confirm'),
                               ('cancel', 'Cancel'), ],
-                             default='new')
+                             default='new', tracking=True)
     status = fields.Selection([('billed', 'Billed'),
                                ('invoiced', 'Invoiced'),
                                ('received', 'Received'),
@@ -161,8 +161,38 @@ class ARBill(models.Model):
                 # check is there is any line
                 if not record.bill_line_ids:
                     raise UserError("Please add at least one line to the bill.")
-
                 record.state = 'confirm'
+
+                # Send Odoo message
+                subject = 'A/R Bill Confirmed,please check it and create A/R Invoice'
+                # Get base URL
+                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                # Construct URL to AR Bill
+                ar_bill_id_url = "{}/web#id={}&model=panexlogi.ar.bill&view_type=form".format(
+                    base_url,
+                    record.id)
+                # content
+                content = f'''
+                    <p>Hello,</p>
+                    <p>An A/R Bill has been confirmed:</p>
+                    <p><a href="{ar_bill_id_url}" style="color: #1A73E8; text-decoration: none; font-weight: bold;">View A/R Bill</a></p>
+                    <p>Click the link above to access the details.</p>
+                '''
+                # Get users in the Finance group
+                group = self.env['res.groups'].search([('name', '=', 'Finance')], limit=1)
+                users = self.env['res.users'].search([('groups_id', '=', group.id)])
+                # Get partner IDs from users
+                partner_ids = users.mapped("partner_id").ids
+                # Add Transport group users as followers
+                record.message_subscribe(partner_ids=partner_ids)
+                # Send message
+                record.message_post(
+                    body=content,
+                    subject=subject,
+                    message_type='notification',
+                    subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                    body_is_html=True,  # Render HTML in email
+                )
             else:
                 raise UserError("Only new bills can be confirmed.")
 

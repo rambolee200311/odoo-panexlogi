@@ -17,16 +17,16 @@
                     <field name="project" optional="show"/>
                     <field name="project_manager" optional="show"/>
                     <field name="currency_id" optional="show"/>
-                    <field name="amount" optional="show"/>
-                    <field name="vat" optional="show"/>
-                    <field name="amount_with_vat" optional="show"/>
+                    <field name="amount" optional="show" sum="Page Total: %s"/>
+                    <field name="vat" optional="show" sum="Page Total: %s"/>
+                    <field name="amount_with_vat" optional="show" sum="Page Total: %s"/>
                     <field name="state" optional="show"/>
                     <field name="customer" optional="show"/>
                     <field name="ar_invoice_id" optional="show"/>
-                    <field name="invoice_amount" optional="show"/>
-                    <field name="invoice_vat" optional="show"/>
-                    <field name="invoice_amount_with_vat" optional="show"/>
-                    <field name="receive_amount" optional="show"/>
+                    <field name="invoice_amount" optional="show" sum="Page Total: %s"/>
+                    <field name="invoice_vat" optional="show" sum="Page Total: %s"/>
+                    <field name="invoice_amount_with_vat" optional="show" sum="Page Total: %s"/>
+                    <field name="receive_amount" optional="show" sum="Page Total: %s"/>
                     <field name="remark" optional="show"/>
                     <field name="status" optional="show"/>
                 </tree>
@@ -94,7 +94,7 @@
                                 <field name="invoice_vat" readonly="1"/>
                                 <field name="invoice_amount_with_vat" readonly="1"/>
                             </group>
-                            <group col="2" string="Payment">
+                            <group col="2" string="Receive">
                                 <field name="receive_amount" readonly="1"/>
                                 <field name="status" readonly="1"/>
                             </group>

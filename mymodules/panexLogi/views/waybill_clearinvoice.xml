@@ -200,197 +200,49 @@
         </field>
     </record>
 
-    <record id="view_waybill_clearinvoice_detail_form" model="ir.ui.view">
-        <field name="name">waybill.clearinvoice.detail.form</field>
-        <field name="model">panexlogi.waybill.clearinvoice.detail</field>
-        <field name="arch" type="xml">
-            <form string="Waybill Clearance Invoice Detail">
-                <sheet>
-                    <!-- Title Section -->
-                    <div class="oe_title">
-                        <label for="clearance_type" string="Clearan Type" class="col-form-label"/>
-                        <h1><field name="clearance_type" nolabel="1"/></h1>
-                    </div>
-
-                    <div class="row mt-4">
-                        <!-- Left Column - BASIC INFORMATION -->
-                        <div class="col-6">
-                            <group string="BASIC INFORMATION">
-                                <div class="container-fluid">
-                                    <!-- Container No -->
-                                    <div class="row mb-4">
-                                        <div class="col-6 pr-4">
-                                            <label for="cntrno" string="Container No" class="text-small"/>
-                                        </div>
-                                        <div class="col-6">
-                                            <field name="cntrno" class="oe_inline" nolabel="1"/>
-                                        </div>
-                                        </div><!-- Clearance Type -->
-
-                                        <!-- Reference No -->
-                                        <div class="row mb-4">
-                                        <div class="col-6 pl-4">
-                                            <label for="refno" string="Reference No" class="text-small"/>
-                                        </div>
-                                        <div class="col-6">
-                                            <field name="refno" class="oe_inline" nolabel="1"/>
-                                        </div>
-                                        </div>
-                                        <!-- Fee Item -->
-                                        <div class="row mb-4">
-                                        <div class="col-6 pl-4">
-                                            <label for="fitem" string="Fee Item" class="text-small"/>
-                                        </div>
-                                        <div class="col-6">
-                                            <field name="fitem" class="oe_inline" nolabel="1"/>
-                                        </div>
-                                        </div>
-
-                                        <!-- Item Name -->
-                                        <div class="row mb-4">
-                                        <div class="col-6 pl-4">
-                                            <label for="fitem_name" string="Item Name" class="text-small"/>
-                                        </div>
-                                        <div class="col-6">
-                                            <field name="fitem_name" class="oe_inline" readonly="1" nolabel="1"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </group>
-                        </div>
-
-                        <!-- Right Column - AMOUNT DETAILS -->
-                        <div class="col-6">
-                            <group string="AMOUNT DETAILS">
-                                <div class="container-fluid">
-                                    <div class="row">
-                                        <!-- Amount (C) -->
-                                        <div class="row mb-4">
-                                            <div class="col-6 pr-4">
-                                                <div class="text-right">
-                                                    <label for="amount" string="Amount (C)" class="text-bold"/>
-                                                </div>
-                                                <div class="col-6">
-                                                <field name="amount" class="oe_inline text-right" nolabel="1"/>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Amount (USD) -->
-                                        <div class="row mb-4">
-                                            <div class="col-6 pl-4">
-                                                <div class="text-right">
-                                                    <label for="amount_usd" string="Amount (USD)" class="text-bold"/>
-                                                </div>
-                                                <div class="col-6">
-                                                    <field name="amount_usd" class="oe_inline text-right" nolabel="1"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </group>
-                        </div>
-                    </div>
-
-                    <!-- Additional Details Section -->
-                    <notebook class="mt24">
-                        <page string="Additional Details">
-                            <div class="container-fluid">
-                                <!-- Section Header -->
-                                <div class="row border-bottom pb-2 mb-4">
-                                    <div class="col-12">
-                                        <h6 class="text-uppercase text-muted">ADDITIONAL DETAILS</h6>
-                                    </div>
-                                </div>
-
-                                <!-- Field Rows -->
-                                <div class="row">
-                                    <div class="col-12">
-                                        <!-- POA -->
-                                        <div class="row mb-4">
-                                            <div class="col-4 text-muted">
-                                                <label for="poa" string="POA"/>
-                                            </div>
-                                            <div class="col-8">
-                                                <field name="poa" class="text-right text-muted" nolabel="1"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- T1 -->
-                                        <div class="row mb-4">
-                                            <div class="col-4 text-muted">
-                                                <label for="t1" string="T1"/>
-                                            </div>
-                                            <div class="col-8">
-                                                <field name="t1" class="text-right text-muted" nolabel="1"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- VAT Defer Notification -->
-                                        <div class="row mb-4">
-                                            <div class="col-4 text-muted">
-                                                <label for="vdn" string="VAT defer notification"/>
-                                            </div>
-                                            <div class="col-8">
-                                                <field name="vdn" class="text-right text-muted" nolabel="1"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- Import Declaration -->
-                                        <div class="row mb-4">
-                                            <div class="col-4 text-muted">
-                                                <label for="imd" string="Import declaration"/>
-                                            </div>
-                                            <div class="col-8">
-                                                <field name="imd" class="text-right text-muted" nolabel="1"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- Extra Article -->
-                                        <div class="row mb-4">
-                                            <div class="col-4 text-muted">
-                                                <label for="exa" string="Extra article"/>
-                                            </div>
-                                            <div class="col-8">
-                                                <field name="exa" class="text-right text-muted" nolabel="1"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- LFR -->
-                                        <div class="row mb-4">
-                                            <div class="col-4 text-muted">
-                                                <label for="lfr" string="LFR"/>
-                                            </div>
-                                            <div class="col-8">
-                                                <field name="lfr" class="text-right text-muted" nolabel="1"/>
-                                            </div>
-                                        </div>
-
-                                        <!-- Export -->
-                                        <div class="row mb-4">
-                                            <div class="col-4 text-muted">
-                                                <label for="expa" string="Export"/>
-                                            </div>
-                                            <div class="col-8">
-                                                <field name="expa" class="text-right text-muted" nolabel="1"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </page>
-                    </notebook>
-
-                    <!-- Remarks Section -->
-                    <group string="REMARKS" class="mt24">
-                        <field name="remark" nolabel="1" class="oe_inline" colspan="4"/>
+   <record id="view_waybill_clearinvoice_detail_form" model="ir.ui.view">
+    <field name="name">waybill.clearinvoice.detail.form</field>
+    <field name="model">panexlogi.waybill.clearinvoice.detail</field>
+    <field name="arch" type="xml">
+        <form string="Waybill Clearance Invoice Detail">
+            <sheet>
+                <div class="oe_title">
+                    <h1>
+                        Clearance Invoice Detail
+                    </h1>
+                </div>
+                <!-- Main Information Section -->
+                <group string="Basic Information" col="2">
+                    <field name="clearance_type" colspan="2"/>
+                    <field name="cntrno" colspan="1"/>
+                    <field name="refno" colspan="1"/>
+                    <field name="fitem" colspan="2"/>
+                    <field name="fitem_name" readonly="1" colspan="2"/>
+                </group>
+                <!-- Amount Details Section -->
+                <group string="Cost" col="2">
+                    <field name="amount" colspan="2"/>
+                    <field name="amount_usd" colspan="2"/>
+                    <field name="remark" colspan="2"/>
+                </group>
+                <!-- Additional Details Section -->
+                <group col="2" string="Income">
+                    <group col="2">
+                        <field name="poa" colspan="2"/>
+                        <field name="t1" colspan="2"/>
+                        <field name="vdn" colspan="2"/>
+                        <field name="imd" colspan="2"/>
                     </group>
-
-                </sheet>
-            </form>
-        </field>
-    </record>
+                    <group col="2">
+                        <field name="exa" colspan="2"/>
+                        <field name="lfr" colspan="2"/>
+                        <field name="expa" colspan="2"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
  <!-- action -->
     <record id="waybill_clearinvoice_action" model="ir.actions.act_window">
         <field name="name">Clearance Invoice</field>

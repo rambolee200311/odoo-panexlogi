@@ -44,8 +44,8 @@
                     <field name="invoice_date" optional="show"/>
                     <field name="due_date" optional="show"/>
                     <field name="date" optional="show"/>
-                    <field name="total_amount" optional="show"/>
-                    <field name="total_amount_usd" optional="show"/>
+                    <field name="total_amount" optional="show" sum="Page Total: %s"/>
+                    <field name="total_amount_usd" optional="show" sum="Page Total: %s"/>
                     <field name="remark" optional="show"/>
                     <field name="pdffile" filename="pdffilename" widget="binary_filename" optional="show"/>
                     <field name="pdffilename" invisible="True" optional="show"/>
