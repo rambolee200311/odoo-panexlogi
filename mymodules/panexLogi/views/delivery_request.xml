@@ -554,7 +554,7 @@
                     <button name="action_cancel"
                             type="object"
                             string="Cancel"
-                            invisible="state == 'cancel'"
+                            invisible="state != 'new'"
                             class="btn-danger"/>
                     <button name="action_unconfirm"
                             type="object"
@@ -577,8 +577,10 @@
                         <!-- Left Column -->
                         <group string="CMR Information">
                             <field name="delivery_id" options="{'no_open': True}" readonly="1"/>
+                            <field name="load_address" readonly="1"/>
                             <field name="loading_refs" readonly="1"/>
                             <field name="load_date" readonly="1"/>
+                            <field name="unload_address" readonly="1"/>
                             <field name="consignee_refs" readonly="1"/>
                             <field name="unload_date" readonly="1"/>
                             <field name="cntrnos" readonly="1"/>
@@ -589,6 +591,11 @@
                             <field name="cmr_file" filename="cmr_filename"/>
                             <field name="cmr_filename" invisible="1"/>
                             <field name="cmr_remark"/>
+                            <field name="outside_eu"/>
+                            <field name="import_file" filename="import_filename"  widget="binary"/>
+                            <field name="import_filename" string="Import Document Filename"/>
+                            <field name="export_file" sfilename="export_filename" widget="binary"/>
+                            <field name="export_filename" string="Order Filename"/>
                         </group>
                     </group>
 
@@ -627,15 +634,23 @@
             <tree decoration-success="state=='confirm'"
                   decoration-danger="state=='cancel'"
                   create="true" delete="false">
-                <field name="billno"/>
+                <field name="billno" optional="show"/>
                 <field name="delivery_id" optional="show"/>
-                <field name="loading_refs"/>
-                <field name="load_date"/>
-                <field name="consignee_refs"/>
-                <field name="unload_date"/>
-                <field name="cntrnos"/>
-                <field name="state" widget="badge"/>
-                <field name="cmr_filename" invisible="1"/>
+                <field name="load_address" optional="show"/>
+                <field name="loading_refs" optional="show"/>
+                <field name="load_date" optional="show"/>
+                <field name="unload_address" optional="show"/>
+                <field name="consignee_refs" optional="show"/>
+                <field name="unload_date" optional="show"/>
+                <field name="cntrnos" optional="show"/>
+                <field name="state" optional="show"/>
+                <field name="cmr_file" filename="cmr_filename" widget="binary_filename" optional="show"/>
+                <field name="cmr_filename" optional="show"/>
+                <field name="outside_eu" optional="show"/>
+                <field name="import_file" filename="import_filename" widget="binary_filename" optional="show"/>
+                <field name="import_filename" string="Import Document Filename" optional="show"/>
+                <field name="export_file" filename="export_filename" widget="binary_filename" optional="show"/>
+                <field name="export_filename" string="Order Filename" optional="show"/>
             </tree>
         </field>
     </record>

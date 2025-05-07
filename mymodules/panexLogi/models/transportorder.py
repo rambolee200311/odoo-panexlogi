@@ -287,32 +287,49 @@ class TransportOrder(models.Model):
                         total_pallets = 0
                         total_pcs = 0
 
-                        for packlist in detail.packlist_ids:
-                            if packlist.product_id:
-                                model = packlist.product_id.model or ''
-                                name = packlist.product_id.name or ''
-                                worksheet[f'F{row}'] = f'[{model}]{name}'
-                                set_cell_style(worksheet[f'F{row}'], ALIGN_TOP_LEFT, ARIAL_10)
+                        worksheet['F29'] = ''
+                        worksheet['H29'] = ''
+                        worksheet['I29'] = ''
+                        worksheet['J29'] = ''
+                        if detail.packlist_ids:
+                            for packlist in detail.packlist_ids:
+                                if packlist.product_id:
+                                    model = packlist.product_id.model or ''
+                                    name = packlist.product_id.name or ''
+                                    worksheet[f'F{row}'] = f'[{model}]{name}'
+                                    set_cell_style(worksheet[f'F{row}'], ALIGN_TOP_LEFT, ARIAL_10)
 
-                            gross_weight = packlist.gw or 0
-                            if gross_weight == 0 and packlist.gwp:
-                                if packlist.pallets:
-                                    gross_weight = packlist.gwp * packlist.pallets
-                                elif packlist.pcs:
-                                    gross_weight = packlist.gwp * packlist.pcs
+                                gross_weight = packlist.gw or 0
+                                if gross_weight == 0 and packlist.gwp:
+                                    if packlist.pallets:
+                                        gross_weight = packlist.gwp * packlist.pallets
+                                    elif packlist.pcs:
+                                        gross_weight = packlist.gwp * packlist.pcs
 
-                            worksheet[f'H{row}'] = f'{packlist.pallets or 0}'
-                            set_cell_style(worksheet[f'H{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+                                worksheet[f'H{row}'] = f'{packlist.pallets or 0}'
+                                set_cell_style(worksheet[f'H{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
 
-                            worksheet[f'I{row}'] = f'{gross_weight}'
-                            set_cell_style(worksheet[f'I{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+                                worksheet[f'I{row}'] = f'{gross_weight}'
+                                set_cell_style(worksheet[f'I{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
 
-                            worksheet[f'J{row}'] = f'{packlist.pcs or 0}'
-                            set_cell_style(worksheet[f'J{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
+                                worksheet[f'J{row}'] = f'{packlist.pcs or 0}'
+                                set_cell_style(worksheet[f'J{row}'], ALIGN_TOP_RIGHT, ARIAL_10)
 
-                            total_pallets += packlist.pallets or 0
-                            total_pcs += packlist.pcs or 0
-                            row += 1
+                                total_pallets += packlist.pallets or 0
+                                total_pcs += packlist.pcs or 0
+                                row += 1
+                        else: # packlist_ids is empty
+                            worksheet['F29'] = detail.model_type if detail.model_type else ''
+                            set_cell_style(worksheet['F29'], ALIGN_TOP_LEFT, ARIAL_10)
+                            worksheet['H29'] = f'{detail.pallets or 0}'
+                            total_pallets += detail.pallets or 0
+                            set_cell_style(worksheet['H29'], ALIGN_TOP_RIGHT, ARIAL_10)
+                            worksheet['I29'] = f'{detail.weight_kg or 0}'
+                            set_cell_style(worksheet['I29'], ALIGN_TOP_RIGHT, ARIAL_10)
+                            worksheet['J29'] = f'{detail.total_pcs or 0}'
+                            set_cell_style(worksheet['J29'], ALIGN_TOP_RIGHT, ARIAL_10)
+                            total_pcs += detail.total_pcs or 0
+
 
                         worksheet['G36'] = 'Total Pallets:'
                         worksheet['H36'] = total_pallets

@@ -181,14 +181,34 @@ class DeliveryOrderNewWizard(models.TransientModel):
     def create_delivery_order_new(self):
         if not self.selected_cmr_ids:
             raise UserError(_("Please select at least one CMR Detail."))
+        # check cmr_ids state!='order'
+        if self.selected_cmr_ids.filtered(lambda x: x.state != 'confirm'):
+            raise UserError(_("Please select CMR records in 'Confirm' state only."))
+        # check cmr_ids delivery_order_new_id=False
+        if self.selected_cmr_ids.filtered(lambda x: x.delivery_order_new_id):
+            raise UserError(_("Please select CMR records without a new delivery order."))
 
         # Prepare values for the new delivery order
+        #delivery_detail_ids = self.selected_cmr_ids.mapped('delivery_detail_id').ids
+        #delivery_detail_ids = self.selected_cmr_ids.mapped('delivery_detail').ids
+        delivery_detail_ids = []
+        for cmr_id in self.selected_cmr_ids:
+            details = self.env['panexlogi.delivery.detail'].search([
+                ('delivery_detail_cmr_id', '=', cmr_id.id)  # Ensure no CMR is associated
+            ])
+            delivery_detail_ids.extend(details.ids)  # Append the IDs to the list
+        if not delivery_detail_ids:
+            raise UserError(_("No delivery details found for the selected CMR records."))
         delivery_order_vals = {
             'project': self.selected_cmr_ids[0].delivery_id.project.id,
             'truckco': self.selected_cmr_ids[0].delivery_id.trucker.id,
             'delivery_id': self.selected_cmr_ids[0].delivery_id.id,
             'delivery_detail_cmr_ids': [(6, 0, self.selected_cmr_ids.ids)],
-            'delivery_detail_ids': [(6, 0, self.selected_cmr_ids.mapped('delivery_detail_id').ids)],
+            'quote': self.selected_cmr_ids[0].delivery_id.quote,
+            'additional_cost': self.selected_cmr_ids[0].delivery_id.additional_cost,
+            'extra_cost': self.selected_cmr_ids[0].delivery_id.extra_cost,
+            #'delivery_detail_ids': [(6, 0, self.selected_cmr_ids.mapped('delivery_detail_id').ids)],
+            'delivery_detail_ids': [(6, 0, delivery_detail_ids)],
         }
 
         # Create the new delivery order
@@ -198,6 +218,7 @@ class DeliveryOrderNewWizard(models.TransientModel):
         #self.delivery_detail_cmr_ids.write({'delivery_order_new_id': new_delivery_order.id})
         for line in self.selected_cmr_ids:
             line.delivery_order_new_id = new_delivery_order.id
+            line.state = 'order'
 
 
         # Return an action to open the newly created delivery order

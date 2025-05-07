@@ -53,25 +53,38 @@
                     </header>
                     <sheet>
                         <div class="oe_title">
-                        <h1>
-                            Delivery Order
-                        </h1>
-                        <h2>
-                            <field name="billno"/>
-                        </h2>
-                    </div>
+                            <h1>
+                                Delivery Order
+                            </h1>
+                            <h2>
+                                <field name="billno"/>
+                            </h2>
+                        </div>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_print_delivery_order"
+                                type="object"
+                                string="Print"
+                                class="oe_stat_button" icon="fa-print"/>
+                            <button name="action_open_change_wizard"
+                                type="object"
+                                string="Change"
+                                class="oe_stat_button" icon="fa-camera-retro"/>
+                        </div>
                         <group col="2">
                             <group>
                                 <field name="date"/>
-                                <field name="project"/>
-                                <field name="truckco"/>
-                                <field name="state" readonly="1"/>
-                                <field name="delivery_state" readonly="1"/>
+                                <field name="project" readonly="state!='new'"/>
+                                <field name="truckco" readonly="state!='new'"/>
+
                             </group>
                             <group>
-                                <field name="outside_eu"/>
+                                <field name="delivery_state" readonly="1" widget="badge"/>
+                                <field name="remark" readonly="state!='new'"/>
+                               <!-- <field name="outside_eu"/>
                                 <field name="import_file" filename="import_filename"/>
                                 <field name="export_file" filename="export_filename"/>
+                                <field name="order_file" filename="order_filename" widget="binary" readonly="state!='new'"/>
+                                <field name="order_filename" readonly="state!='new'"/>-->
                             </group>
                         </group>
                         <group>
@@ -80,22 +93,25 @@
                             <field name="extra_cost"/>
                         </group>
                         <notebook>
-                            <page>
-                                <field name="delivery_detail_cmr_ids">
-                                    <tree>
+                            <page string="CMR">
+                                <field name="delivery_detail_cmr_ids" readonly="state!='new'">
+                                    <tree delete="false" create="false">
                                         <field name="billno" optional="show"/>
                                         <field name="delivery_id" optional="show"/>
+                                        <field name="load_address" optional="show"/>
                                         <field name="loading_refs" optional="show"/>
                                         <field name="load_date" optional="show"/>
+                                        <field name="unload_address" optional="show"/>
                                         <field name="consignee_refs" optional="show"/>
                                         <field name="unload_date" optional="show"/>
                                         <field name="cntrnos" optional="show"/>
+                                        <field name="cmr_file" filename="cmr_filename" optional="show"/>
                                     </tree>
                                 </field>
                             </page>
-                            <page>
-                                <field name="delivery_detail_ids">
-                                    <tree>
+                            <page string="Details">
+                                <field name="delivery_detail_ids" readonly="state!='new'">
+                                    <tree delete="false" create="false">
                                         <field name="loading_ref"/>
                                         <field name="load_condition"/>
                                         <field name="load_address"/>
@@ -116,6 +132,9 @@
                                         <field name="batch_no"/>
                                     </tree>
                                 </field>
+                            </page>
+                            <page string="Change Log">
+                                <field name="delivery_order_change_log_ids" readonly="state!='new'"/>
                             </page>
                         </notebook>
                     </sheet>
@@ -183,5 +202,61 @@
                 </form>
             </field>
         </record>
+        <!-- Delivery Order change log tree view -->
+        <record id="view_delivery_order_change_log_new_tree" model="ir.ui.view">
+            <field name="name">delivery.order.change.new.log.tree</field>
+            <field name="model">delivery.order.change.log.new</field>
+            <field name="arch" type="xml">
+                <tree string="Delivery Order Change Logs" create="false">
+                   <!-- <field name="delivery_order_id"/>-->
+                    <field name="extra_cost"/>
+                    <field name="charge"/>
+                    <field name="reason"/>
+                    <field name="remark"/>
+                    <field name="change_time"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Delivery Order change log form view -->
+        <record id="view_delivery_order_change_log_new_form" model="ir.ui.view">
+            <field name="name">delivery.order.change.log.new.form</field>
+            <field name="model">delivery.order.change.log.new</field>
+            <field name="arch" type="xml">
+                <form string="Delivery Order Change Log">
+                    <sheet>
+                        <group>
+                            <!--<field name="delivery_order_id" readonly="1"/>-->
+                            <field name="extra_cost"/>
+                            <field name="charge"/>
+                            <field name="reason"/>
+                            <field name="remark"/>
+                            <field name="change_time" readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <!-- Delivery Order change wizard form view -->
+        <record id="view_delivery_order_change_wizard_new_form" model="ir.ui.view">
+        <field name="name">delivery.order.change.wizard.new.form</field>
+        <field name="model">delivery.order.change.wizard.new</field>
+        <field name="arch" type="xml">
+            <form string="Delivery Order Change Wizard">
+                <sheet>
+                    <group>
+                        <field name="delivery_order_id_new" readonly="1"/>
+                        <field name="extra_cost" string="Extra Cost (add)"/>
+                        <field name="charge" string="Charge (add)"/>
+                        <field name="reason"/>
+                        <field name="remark"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_record_change" string="Record Change" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
     </data>
 </odoo>

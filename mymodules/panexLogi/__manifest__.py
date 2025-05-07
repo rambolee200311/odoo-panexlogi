@@ -102,6 +102,7 @@
         'views/ar_bill.xml',
         'views/ar_invoice.xml',
         #'report/ar_invoice_report.xml',
+        'report/no_header_footer_report.xml',
         'views/ar_receive.xml',
         'views/customer_temp.xml',
         'views/delivery_order_new.xml',

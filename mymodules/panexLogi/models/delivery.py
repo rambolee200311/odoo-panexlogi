@@ -478,6 +478,8 @@ class Delivery(models.Model):
                 'unloading_ref': recs[0].consignee_ref,
                 'loading_condition': recs[0].load_condition.id,
                 'unloading_condition': recs[0].unload_condition.id,
+                'load_address': recs[0].load_address.id,
+                'unload_address': recs[0].unload_address.id,
                 #'planned_for_loading': recs[0].deliveryid.planned_for_loading,
                 #'planned_for_unloading': recs[0].deliveryid.planned_for_unloading,
                 #'load_type': recs[0].deliveryid.load_type,
@@ -837,6 +839,14 @@ class DeliveryDatailCmr(models.Model):
 
     delivery_order_new_id = fields.Many2one('panexlogi.delivery.order.new', string='Delivery Order')
 
+    outside_eu = fields.Boolean(string='Outside of EU')
+    import_file = fields.Binary(string='Import File')
+    import_filename = fields.Char(string='Import File Name')
+    export_file = fields.Binary(string='Export File')
+    export_filename = fields.Char(string='Export File Name')
+    load_address = fields.Many2one('panexlogi.address', 'Load Address')
+    unload_address = fields.Many2one('panexlogi.address', 'Unload Address')
+
     @api.model
     def create(self, vals):
         if 'delivery_id' in vals:
@@ -1116,6 +1126,8 @@ class DeliveryDetailCmrWizard(models.TransientModel):
                 'cmr_file': base64.b64encode(excel_buffer.getvalue()),
                 # 'cmr_filename': f'CMR_{self.delivery_id.billno}.xlsx',
                 'cmr_remark': self.cmr_remark,
+                'load_address': self.detail_ids[0].load_address.id,
+                'unload_address': self.detail_ids[0].unload_address.id,
             }
             cmr = self.env['panexlogi.delivery.detail.cmr'].create(cmr_vals)
             cmr.write({'cmr_filename': f'CMR_{cmr.billno}.xlsx'})

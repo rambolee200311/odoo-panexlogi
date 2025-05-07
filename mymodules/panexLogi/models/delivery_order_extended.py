@@ -46,7 +46,6 @@ class TransportOrderDetailExtended(models.Model):
 
     # return
 
-
 class DeliveryOrderChangeLog(models.Model):
     _name = 'delivery.order.change.log'
     _description = 'Delivery Order Change Log'
@@ -54,8 +53,13 @@ class DeliveryOrderChangeLog(models.Model):
     delivery_order_id = fields.Many2one(
         'panexlogi.delivery.order',
         string='Delivery Order',
-        ondelete='cascade',
-        required=True
+        ondelete='cascade'
+    )
+
+    delivery_order_id_new = fields.Many2one(
+        'panexlogi.delivery.order.new',
+        string='Delivery Order',
+        ondelete='cascade'
     )
     extra_cost = fields.Float(string='Extra Cost')
     charge = fields.Float(string='Charge')
@@ -68,8 +72,13 @@ class DeliveryOrderChangeWizard(models.TransientModel):
     _name = 'delivery.order.change.wizard'
     _description = 'Delivery Order Change Wizard'
 
-    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order', required=True,
-                                        readonly=True)
+    delivery_order_id = fields.Many2one('panexlogi.delivery.order', string='Delivery Order', readonly=True)
+    delivery_order_id_new = fields.Many2one(
+        'panexlogi.delivery.order.new',
+        string='New Delivery Order',
+        ondelete='cascade',
+        readonly=True,
+    )
     extra_cost = fields.Float(string='Extra Cost (add)')
     charge = fields.Float(string='Charge (add)')
     reason = fields.Text(string='Reason')
@@ -78,7 +87,7 @@ class DeliveryOrderChangeWizard(models.TransientModel):
     def action_record_change(self):
         """Record the change and log it in a history model."""
         self.env['delivery.order.change.log'].create({
-            'delivery_order_id': self.delivery_order_id.id,
+            'delivery_order_id_new': self.delivery_order_id_new.id,
             'extra_cost': self.extra_cost,
             'charge': self.charge,
             'reason': self.reason,

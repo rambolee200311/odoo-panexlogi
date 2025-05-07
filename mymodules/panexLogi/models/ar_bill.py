@@ -14,8 +14,8 @@ class ARBill(models.Model):
 
     billno = fields.Char("Bill No", readonly=True)
     date = fields.Date(string="Date", default=fields.Date.context_today)
-    fiscal_year = fields.Many2one("fiscal.year", string="Fiscal Year")
-    fiscal_month = fields.Many2one("fiscal.month", string="Fiscal Month")
+    fiscal_year = fields.Many2one("fiscal.year", string="Fiscal Year", required=True)
+    fiscal_month = fields.Many2one("fiscal.month", string="Fiscal Month", required=True)
     occurred_month = fields.Char(string="Occurred Month", required=True)
     project = fields.Many2one("panexlogi.project", string="Project")
     project_manager = fields.Many2one("res.users", string="Project Manager", default=lambda self: self.env.user)

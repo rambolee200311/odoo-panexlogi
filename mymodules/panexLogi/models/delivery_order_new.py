@@ -40,14 +40,19 @@ class DeliveryOrderNew(models.Model):
         ('other', 'Other'),
         ('complete', 'Complete'),
     ], string='Delivery State', readonly=True, default='none')
+    remark = fields.Text(string='Remark')
 
     # outside_eu, import_file,export_file, transit_file
+    order_file = fields.Binary(string='Order File')
+    order_filename = fields.Char(string='Order File Name')
     outside_eu = fields.Boolean(string='Outside of EU')
     import_file = fields.Binary(string='Import File')
     import_filename = fields.Char(string='Import File Name')
     export_file = fields.Binary(string='Export File')
     export_filename = fields.Char(string='Export File Name')
-    quote = fields.Float('Quote', default=0, tracking=True, readonly=True)
+    charge = fields.Float('Charge', default=0, tracking=True, readonly=True, compute='_compute_addtion_cost',
+                          store=True)
+    quote = fields.Float('Quote', default=0, tracking=True, readonly=True, compute='_compute_addtion_cost', store=True)
     additional_cost = fields.Float('Additional Cost', default=0, tracking=True, readonly=True)  # 额外费用
     extra_cost = fields.Float('Extra Cost', default=0, tracking=True, readonly=True)
     delivery_detail_cmr_ids = fields.Many2many(
@@ -65,6 +70,9 @@ class DeliveryOrderNew(models.Model):
         'detail_id',
         string='Delivery Details'
     )
+
+    delivery_order_change_log_ids = fields.One2many('delivery.order.change.log.new', 'delivery_order_id_new',
+                                                    string='Change Log')
 
     @api.model
     def create(self, values):
@@ -97,12 +105,145 @@ class DeliveryOrderNew(models.Model):
             if rec.state != 'new':
                 raise UserError(_("You only can cancel New Order"))
             else:
-                for line in rec.deliver_datail_cmr_ids:
-                    line.delivery_order_new_id = False
                 rec.state = 'cancel'
-                # rec.delivery_id.state = 'confirm'
+                for line in rec.delivery_detail_cmr_ids:
+                    line.delivery_order_new_id = False
+                    line.state = 'confirm'
+
                 return True
 
+    def action_print_delivery_order(self):
+        # Generate PDF using standard reporting method
+        from odoo import _
+        try:
+            self.ensure_one()
+            for rec in self:
+                rec.write({
+                    'order_file': False,
+                    'order_filename': False
+                })
+
+                # Get predefined report reference
+                report = self.env['ir.actions.report'].search([
+                    ('report_name', '=', 'panexLogi.report_delivery_order_my')
+                ], limit=1)
+
+                # Force template reload and generate PDF
+                self.env.flush_all()
+
+                # Use standard rendering method
+                result = report._render_qweb_pdf(report_ref=report.report_name,
+                                                 res_ids=[rec.id],
+                                                 data=None)
+
+                # Validate return structure
+                if not isinstance(result, tuple) or len(result) < 1:
+                    raise ValueError("Invalid data structure returned from report rendering")
+
+                pdf_content = result[0]
+
+                # Create attachment
+                order_file = self.env['ir.attachment'].create({
+                    'name': f'Delivery_Order_{self.billno}_{fields.Datetime.now().strftime("%Y%m%d%H%M%S")}.pdf',
+                    'type': 'binary',
+                    'datas': base64.b64encode(pdf_content),
+                    'res_model': self._name,
+                    'res_id': rec.id,
+                })
+                # Write the attachment to the record
+                rec.write({
+                    'order_file': order_file.datas,
+                    'order_filename': order_file.name
+                })
+
+        except Exception as e:
+            _logger.error("PDF generate failed: %s", str(e))
+            raise UserError(_("PDF generate failed: %s") % str(e))
+
+    @api.depends('delivery_order_change_log_ids.extra_cost', 'delivery_order_change_log_ids.charge')
+    def _compute_addtion_cost(self):
+        for record in self:
+            # Reset to the original value
+            original_extra_cost = record._origin.extra_cost or 0
+            original_charge = record._origin.charge or 0
+
+            # Start with the original values
+            record.extra_cost = original_extra_cost
+            record.charge = original_charge
+
+            # Add values from related records
+            for log in record.delivery_order_change_log_ids:
+                record.extra_cost += log.extra_cost
+                record.charge += log.charge
+
     # The method returns an action dictionary that opens the delivery.order.new.wizard in a form view
+    def action_open_change_wizard(self, **kwargs):
+        """Open the Change Wizard for the current record."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Change Log',
+            'res_model': 'delivery.order.change.wizard.new',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_delivery_order_id_new': self.id,
+            },
+        }
 
 
+class DeliveryOrderChangeLogNew(models.Model):
+    _name = 'delivery.order.change.log.new'
+    _description = 'Delivery Order Change Log'
+
+    delivery_order_id_new = fields.Many2one(
+        'panexlogi.delivery.order.new',
+        string='Delivery Order',
+        ondelete='cascade',
+        required=True,
+        readonly=True,
+    )
+    extra_cost = fields.Float(string='Extra Cost')
+    charge = fields.Float(string='Charge')
+    reason = fields.Text(string='Reason')
+    remark = fields.Text(string='Remark')
+    change_time = fields.Datetime(string='Change Time', default=fields.Datetime.now)
+
+
+class DeliveryOrderChangeWizardNew(models.TransientModel):
+    _name = 'delivery.order.change.wizard.new'
+    _description = 'Delivery Order Change Wizard'
+
+    delivery_order_id_new = fields.Many2one(
+        'panexlogi.delivery.order.new',
+        string='New Delivery Order',
+        ondelete='cascade',
+        readonly=True,
+    )
+    extra_cost = fields.Float(string='Extra Cost (add)')
+    charge = fields.Float(string='Charge (add)')
+    reason = fields.Text(string='Reason')
+    remark = fields.Text(string='Remark')
+
+    def action_record_change(self):
+        """Record the change and log it in a history model."""
+        self.env['delivery.order.change.log.new'].create({
+            'delivery_order_id_new': self.delivery_order_id_new.id,
+            'extra_cost': self.extra_cost,
+            'charge': self.charge,
+            'reason': self.reason,
+            'remark': self.remark,
+            'change_time': fields.Datetime.now(),
+        })
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Change recorded successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }, {
+            'type': 'ir.actions.act_window_close'
+        }
