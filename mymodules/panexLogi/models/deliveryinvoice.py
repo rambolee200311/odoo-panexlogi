@@ -115,14 +115,15 @@ class DeliveryInvoice(models.Model):
                         domain += [('|', ('loading_ref', 'ilike', part), ('cntrno', 'ilike', part)) for part in parts]
                     else:
                         domain += ['|', ('loading_ref', 'ilike', parts[0]), ('cntrno', 'ilike', parts[0])]
-
-                    if self.env['panexlogi.delivery.detail'].search_count(domain) > 0:
+                    deliver_detail = self.env['panexlogi.delivery.detail'].search(domain)
+                    if deliver_detail:
                         bcheck = True
 
                     if not bcheck:
                         record.check = False
                         record.check_message = 'The combination of truck company and inner ref is not exist in delivery order!'
                     else:
+                        record.project = deliver_detail.deliveryid.project.id
                         record.check = True
                         record.check_message = ''
 
@@ -240,15 +241,17 @@ class DeliveryInvoice(models.Model):
                 'due_date': record.due_date,
             })
             # Unit price= OUD
+
             for records in self.deliveryinvoicedetailids:
+                projectid = records.project.id
                 self.env['panexlogi.finance.paymentapplicationline'].create({
                     'payapp_billno': payment_application.id,
                     'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'OUD')]).id,
                     'amount': records.amount,
                     'amount_usd': records.amount_usd,
                     'remark': records.inner_ref,
+                    'project': projectid,
                 })
-
             self.env['panexlogi.finance.paymentapplicationline'].create({
                 'payapp_billno': payment_application.id,
                 'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'OUD')]).id,
@@ -290,6 +293,7 @@ class DeliveryInvoiceDetail(models.Model):
     amount_tax_usd = fields.Float(string='Amount Tax USD')
     check = fields.Boolean(string='Check with Order')
     check_message = fields.Text(string='Check Message')
+    project = fields.Many2one('panexlogi.project', string='Project')
 
     # chcek inner ref is unique,and state is not cancel
     """      

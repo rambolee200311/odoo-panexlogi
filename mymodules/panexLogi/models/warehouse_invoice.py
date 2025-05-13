@@ -140,6 +140,7 @@ class WarehouseInvoice(models.Model):
                     'amount': records.amount,
                     'amount_usd': records.amount_usd,
                     'remark': records.cntrno,
+                    'project': records.project.id,
                 })
 
             self.env['panexlogi.finance.paymentapplicationline'].create({

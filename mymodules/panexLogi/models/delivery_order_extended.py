@@ -101,8 +101,6 @@ class DeliveryOrderChangeWizard(models.TransientModel):
                 'title': 'Success',
                 'message': 'Change recorded successfully!',
                 'type': 'success',
-                'sticky': False,
+                'next': {'type': 'ir.actions.act_window_close'},
             }
-        }, {
-            'type': 'ir.actions.act_window_close'
         }

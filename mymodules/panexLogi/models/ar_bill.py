@@ -20,7 +20,7 @@ class ARBill(models.Model):
     project = fields.Many2one("panexlogi.project", string="Project")
     project_manager = fields.Many2one("res.users", string="Project Manager", default=lambda self: self.env.user)
     customer = fields.Many2one("res.partner", string="Customer",
-                               domain="[('is_company', '=', True), ('project', '=', True)]")
+                               domain="[('is_company', '=', True)]")
     remark = fields.Text(string="Remark")
     amount = fields.Float(string="Amount", compute="_compute_amount", store=True)
     vat = fields.Float(string="VAT", compute="_compute_vat", store=True)
@@ -51,6 +51,20 @@ class ARBill(models.Model):
     original_ar_bill_id = fields.Many2one('panexlogi.ar.bill', string='Original AR Bill', readonly=True)
     credit_note_ar_bill_id = fields.Many2one('panexlogi.ar.bill', string='Credit Note AR Bill', readonly=True)
 
+    # Properly define company_id and exclude from tracking
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        default=lambda self: self.env.company,
+        tracking=False  # Explicitly disable tracking
+    )
+
+    #
+    # def _mail_track_get_field_sequence(self, field_name):
+    #     # Exclude 'company_id' from being tracked
+    #     if field_name == 'company_id':
+    #         return None
+    #     return super()._mail_track_get_field_sequence(field_name)
     @api.returns('self', lambda value: value.id if value else None)
     def copy(self, default=None):
         """Override copy to generate new bill number for all duplicates"""
@@ -85,7 +99,7 @@ class ARBill(models.Model):
         return new_record
 
     # compute receive amount from ar_invoice
-
+    @api.depends('ar_invoice_id.receive_amount', 'ar_invoice_id.invoice_amount', )
     def _compute_receive_amount(self, compute=False):
         for record in self:
             record.receive_amount = 0.0
@@ -100,6 +114,7 @@ class ARBill(models.Model):
                     record.invoice_amount_with_vat = record.ar_invoice_id.invoice_amount_with_vat
 
     # compute status from amount, invoice_amount, receive_amount
+    @api.depends('amount_with_vat', 'invoice_amount_with_vat', 'receive_amount')
     def _compute_status(self):
         for record in self:
             if record.amount_with_vat > 0:  # POSITIVE

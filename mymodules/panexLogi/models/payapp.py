@@ -370,6 +370,67 @@ class PaymentApplicationLine(models.Model):
 
         return super(PaymentApplicationLine, self).create(values)
 
+    #@api.model
+    def cron_update_project(self):
+        """
+        Scheduled task to update the project field for payment application lines.
+        """
+        try:
+            _logger.info("Starting cron_update_project")
+            for rec in self.env['panexlogi.finance.paymentapplicationline'].search([('project', '=', False)]):
+                _logger.info(f"Project {rec.project.project_name} for BillNo: {rec.payapp_billno.billno}")
+                if not rec.project:
+                    # Check if the project is linked via the waybill
+                    _logger.info(f"Updating project for billno: {rec.payapp_billno.billno}")
+                    if rec.payapp_billno.waybill_billno and rec.payapp_billno.waybill_billno.project:
+                        rec.project = rec.payapp_billno.waybill_billno.project.id
+                        continue
+
+                    # Handle different sources
+                    source_mapping = {
+                        'Shipping Invoice': 'panexlogi.waybill.shipinvoice',
+                        'Clearance Invoice': 'panexlogi.waybill.clearinvoice',
+                        'Warehouse Invoice': 'panexlogi.warehouse.invoice',
+                        'Transport Invoice': 'panexlogi.transport.invoice',
+                        'Delivery Invoice': 'panexlogi.delivery.invoice',
+                    }
+
+                    model_name = source_mapping.get(rec.payapp_billno.source)
+                    if model_name:
+                        invoice = self.env[model_name].search([('billno', '=', rec.payapp_billno.source_Code)], limit=1)
+                        if invoice:
+                            if rec.payapp_billno.source == 'Transport Invoice':
+                                for detail in invoice.transportinvoicedetailids:
+                                    waybill = self.env['panexlogi.waybill'].search(
+                                        [('waybillno', '=', detail.waybillno)], limit=1)
+                                    if waybill:
+                                        rec.project = waybill.project.id
+                                        break
+                            elif rec.payapp_billno.source == 'Delivery Invoice':
+                                for detail in invoice.deliveryinvoicedetailids:
+                                    inner_ref_parts = detail.inner_ref.split('-')
+                                    domain = [('deliveryid.trucker', '=', rec.payapp_billno.payee.id),
+                                              ('deliveryid.state', '!=', 'cancel')]
+                                    domain += ['|'] * (len(inner_ref_parts) - 1)
+                                    domain += [('|', ('loading_ref', 'ilike', part), ('cntrno', 'ilike', part)) for part
+                                               in inner_ref_parts]
+                                    delivery_detail = self.env['panexlogi.delivery.detail'].search(domain, limit=1)
+                                    if delivery_detail:
+                                        rec.project = delivery_detail.deliveryid.project.id
+                                        break
+                            else:
+                                rec.project = invoice.project.id
+                        else:
+                            _logger.warning(
+                                f"No matching record found for source: {rec.payapp_billno.source}, Code: {rec.payapp_billno.source_Code}")
+                    else:
+                        _logger.warning(f"Unsupported source type: {rec.payapp_billno.source}")
+                else:
+                    _logger.info(f"Project already set for record ID: {rec.id}")
+        except Exception as e:
+            _logger.error(f"Error in cron_update_project: {str(e)}")
+        return True
+
 
 # 进口付款申请
 class ImportPaymentApplication(models.Model):

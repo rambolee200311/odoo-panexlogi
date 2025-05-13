@@ -86,6 +86,7 @@
                                 <field name="invoice_vat" readonly="1"/>
                                 <field name="invoice_amount_with_vat" readonly="1"/>
                                 <field name="ar_company" readonly="state!='new'"/>
+                                <field name="ar_company_account" readonly="state!='new'"/>
                             </group>
                         </group>
                         <group col="2">
@@ -106,10 +107,11 @@
                                 <field name="invoice_line_ids" readonly="state!='new'">
                                     <tree editable="bottom">
                                         <field name="fitem"/>
+                                        <field name="fitem_name"/>
+                                        <field name="remark"/>
                                         <field name="invoice_amount"/>
                                         <field name="invoice_vat"/>
                                         <field name="invoice_amount_with_vat" readonly="1"/>
-                                        <field name="remark"/>
                                     </tree>
                                 </field>
                             </page>
@@ -170,6 +172,15 @@
                     Click to create a new AR Invoice.
                 </p>
             </field>
+        </record>
+        <!-- report action-->
+        <record id="report_ar_invoice_template" model="ir.actions.report">
+            <field name="name">AR Invoice Temp</field>
+            <field name="model">panexlogi.ar.invoice</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">panexLogi.report_ar_invoice_template_view</field>
+           <!-- <field name="report_file">panexlogi/report/ar_invoice_report.xml</field>-->
+           <!-- <field name="binding_model_id" ref="panexlogi.model_ar_invoice"/>-->
         </record>
     </data>
 </odoo>

@@ -16,8 +16,10 @@ class ARInvoice(models.Model):
     billno = fields.Char("Bill No", readonly=True)
     date = fields.Date(string="Date", default=fields.Date.context_today)
 
-    ar_company = fields.Many2one('res.partner', string='Payee（收款方）', tracking=True,
+    ar_company = fields.Many2one('res.partner', string='Payee（收款方）',
                                  domain="[('is_company', '=', True),('category_id.name', 'ilike', 'company')]")
+    ar_company_account = fields.Many2one('res.partner.bank', string='Payee Account',
+                                            domain="[('partner_id', '=', ar_company)]")
 
     fiscal_year = fields.Many2one("fiscal.year", string="Fiscal Year")
     fiscal_month = fields.Many2one("fiscal.month", string="Fiscal Month")
@@ -25,7 +27,7 @@ class ARInvoice(models.Model):
     project = fields.Many2one("panexlogi.project", string="Project")
     project_manager = fields.Many2one("res.users", string="Project Manager", default=lambda self: self.env.user)
     customer = fields.Many2one("res.partner", string="Customer",
-                               domain="[('is_company', '=', True), ('project', '=', True)]")
+                               domain="[('is_company', '=', True)]")
     remark = fields.Text(string="Remark")
 
     currency_id = fields.Many2one('res.currency', string='Currency（币种）', required=True, tracking=True,
@@ -53,6 +55,20 @@ class ARInvoice(models.Model):
     invoice_receive_details_ids = fields.One2many('panexlogi.ar.invoice.receive.details', 'invoice_id',
                                                   string="Receive Details")
     ar_bill_id = fields.Many2one('panexlogi.ar.bill', string='AR Bill')
+    # Properly define company_id and exclude from tracking
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        default=lambda self: self.env.company,
+        tracking=False  # Explicitly disable tracking
+    )
+
+    #
+    # def _mail_track_get_field_sequence(self, field_name):
+    #     # Exclude 'company_id' from being tracked
+    #     if field_name == 'company_id':
+    #         return None
+    #     return super()._mail_track_get_field_sequence(field_name)
 
     @api.depends('receive_amount', 'invoice_amount_with_vat')
     def _compute_invoice_amount_balance(self):
@@ -203,39 +219,54 @@ class ARInvoice(models.Model):
                 record.receive_amount += line.receive_amount
 
     def action_print_pdf(self):
-        """Generate and store the invoice PDF."""
+        from odoo import _
+        """Generate and store the invoice PDF with error handling and performance optimization"""
         self.ensure_one()
+        try:
+            for rec in self:
+                # Clear existing PDF
+                rec.write({
+                    'invoice_pdf': False,
+                    'invoice_pdf_name': False
+                })
+                # Get predefined report reference
+                report = self.env['ir.actions.report'].search([
+                    ('report_name', '=', 'panexLogi.report_ar_invoice_template_view')
+                ], limit=1)
 
-        # Reference the report template
-        # report = self.env.ref('panexLogi.report_ar_invoice_template')
-        report_action = self.env.ref('panexLogi.report_ar_invoice_action')
+                # Force template reload and generate PDF
+                self.env.flush_all()
 
-        if not report_action.exists():
-            raise ValidationError("""
-                   Report configuration error! Missing components:
-                   1. Check if report action is registered in XML
-                   2. Verify report template exists
-                   3. Ensure module dependencies are installed
-                   """)
+                # Use standard rendering method
+                result = report._render_qweb_pdf(report_ref=report.report_name,
+                                                 res_ids=[rec.id],
+                                                 data=None)
 
-        # Generate the PDF using the report service
-        pdf_data, _ = report_action._render_qweb_pdf([self.id])
+                # Validate return structure
+                if not isinstance(result, tuple) or len(result) < 1:
+                    raise ValueError("Invalid data structure returned from report rendering")
 
-        # Generate the file name
-        filename = f"Invoice_{self.billno or 'new'}.pdf"
+                pdf_content = result[0]
 
-        # Update the record fields
-        self.write({
-            'invoice_pdf': base64.b64encode(pdf_data),
-            'invoice_pdf_name': filename
-        })
+                # Create attachment
+                invoice_file = self.env['ir.attachment'].create({
+                    'name': f'AR_Invoice_{self.billno}_{fields.Datetime.now().strftime("%Y%m%d%H%M%S")}.pdf',
+                    'type': 'binary',
+                    'datas': base64.b64encode(pdf_content),
+                    'res_model': self._name,
+                    'res_id': rec.id,
+                })
 
-        # Return a URL for downloading the PDF
-        return {
-            'type': 'ir.actions.act_url',
-            'url': f'/web/content/{self._name}/{self.id}/invoice_pdf/{filename}?download=true',
-            'target': 'self',
-        }
+                # Batch write with sudo
+                rec.sudo().write({
+                    'invoice_pdf': invoice_file.datas,
+                    'invoice_pdf_name': invoice_file.name
+                })
+
+        except Exception as e:
+            error_msg = f"PDF Generation Failed: {str(e)}"
+            _logger.error(error_msg)
+            raise UserError(_(f"{error_msg}\nCheck server logs (ID:{self.id})")) from e
 
 
 class ARInvoiceLine(models.Model):

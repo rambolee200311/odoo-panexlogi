@@ -13,12 +13,13 @@
             <field name="model">panexlogi.delivery.order.new</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="billno"/>
-                    <field name="date"/>
-                    <field name="project"/>
-                    <field name="truckco"/>
-                    <field name="state"/>
-                    <field name="delivery_state"/>
+                    <field name="billno" optional="show"/>
+                    <field name="date" optional="show"/>
+                    <field name="project" optional="show"/>
+                    <field name="truckco" optional="show"/>
+                    <field name="state" optional="show"/>
+                    <field name="delivery_state" optional="show"/>
+                    <field name="trailer_type" optional="show"/>
                 </tree>
             </field>
         </record>
@@ -75,9 +76,11 @@
                                 <field name="date"/>
                                 <field name="project" readonly="state!='new'"/>
                                 <field name="truckco" readonly="state!='new'"/>
-
+                                <field name="trailer_type" readonly="state!='new'"/>
                             </group>
                             <group>
+                                <field name="client_company" readonly="state!='new'"/>
+                                <field name="contact_person" readonly="state!='new'"/>
                                 <field name="delivery_state" readonly="1" widget="badge"/>
                                 <field name="remark" readonly="state!='new'"/>
                                <!-- <field name="outside_eu"/>
@@ -86,11 +89,6 @@
                                 <field name="order_file" filename="order_filename" widget="binary" readonly="state!='new'"/>
                                 <field name="order_filename" readonly="state!='new'"/>-->
                             </group>
-                        </group>
-                        <group>
-                            <field name="quote"/>
-                            <field name="additional_cost"/>
-                            <field name="extra_cost"/>
                         </group>
                         <notebook>
                             <page string="CMR">
@@ -105,6 +103,7 @@
                                         <field name="consignee_refs" optional="show"/>
                                         <field name="unload_date" optional="show"/>
                                         <field name="cntrnos" optional="show"/>
+                                        <field name="quote" optional="show"/>
                                         <field name="cmr_file" filename="cmr_filename" optional="show"/>
                                     </tree>
                                 </field>
@@ -135,6 +134,13 @@
                             </page>
                             <page string="Change Log">
                                 <field name="delivery_order_change_log_ids" readonly="state!='new'"/>
+                            </page>
+                            <page string="quote">
+                                <group>
+                                    <field name="quote" readonly="1"/>
+                                    <field name="additional_cost" readonly="1"/>
+                                    <field name="extra_cost" readonly="1"/>
+                                </group>
                             </page>
                         </notebook>
                     </sheet>

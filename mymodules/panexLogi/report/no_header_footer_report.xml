@@ -3,7 +3,27 @@
         <t t-call="web.html_container">
             <div class="page">
                 <t t-raw="0"/>
+                <!-- Footer with page numbering -->
+                <div class="footer" style="position: absolute; bottom: 0; width: 100%">
+                    <div style="text-align: right; margin-right: 20px;" t-if="report_type == 'pdf'">
+                        Page <span class="page"/> of <span class="topage"/>
+                    </div>
+                </div>
             </div>
         </t>
+        <style>
+            @page {
+                size: A4;
+                margin: 20mm;
+                @bottom-right {
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+            }
+            .footer {
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                color: #000;
+            }
+        </style>
     </template>
 </odoo>

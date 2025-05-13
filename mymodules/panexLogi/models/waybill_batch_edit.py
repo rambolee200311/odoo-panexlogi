@@ -86,6 +86,7 @@ class WaybillBatchEditWizard(models.TransientModel):
                     # 仅在 Truck Type 为 delivery 时更新 delivery 相关字段
                     if rec.truck_type == 'delivery' and rec.delivery_address:
                         detail.write({
+                            'unload_address': rec.unload_address.id,
                             'delivery_address': rec.delivery_address,
                             'delivery_company_name': rec.delivery_company_name,
                             'delivery_contact_phone': rec.delivery_contact_phone,

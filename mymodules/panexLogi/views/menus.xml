@@ -113,7 +113,8 @@
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->
 
         <menuitem id="report_menu" name="Reporting" parent="panex_logi_menu" sequence="800" />
-        <menuitem id="report_demotodo_menu" name="DemoToDo Report" parent="report_menu" sequence="801" action="action_panexlogi_demotodo_report_all"/>
+        <!--<menuitem id="report_demotodo_menu" name="DemoToDo Report" parent="report_menu" sequence="801" action="action_panexlogi_demotodo_report_all"/>-->
+        <menuitem id="report_project_item_menu" name="Project Item Report" parent="report_menu" sequence="801" action="action_project_item_analysis_report"/>
 
     </data>
 </odoo>

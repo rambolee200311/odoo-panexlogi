@@ -42,6 +42,10 @@ class DeliveryOrderNew(models.Model):
     ], string='Delivery State', readonly=True, default='none')
     remark = fields.Text(string='Remark')
 
+    client_company = fields.Many2one('res.partner', string='Company',
+                              domain="[('is_company', '=', True),('category_id.name', 'ilike', 'company')]")
+    contact_person = fields.Char(string='Contact Person', tracking=True)
+
     # outside_eu, import_file,export_file, transit_file
     order_file = fields.Binary(string='Order File')
     order_filename = fields.Char(string='Order File Name')
@@ -73,6 +77,14 @@ class DeliveryOrderNew(models.Model):
 
     delivery_order_change_log_ids = fields.One2many('delivery.order.change.log.new', 'delivery_order_id_new',
                                                     string='Change Log')
+
+    # Properly define company_id and exclude from tracking
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        default=lambda self: self.env.company,
+        tracking=False  # Explicitly disable tracking
+    )
 
     @api.model
     def create(self, values):

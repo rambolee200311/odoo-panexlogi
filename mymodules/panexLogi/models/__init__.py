@@ -41,7 +41,9 @@ from . import LoadingCondition
 from . import UnLoadingCondition
 from . import PackageType
 from . import delivery
+from . import delivery_detail
 from . import deliveryquote
+from . import delivery_cmr
 from . import terminal
 from . import transportcontract
 from . import transportorder
@@ -66,3 +68,4 @@ from . import ar_invoice
 from . import ar_receive
 from . import customer_temp
 from . import delivery_order_new
+from . import project_item_report

@@ -27,9 +27,9 @@ class Receive(models.Model):
                                  readonly=True)
 
     payee = fields.Char(string='Payee（收款方）', tracking=True)
-    payee_company = fields.Many2one('res.partner', string='Payee（收款方）', tracking=True,
+    payee_company = fields.Many2one('res.partner', string='Payee（收款方）',
                                     domain="[('is_company', '=', True),('category_id.name', 'ilike', 'company')]")
-    payee_company_account = fields.Many2one('res.partner.bank', string='Payee Account', tracking=True,
+    payee_company_account = fields.Many2one('res.partner.bank', string='Payee Account',
                                             domain="[('partner_id', '=', payee_company)]")
     payee_bank = fields.Char(string='Payee BIC', related='payee_company_account.bank_bic', tracking=True)
     currency_id = fields.Many2one('res.currency', string='Currency（币种）', required=True, tracking=True,
@@ -62,7 +62,18 @@ class Receive(models.Model):
         compute='_compute_global_total',
         store=False
     )
-
+    # Properly define company_id and exclude from tracking
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        default=lambda self: self.env.company,
+        tracking=False  # Explicitly disable tracking
+    )
+    # def _mail_track_get_field_sequence(self, field_name):
+    #     # Exclude 'company_id' from being tracked
+    #     if field_name == 'company_id':
+    #         return None
+    #     return super()._mail_track_get_field_sequence(field_name)
     @api.depends('receive_amount', 'cost')
     def _compute_global_total(self):
         all_records = self.search([])

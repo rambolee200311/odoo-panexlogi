@@ -1,0 +1,57 @@
+<odoo>
+    <data>
+        <!--search view-->
+        <record id="view_project_item_analysis_report_search" model="ir.ui.view">
+            <field name="name">project.item.analysis.report.search</field>
+            <field name="model">project.item.analysis.report</field>
+            <field name="arch" type="xml">
+                <search string="Financial Analysis">
+                    <field name="date"/>
+                    <field name="project_id"/>
+                    <field name="fitem_id"/>
+                </search>
+            </field>
+        </record>
+        <!--tree view-->
+        <record id="view_project_item_analysis_report_tree" model="ir.ui.view">
+            <field name="name">project.item.analysis.report.tree</field>
+            <field name="model">project.item.analysis.report</field>
+            <field name="arch" type="xml">
+                <tree string="Financial Analysis">
+                    <field name="date" optional="show"/>
+                    <field name="project_id" optional="show"/>
+                    <field name="project_name" optional="show"/>
+                    <field name="fitem_id" optional="show"/>
+                    <field name="fitem_name" optional="show"/>
+                    <field name="pay_amount" optional="show"/>
+                    <field name="invoice_amount" optional="show"/>
+                    <field name="balance_amount" optional="show"/>
+                </tree>
+            </field>
+        </record>
+        <!--pivot view-->
+        <record id="view_project_item_analysis_report_pivot" model="ir.ui.view">
+            <field name="name">project.item.analysis.report.pivot</field>
+            <field name="model">project.item.analysis.report</field>
+            <field name="arch" type="xml">
+                <pivot string="Financial Analysis">
+                    <field name="date" type="row" interval="month"/>
+                    <field name="project_name" type="row"/>
+                    <field name="fitem_name" type="row"/>
+                    <field name="pay_amount" type="measure"/>
+                    <field name="invoice_amount" type="measure"/>
+                    <field name="balance_amount" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="action_project_item_analysis_report" model="ir.actions.act_window">
+            <field name="name">Project Item Analysis Report</field>
+            <field name="res_model">project.item.analysis.report</field>
+            <field name="view_mode">tree,pivot</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Click to analyze payments and invoices.</p>
+            </field>
+        </record>
+    </data>
+</odoo>
