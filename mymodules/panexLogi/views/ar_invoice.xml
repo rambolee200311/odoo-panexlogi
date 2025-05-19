@@ -83,6 +83,7 @@
                                 <field name="ar_bill_id" readonly="1"/>
                                 <field name="currency_id" readonly="1"/>
                                 <field name="invoice_amount" readonly="1"/>
+                                <field name="be_vat" readonly="1"/>
                                 <field name="invoice_vat" readonly="1"/>
                                 <field name="invoice_amount_with_vat" readonly="1"/>
                                 <field name="ar_company" readonly="state!='new'"/>
@@ -110,6 +111,7 @@
                                         <field name="fitem_name"/>
                                         <field name="remark"/>
                                         <field name="invoice_amount"/>
+                                        <field name="be_vat"/>
                                         <field name="invoice_vat"/>
                                         <field name="invoice_amount_with_vat" readonly="1"/>
                                     </tree>

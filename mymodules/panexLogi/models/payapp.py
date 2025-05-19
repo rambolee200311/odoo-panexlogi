@@ -175,6 +175,11 @@ class PaymentApplication(models.Model):
                     warehouseinvoice.state = 'confirm'
                 else:
                     raise exceptions.ValidationError('Can not find the Warehouse Invoice')
+            if rec.source == 'A/R Bill':
+                ar_bill = self.env['panexlogi.ar.bill'].search([('billno', '=', rec.source_Code)])
+                if ar_bill:
+                    ar_bill.state = 'confirm'
+                    ar_bill.payment_application_id = False
 
             rec.state = 'cancel'
             return True
@@ -370,7 +375,7 @@ class PaymentApplicationLine(models.Model):
 
         return super(PaymentApplicationLine, self).create(values)
 
-    #@api.model
+    # @api.model
     def cron_update_project(self):
         """
         Scheduled task to update the project field for payment application lines.

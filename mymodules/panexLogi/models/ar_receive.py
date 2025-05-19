@@ -39,7 +39,14 @@ class Receive(models.Model):
                                      string='Payment Method（收款方式）',
                                      domain=[('state', '=', 'active')], tracking=True)
     receive_date = fields.Date(string='Date(收款日期)', tracking=True)
-    receive_amount = fields.Float(string='Amount（金额）', tracking=True, default=0)
+    #receive_amount = fields.Float(string='Amount（金额）', tracking=True, default=0)
+    receive_amount = fields.Monetary(string='Amount（金额）',
+                                     tracking=True,
+                                     currency_field='currency_id')
+    #cost = fields.Float(string="Cost", default=0)
+    cost = fields.Monetary(string="Cost",
+                           default=0,
+                           tracking=True)
     remark = fields.Text(string='Remark', tracking=True)
     pdffile = fields.Binary(string='File（原件）')
     pdffilename = fields.Char(string='File name')
@@ -50,7 +57,7 @@ class Receive(models.Model):
                              default='new', tracking=True)
     ar_receive_line_ids = fields.One2many('panexlogi.ar.receive.line', 'receive_id', string='Receive Line')
     invoice_number = fields.Char(string="Invoice Number")
-    cost = fields.Float(string="Cost", default=0)
+
 
     global_total_receive_amount = fields.Float(
         string="Global Total Receive Amount",
@@ -226,17 +233,37 @@ class ReceiveLine(models.Model):
 
     ar_invoice_id = fields.Many2one('panexlogi.ar.invoice', string='AR Invoice',
                                     domain="[('state', '=', 'confirm'), ('invoice_amount_with_vat', '>', receive_amount)]")
+    receive_id = fields.Many2one('panexlogi.ar.receive', string='AR Receive')
     invoice_date = fields.Date(string='Invoice Date', related='ar_invoice_id.invoice_date')
     invoice_due_date = fields.Date(string='Invoice Due Date', related='ar_invoice_id.invoice_due_date')
     invoice_number = fields.Char(string='Invoice Number', related='ar_invoice_id.invoice_number')
-    invoice_amount_with_vat = fields.Float(string='Invoice Amount', related='ar_invoice_id.invoice_amount_with_vat')
-    receive_amount = fields.Float(string='Receive Amount', related='ar_invoice_id.receive_amount')
-    invoice_amount_balance = fields.Float(string='Invoice Amount Balance',
-                                          related='ar_invoice_id.invoice_amount_balance')
-    amount = fields.Float(string='Amount')
+    # Add related currency_id from the parent invoice
+    currency_id = fields.Many2one(
+        'res.currency',
+        related='receive_id.currency_id',
+        string='Currency',
+        store=True,
+        readonly=True
+    )
+
+    #invoice_amount_with_vat = fields.Float(string='Invoice Amount', related='ar_invoice_id.invoice_amount_with_vat')
+    invoice_amount_with_vat = fields.Monetary(string='Invoice Amount',
+                                              related='ar_invoice_id.invoice_amount_with_vat',
+                                              currency_field='currency_id')
+    #receive_amount = fields.Float(string='Receive Amount', related='ar_invoice_id.receive_amount')
+    receive_amount = fields.Monetary(string='Receive Amount',
+                                     related='ar_invoice_id.receive_amount',
+                                     currency_field='currency_id')
+    #invoice_amount_balance = fields.Float(string='Invoice Amount Balance',related='ar_invoice_id.invoice_amount_balance')
+    invoice_amount_balance = fields.Monetary(string='Invoice Amount Balance',
+                                             related='ar_invoice_id.invoice_amount_balance',
+                                             currency_field='currency_id')
+    #amount = fields.Float(string='Amount')
+    amount = fields.Monetary(string='Amount',
+                              currency_field='currency_id')
     remark = fields.Text(string='Remark')
 
-    receive_id = fields.Many2one('panexlogi.ar.receive', string='AR Receive')
+
 
     @api.onchange('amount')
     def _onchange_amount(self):

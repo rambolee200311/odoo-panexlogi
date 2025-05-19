@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import _, models, fields, api
 from odoo.exceptions import ValidationError, UserError
 import requests
 import logging
@@ -22,9 +22,23 @@ class ARBill(models.Model):
     customer = fields.Many2one("res.partner", string="Customer",
                                domain="[('is_company', '=', True)]")
     remark = fields.Text(string="Remark")
-    amount = fields.Float(string="Amount", compute="_compute_amount", store=True)
-    vat = fields.Float(string="VAT", compute="_compute_vat", store=True)
-    amount_with_vat = fields.Float(string="Amount(with VAT)", compute="_compute_amount_with_vat", store=True)
+    currency_id = fields.Many2one('res.currency', string='Currency（币种）', required=True, tracking=True,
+                                  default=lambda self: self.env.ref('base.EUR'))
+    # amount = fields.Float(string="Amount", compute="_compute_amount", store=True)
+    # vat = fields.Float(string="VAT", compute="_compute_vat", store=True)
+    # amount_with_vat = fields.Float(string="Amount(with VAT)", compute="_compute_amount_with_vat", store=True)
+    amount = fields.Monetary(string="Amount",
+                             compute="_compute_amount",
+                             store=True,
+                             currency_field='currency_id')
+    vat = fields.Monetary(string="VAT",
+                          compute="_compute_vat",
+                          store=True,
+                          currency_field='currency_id')
+    amount_with_vat = fields.Monetary(string="Amount(with VAT)",
+                                      compute="_compute_amount_with_vat",
+                                      store=True,
+                                      currency_field='currency_id')
     state = fields.Selection([('new', 'New'),
                               ('confirm', 'Confirm'),
                               ('cancel', 'Cancel'), ],
@@ -38,14 +52,28 @@ class ARBill(models.Model):
                               default='billed')
     bill_line_ids = fields.One2many('panexlogi.ar.bill.line', 'ar_bill_id', string="Bill Line")
     bill_doc_ids = fields.One2many('panexlogi.ar.bill.doc', 'ar_bill_id', string="Bill Document")
-    currency_id = fields.Many2one('res.currency', string='Currency（币种）', required=True, tracking=True,
-                                  default=lambda self: self.env.ref('base.EUR'))
-    invoice_amount = fields.Float(string="Invoice Amount", compute="_compute_receive_amount", store=True)
-    invoice_vat = fields.Float(string="Invoice VAT", compute="_compute_receive_amount", store=True)
-    invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)", compute="_compute_receive_amount",
-                                           store=True)
 
-    receive_amount = fields.Float(string="Receive Amount", compute="_compute_receive_amount", store=True)
+    # invoice_amount = fields.Float(string="Invoice Amount", compute="_compute_receive_amount", store=True)
+    # invoice_vat = fields.Float(string="Invoice VAT", compute="_compute_receive_amount", store=True)
+    # invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)", compute="_compute_receive_amount", store=True)
+    invoice_amount = fields.Monetary(string="Invoice Amount",
+                                     compute="_compute_receive_amount",
+                                     store=True,
+                                     currency_field='currency_id')
+    invoice_vat = fields.Monetary(string="Invoice VAT",
+                                  compute="_compute_receive_amount",
+                                  store=True,
+                                  currency_field='currency_id')
+    invoice_amount_with_vat = fields.Monetary(string="Invoice Amount(with VAT)",
+                                              compute="_compute_receive_amount",
+                                              store=True,
+                                              currency_field='currency_id')
+
+    # receive_amount = fields.Float(string="Receive Amount", compute="_compute_receive_amount", store=True)
+    receive_amount = fields.Monetary(string="Receive Amount",
+                                     compute="_compute_receive_amount",
+                                     store=True,
+                                     currency_field='currency_id')
 
     ar_invoice_id = fields.Many2one('panexlogi.ar.invoice', string='AR Invoice', readonly=True)
     original_ar_bill_id = fields.Many2one('panexlogi.ar.bill', string='Original AR Bill', readonly=True)
@@ -58,6 +86,16 @@ class ARBill(models.Model):
         default=lambda self: self.env.company,
         tracking=False  # Explicitly disable tracking
     )
+
+    payment_application_id = fields.Many2one('panexlogi.finance.paymentapplication',
+                                             string='Payment Application',
+                                             readonly=True)
+
+    inv_no = fields.Char(string="Invoice No")
+    inv_date = fields.Date(string="Invoice Date")
+    inv_duedate = fields.Date(string="Invoice Due Date")
+    inv_file = fields.Binary(string="Invoice File")
+    inv_file_name = fields.Char(string="Invoice File Name")
 
     #
     # def _mail_track_get_field_sequence(self, field_name):
@@ -72,6 +110,7 @@ class ARBill(models.Model):
         default.update({
             'billno': self.env['ir.sequence'].next_by_code('seq.ar.bill'),
             'state': 'new',
+            'status': 'billed',
             'ar_invoice_id': False,
             'original_ar_bill_id': False,
             'credit_note_ar_bill_id': False,
@@ -97,6 +136,126 @@ class ARBill(models.Model):
             self.env['panexlogi.ar.bill.doc'].create(doc_data)
 
         return new_record
+
+    # Create PaymentApplication
+    def create_payment_application(self):
+        # Create PaymentApplication
+
+        for record in self:
+            # check if state is confirm
+            if record.state != 'confirm':
+                raise UserError(_("You can only create Payment Application for a A/R Bill in Confirm state."))
+            # check if amount is negative
+            if record.amount_with_vat >= 0:
+                raise UserError("Payment applications can only be created for negative A/R Bill.")
+            # check if inv_no is empty
+            if not record.inv_no:
+                raise UserError(_("Please input Invoice No."))
+            # check if inv_date is empty
+            if not record.inv_date:
+                raise UserError(_("Please input Invoice Date."))
+            # check if inv_duedate is empty
+            if not record.inv_duedate:
+                raise UserError(_("Please input Invoice Due Date."))
+            # check if billno is duplicate
+            domain1 = [
+                ('source', '=', 'A/R Bill')
+                , ('source_Code', '=', record.billno)
+                , ('state', '!=', 'cancel')
+            ]
+            existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain1)
+            if existing_records:
+                existing_billnos = ", ".join(existing_records.mapped('billno'))
+                raise UserError(_
+                                ("Payment Application [%(billno)s] already exists for this A/R Bill '%(suorce)s'") %
+                                {
+                                    'billno': existing_billnos, 'suorce': record.billno
+                                })
+            # check if invoiceno is duplicate
+            domain2 = [
+                ('source', '=', 'A/R Bill')
+                , ('invoiceno', '=', record.inv_no)
+                , ('state', '!=', 'cancel')]
+            existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain2)
+            if existing_records:
+                existing_billnos = ", ".join(existing_records.mapped('billno'))
+                raise UserError(_(
+                    "Invoice No '%(invno)s' is already used in Payment Application(s) [%(billnos)s] '."
+                ) % {
+                        'invno': record.invno,
+                        'billnos': existing_billnos,
+                    })
+            # Check if payee is selected
+            if not record.customer.id:
+                raise UserError(_("Please select a Payee."))
+            # Create PaymentApplication
+            payment_application = self.env['panexlogi.finance.paymentapplication'].create({
+                'type': 'other',
+                'date': fields.Date.today(),
+                'source': 'A/R Bill',
+                'payee': record.customer.id,
+                'source_Code': record.billno,
+                'invoiceno': record.inv_no,
+                'invoice_date': record.inv_date,
+                'due_date': record.inv_duedate,
+                'pay_pdffile': record.inv_file,
+                'pay_pdffilename': record.inv_file_name,
+                'remark': record.remark,
+            })
+            for records in record.bill_line_ids:
+                # Create PaymentApplicationLine
+                if records.amount != 0:
+                    self.env['panexlogi.finance.paymentapplicationline'].create({
+                        'fitem': records.fitem.id,
+                        'payapp_billno': payment_application.id,
+                        'amount': abs(records.amount),
+                        'remark': records.remark,
+                        'project': record.project.id,
+                    })
+            # record.state = 'apply'
+            record.payment_application_id = payment_application.id
+            # Send Odoo message
+            subject = 'Payment Application Created'
+            # Get base URL
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            # Construct URL to transport order
+            transport_order_url = "{}/web#id={}&model=panexlogi.finance.paymentapplication&view_type=form".format(
+                base_url,
+                payment_application.id)
+            # content = 'Transport order: <a href="{}">{}</a> created successfully!'.format(transport_order_url,
+            #                                                                              payment_application.billno)
+            # HTML content with button styling
+            content = f'''
+                        <p>Hello,</p>
+                        <p>A new Payment application has been created:</p>                                
+                        <p>Click the button above to access the details.</p>
+                        '''
+            # Get users in the Finance group
+            group = self.env['res.groups'].search([('name', '=', 'Finance')], limit=1)
+            users = self.env['res.users'].search([('groups_id', '=', group.id)])
+            # Get partner IDs from users
+            partner_ids = users.mapped("partner_id").ids
+            # Add Transport group users as followers
+            payment_application.message_subscribe(partner_ids=partner_ids)
+            # Send message
+            payment_application.message_post(
+                body=content,
+                subject=subject,
+                message_type='notification',
+                subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
+                body_is_html=True,  # Render HTML in email
+            )
+            # force_send=True,
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Success',
+                'message': 'Import Payment Application create successfully!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     # compute receive amount from ar_invoice
     @api.depends('ar_invoice_id.receive_amount', 'ar_invoice_id.invoice_amount', )
@@ -221,6 +380,7 @@ class ARBill(models.Model):
                 if self.credit_note_ar_bill_id:
                     raise UserError("This bill has a credit note, cannot be canceled.")
 
+
                 record.state = 'cancel'
             else:
                 raise UserError("Only new bills can be canceled.")
@@ -242,6 +402,8 @@ class ARBill(models.Model):
                     [('ab_bill_id', '=', self.id), ('ar_invoice_id.state', '!=', 'cancel')])
                 if ar_invoice_line:
                     raise UserError("This bill has been invoiced, cannot be unconfirmed.")
+                if record.payment_application_id:
+                    raise UserError("This bill has a payment application, cannot be unconfirmed.")
 
                 record.state = 'new'
             else:
@@ -347,6 +509,7 @@ class ARBill(models.Model):
         new_bill = self.copy({
             'billno': self.env['ir.sequence'].next_by_code('seq.ar.bill'),
             'state': 'new',
+            'status': 'billed',
             'ar_invoice_id': False,
             'original_ar_bill_id': False,
             'credit_note_ar_bill_id': False,
@@ -375,19 +538,33 @@ class ARBillLine(models.Model):
 
     fitem = fields.Many2one('panexlogi.fitems', string='Item(费用项目)', tracking=True)
     fitem_name = fields.Char(string='Item Name(费用项目名称)', related='fitem.name', readonly=True)
-    amount = fields.Float(string="Amount")
-    vat = fields.Float(string="VAT")
-    amount_with_vat = fields.Float(string="Amount(with VAT)", compute="_compute_amount_with_vat", store=True)
-    remark = fields.Text(string="Remark")
     ar_bill_id = fields.Many2one('panexlogi.ar.bill', string='AR Bill', ondelete='cascade')
+    currency_id = fields.Many2one('res.currency', string='Currency（币种）', required=True, tracking=True,
+                                  related='ar_bill_id.currency_id')
+    # amount = fields.Float(string="Amount")
+    # vat = fields.Float(string="VAT")
+    # amount_with_vat = fields.Float(string="Amount(with VAT)", compute="_compute_amount_with_vat", store=True)
+    amount = fields.Monetary(string="Amount", currency_field='currency_id')
+    vat = fields.Monetary(string="VAT", currency_field='currency_id')
+    amount_with_vat = fields.Monetary(string="Amount(with VAT)",
+                                      compute="_compute_amount_with_vat",
+                                      store=True,
+                                      currency_field='currency_id')
+    remark = fields.Text(string="Remark")
 
-    invoice_amount = fields.Float(string="Invoice Amount")
-    invoice_vat = fields.Float(string="Invoice VAT")
-    invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)")
+    # invoice_amount = fields.Float(string="Invoice Amount")
+    # invoice_vat = fields.Float(string="Invoice VAT")
+    # invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)")
+    invoice_amount = fields.Monetary(string="Invoice Amount", currency_field='currency_id')
+    invoice_vat = fields.Monetary(string="Invoice VAT", currency_field='currency_id')
+    invoice_amount_with_vat = fields.Monetary(string="Invoice Amount(with VAT)", currency_field='currency_id')
 
-    receive_amount = fields.Float(string="Receive Amount")
-    receive_vat = fields.Float(string="Receive VAT")
-    receive_amount_with_vat = fields.Float(string="Receive Amount(with VAT)")
+    # receive_amount = fields.Float(string="Receive Amount")
+    # receive_vat = fields.Float(string="Receive VAT")
+    # receive_amount_with_vat = fields.Float(string="Receive Amount(with VAT)")
+    receive_amount = fields.Monetary(string="Receive Amount", currency_field='currency_id')
+    receive_vat = fields.Monetary(string="Receive VAT", currency_field='currency_id')
+    receive_amount_with_vat = fields.Monetary(string="Receive Amount(with VAT)", currency_field='currency_id')
 
     ar_invoice_line_id = fields.Many2one('panexlogi.ar.invoice.line', string='AR Invoice Line')
 

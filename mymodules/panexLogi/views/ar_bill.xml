@@ -66,6 +66,10 @@
                                     type="object"
                                     string="Credit Note"
                                     class="oe_stat_button" icon="fa-clone"/>
+                            <button name="create_payment_application"
+                                    type="object"
+                                    string="Create Payment App"
+                                    class="oe_stat_button" icon="fa-exchange"/>
                         </div>
                         <group col="2">
                             <group col="2" string="Information">
@@ -88,15 +92,27 @@
                             </group>
                         </group>
                         <group col="2">
-                            <group col="2" string="Invoice">
+                            <group col="2" string="A/R Invoice">
                                 <field name="ar_invoice_id"/>
                                 <field name="invoice_amount" readonly="1"/>
                                 <field name="invoice_vat" readonly="1"/>
                                 <field name="invoice_amount_with_vat" readonly="1"/>
                             </group>
-                            <group col="2" string="Receive">
+                            <group col="2" string="A/R Receive">
                                 <field name="receive_amount" readonly="1"/>
                                 <field name="status" readonly="1"/>
+                            </group>
+                        </group>
+                        <group col="2" invisible="amount>=0">
+                            <group col="2" string="Invoice">
+                                <field name="inv_no" readonly="amount>0"/>
+                                <field name="inv_date" readonly="amount>0"/>
+                                <field name="inv_duedate" readonly="amount>0"/>
+                            </group>
+                            <group col="2" string="Payment Application">
+                                <field name="inv_file" filename="inv_file_name" readonly="amount>0"/>
+                                <field name="inv_file_name" readonly="amount>0"/>
+                                <field name="payment_application_id" readonly="1"/>
                             </group>
                         </group>
                         <notebook>

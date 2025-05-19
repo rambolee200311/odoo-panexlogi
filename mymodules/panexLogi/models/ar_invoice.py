@@ -19,7 +19,7 @@ class ARInvoice(models.Model):
     ar_company = fields.Many2one('res.partner', string='Payee（收款方）',
                                  domain="[('is_company', '=', True),('category_id.name', 'ilike', 'company')]")
     ar_company_account = fields.Many2one('res.partner.bank', string='Payee Account',
-                                            domain="[('partner_id', '=', ar_company)]")
+                                         domain="[('partner_id', '=', ar_company)]")
 
     fiscal_year = fields.Many2one("fiscal.year", string="Fiscal Year")
     fiscal_month = fields.Many2one("fiscal.month", string="Fiscal Month")
@@ -30,20 +30,51 @@ class ARInvoice(models.Model):
                                domain="[('is_company', '=', True)]")
     remark = fields.Text(string="Remark")
 
-    currency_id = fields.Many2one('res.currency', string='Currency（币种）', required=True, tracking=True,
+    currency_id = fields.Many2one('res.currency',
+                                  string='Currency（币种）',
+                                  required=True,
+                                  tracking=True,
                                   default=lambda self: self.env.ref('base.EUR'))
-    invoice_amount = fields.Float(string="Invoice Amount", compute="_compute_amount", store=True)
-    invoice_vat = fields.Float(string="Invoice VAT", compute="_compute_vat", store=True)
-    invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)", compute="_compute_amount_with_vat",
-                                           store=True)
+    # invoice_amount = fields.Float(string="Invoice Amount", compute="_compute_amount", store=True)
+    # invoice_vat = fields.Float(string="Invoice VAT", compute="_compute_vat", store=True)
+    # invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)", compute="_compute_amount_with_vat",
+    #                                        store=True)
+
+    # Updated to Monetary fields
+    invoice_amount = fields.Monetary(
+        string="Invoice Amount",
+        compute="_compute_amount",
+        store=True,
+        currency_field='currency_id'  # Link to existing currency_id
+    )
+    invoice_vat = fields.Monetary(
+        string="Invoice VAT",
+        compute="_compute_vat",
+        store=True,
+        currency_field='currency_id'
+    )
+    be_vat = fields.Boolean(string="VAT(21%)", compute="_compute_vat_rate")
+    vat_rate = fields.Float(string="VAT Rate(%)", default=0, compute="_compute_vat_rate", )
+    invoice_amount_with_vat = fields.Monetary(
+        string="Invoice Amount(with VAT)",
+        compute="_compute_amount_with_vat",
+        store=True,
+        currency_field='currency_id'
+    )
+
     state = fields.Selection([('new', 'New'),
                               ('confirm', 'Confirm'),
                               ('cancel', 'Cancel'), ],
                              default='new', tracking=True)
 
-    receive_amount = fields.Float(string="Receive Amount")
-    invoice_amount_balance = fields.Float(string="Invoice Amount Balance", compute="_compute_invoice_amount_balance",
-                                          store=True)
+    # receive_amount = fields.Float(string="Receive Amount")
+    receive_amount = fields.Monetary(string="Receive Amount",
+                                     currency_field='currency_id')
+    # invoice_amount_balance = fields.Float(string="Invoice Amount Balance", compute="_compute_invoice_amount_balance",store=True)
+    invoice_amount_balance = fields.Monetary(string="Invoice Amount Balance",
+                                             compute="_compute_invoice_amount_balance",
+                                             currency_field='currency_id',
+                                             store=True)
 
     invoice_pdf = fields.Binary(string="Invoice PDF")
     invoice_pdf_name = fields.Char(string="Invoice PDF Name")
@@ -268,24 +299,70 @@ class ARInvoice(models.Model):
             _logger.error(error_msg)
             raise UserError(_(f"{error_msg}\nCheck server logs (ID:{self.id})")) from e
 
+    @api.depends('invoice_line_ids.be_vat', 'invoice_line_ids.vat_rate')
+    def _compute_vat_rate(self):
+        for record in self:
+            be_vat = False
+            for line in record.invoice_line_ids:
+                if line.be_vat:
+                    be_vat = True
+                    break
+                if line.vat_rate != 0:
+                    be_vat = True
+                    break
+            if be_vat:
+                record.be_vat = True
+                record.vat_rate = 21
+            else:
+                record.be_vat = False
+                record.vat_rate = 0
+
 
 class ARInvoiceLine(models.Model):
     _name = 'panexlogi.ar.invoice.line'
     _description = 'panexlogi.ar.invoice.line'
 
+    ar_invoice_id = fields.Many2one('panexlogi.ar.invoice', string='AR Bill', ondelete='cascade')
     fitem = fields.Many2one('panexlogi.fitems', string='Item(费用项目)', tracking=True)
     fitem_name = fields.Char(string='Item Name(费用项目名称)', related='fitem.name', readonly=True)
 
     remark = fields.Text(string="Remark")
 
-    invoice_amount = fields.Float(string="Invoice Amount")
-    invoice_vat = fields.Float(string="Invoice VAT")
-    invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)", compute="_compute_amount_with_vat",
-                                           store=True)
+    # invoice_amount = fields.Float(string="Invoice Amount")
+    # invoice_vat = fields.Float(string="Invoice VAT")
+    # invoice_amount_with_vat = fields.Float(string="Invoice Amount(with VAT)", compute="_compute_amount_with_vat",
+    #                                        store=True)
+    # Add related currency_id from the parent invoice
+    currency_id = fields.Many2one(
+        'res.currency',
+        related='ar_invoice_id.currency_id',
+        string='Currency',
+        store=True,
+        readonly=True
+    )
 
-    receive_amount = fields.Float(string="Receive Amount")
+    # Updated to Monetary fields
+    invoice_amount = fields.Monetary(
+        string="Invoice Amount",
+        currency_field='currency_id'
+    )
+    be_vat = fields.Boolean(string="VAT(21%)")
+    vat_rate = fields.Float(string="VAT Rate(%)", default=0, compute="_compute_vat", )
+    invoice_vat = fields.Monetary(
+        string="Invoice VAT",
+        currency_field='currency_id',
+        compute="_compute_vat",
+    )
+    invoice_amount_with_vat = fields.Monetary(
+        string="Invoice Amount(with VAT)",
+        compute="_compute_amount_with_vat",
+        store=True,
+        currency_field='currency_id'
+    )
 
-    ar_invoice_id = fields.Many2one('panexlogi.ar.invoice', string='AR Bill', ondelete='cascade')
+    # receive_amount = fields.Float(string="Receive Amount")
+    receive_amount = fields.Monetary(string="Receive Amount", currency_field='currency_id')
+
     ab_bill_id = fields.Many2one('panexlogi.ar.bill', string='AR Bill')
     ar_bill_line_id = fields.Many2one('panexlogi.ar.bill.line', string='AR Bill Line')
 
@@ -295,6 +372,17 @@ class ARInvoiceLine(models.Model):
             record.invoice_amount_with_vat = 0
             record.invoice_amount_with_vat = record.invoice_amount + record.invoice_vat
 
+    @api.depends('invoice_amount', 'be_vat')
+    def _compute_vat(self):
+        for record in self:
+            record.invoice_vat = 0
+            record.vat_rate = 0
+            if record.be_vat:
+                record.invoice_vat = record.invoice_amount * 0.21
+                record.vat_rate = 21
+            else:
+                record.invoice_vat = 0
+
 
 class ARInvoiceReceiveDetails(models.Model):
     _name = 'panexlogi.ar.invoice.receive.details'
@@ -303,6 +391,13 @@ class ARInvoiceReceiveDetails(models.Model):
     invoice_id = fields.Many2one('panexlogi.ar.invoice', string='AR Invoice')
     ar_receive_id = fields.Many2one('panexlogi.ar.receive', string='AR Receive')
 
-    receive_amount = fields.Float(string="Receive Amount")
+    currency_id = fields.Many2one(
+        'res.currency',
+        string='Currency',
+        readonly=True
+    )
+
+    # receive_amount = fields.Float(string="Receive Amount")
+    receive_amount = fields.Monetary(string="Receive Amount", currency_field='currency_id')
     receive_date = fields.Date(string="Receive Date")
     remark = fields.Text(string="Remark")

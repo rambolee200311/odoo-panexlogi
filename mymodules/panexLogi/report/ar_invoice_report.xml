@@ -1,258 +1,311 @@
 <odoo>
     <template id="report_ar_invoice_template_view">
         <t t-call="web.html_container">
-            <t t-call="panexLogi.report_layout_no_header_footer">
-                <style>
-                    /* Consolidated CSS classes */
-                    .bordered-cell {
-                        border: 1px solid black !important;
-                        padding: 8px !important;
-                        vertical-align: middle !important;
-                    }
-                    .non-bordered-cell {
-                        border: none !important;
-                        padding: 8px !important;
-                        vertical-align: middle !important;
-                    }
-
-                    .label-cell {
-                        width: 10%;
-                        background-color: #f8f9fa;  /* Subtle background for labels */
-                    }
-
-                    .info-cell {
-                        width: 40%;
-                        font-weight: bold;  /* Emphasize important data */
-                    }
-                    /* 荷兰格式优化版 */
-                    .total-amount::before {
-                        content: "€\00a0";       /* 符号与金额间隔符 */
-                        font-family: Arial, sans-serif;
-                        vertical-align: -0.1em;  /* 符号垂直对齐修正 */
-                        margin-right: 2px;       /* 增加右侧间距 */
-                    }
-                    .total-amount {
-                        font-size: 1.2em;
-                        color: #2c3e50;
-                        font-family: "Courier New", monospace;  /* 更清晰的等宽字体 */
-                        letter-spacing: 0.7px;   /* 加强长数字可读性 */
-                        direction: ltr;          /* 强制左到右文本方向 */
-                        unicode-bidi: embed;     /* 防止符号位置异常 */
-                    }
-                    /* 金额数字对齐优化 */
-                    .total-amount > span {
-                        display: inline-block;
-                        min-width: 8em;         /* 保证最小列宽 */
-                        text-align: right;      /* 数字右对齐 */
-                    }
-                    .table-bordered {
-                        border: 1px solid black !important;
-                        border-collapse: collapse !important;
-                    }
-                    .table-bordered td,
-                    .table-bordered th {
-                        border: 1px solid black !important;
-                        padding: 8px !important;
-                    }
-                    .table-non-bordered {
-                        border: none !important;
-                        border-collapse: collapse !important;
-                    }
-                    .table-non-bordered tr,
-                    .table-non-bordered td,
-                    .table-non-bordered th {
-                        border: none !important;
-                        padding: 2px !important;
-                    }
-
-                    .align-center { text-align: center; vertical-align: middle; }
-                    .align-left { text-align: left; vertical-align: middle; }
-                    .align-right { text-align: right; vertical-align: middle; }
-                </style>
-
-                <t t-name="panexLogi.report_ar_invoice_template_view">
-                    <t t-set="format_date" t-value="request.env['ir.qweb.field.date'].value_to_html"/>
-                    <t t-foreach="docs" t-as="o">
-                        <div class="page">
-                            <!-- Company Info Section -->
-                            <table style="width: 100%; margin-bottom: 20px;">
+        <t t-call="panexLogi.report_layout_no_header_footer">
+            <style>
+                @charset "UTF-8";
+                @page {
+                    size: A4 portrait;
+                    margin-top: 0cm;
+                    margin-bottom: 2cm;
+                    margin-left: 1.5cm;
+                    margin-right: 1.5cm;
+                }
+                .header {
+                    position: relative;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 1cm;
+                    background-color: #f8f9fa;
+                    text-align: center;
+                    line-height: 1.5cm;
+                    font-size: 0.8em; /* Reduced font size */
+                    font-weight: bold;
+                }
+                footer {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 2cm;
+                    background-color: #f8f9fa;
+                    text-align: center;
+                    line-height: 1.2;
+                    font-size: 0.8em; /* Reduced font size */
+                    font-weight: normal;
+                    border-top: 1px solid #ddd;
+                    padding: 5px 0;
+                }
+                body {
+                    font-size: 0.8em !important; /* Reduced global font size */
+                }
+                table {
+                    width: 100%;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+                td, th {
+                    padding: 0px !important; /* Reduced padding */
+                    line-height: 1.0 !important; /* Reduced row height */
+                }
+                .table-bordered td,
+                .table-bordered th {
+                    border: 1px solid black !important;
+                    padding: 0px !important; /* Reduced padding */
+                }
+                .align-center { text-align: center; vertical-align: middle; }
+                .align-left { text-align: left; vertical-align: middle; }
+                .align-right { text-align: right; vertical-align: middle; }
+            </style>
+            <t t-name="panexLogi.report_ar_invoice_template_view">
+                <t t-set="format_date" t-value="request.env['ir.qweb.field.date'].value_to_html"/>
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <div>
+                            <!-- Add this in your report template (e.g. report_invoice.xml) -->
+                            <table style="width: 100%; margin-bottom: 2px;" class="table-non-bordered">
+                                <tr>
+                                    <!-- Left Grid: Partner Logo -->
+                                    <td style="width: 50%; vertical-align: top; padding: 10px;">
+                                        <t t-if="o.ar_company.image_1920">
+                                            <img t-att-src="image_data_uri(o.ar_company.image_1920)"
+                                                 style="max-height: 80px; max-width: 200px;"/>
+                                        </t>
+                                    </td>
+                                    <td style="width: 50%;"></td>
+                                </tr>
+                                <tr>
+                                    <!-- Right Grid: Invoice Title -->
+                                    <td style="width: 50%;"></td>
+                                    <td style="width: 50%; text-align: center; padding: 10px;">
+                                        <h2 style="font-size: 48px; color: #2C3E50; margin: 0; font-family: Arial;">
+                                            INVOICE
+                                        </h2>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Company Info Section -->
+                        <table style="width: 100%; margin-bottom: 2px 0;">
+                            <tr>
+                                <td class="non-bordered-cell info-cell">
+                                    <div style="margin-bottom: 12px; font-size: 0.8em;">
+                                        <span t-field="o.ar_company.name"/>
+                                    </div>
+                                    <div style="line-height: 1.5;font-size: 0.8em;">
+                                        [Address]<span t-esc="o.ar_company.street or 'N/A'"/>
+                                    </div>
+                                    <div style="line-height: 1.5;font-size: 0.8em;">
+                                        [City.Country]<span t-esc="o.ar_company.city or 'N/A'"/>,<span t-esc="o.ar_company.country_id.name or 'N/A'"/>
+                                    </div>
+                                    <div style="line-height: 1.5;font-size: 0.8em;">
+                                        [Phone]<span t-esc="o.ar_company.phone or 'N/A'"/>
+                                    </div>
+                                    <div style="line-height: 1.5;font-size: 0.8em;">
+                                        [Kvk]<span t-esc="o.ar_company.x_kvknr or 'N/A'"/>
+                                    </div>
+                                    <div style="line-height: 1.5;font-size: 0.8em;">
+                                        [VAT]<span t-esc="o.ar_company.vat or 'N/A'"/>
+                                    </div>
+                                    <div style="line-height: 1.5;font-size: 0.8em;">
+                                        [IBAN]<span t-esc="o.ar_company_account.acc_number or 'N/A'"/>
+                                    </div>
+                                    <div style="line-height: 1.5;font-size: 0.8em;">
+                                        [BIC]<span t-esc="o.ar_company_account.bank_bic or 'N/A'"/>
+                                    </div>
+                                </td>
+                                <td style="width: 50%; text-align: center; vertical-align: middle;">
+                                    <!--<h2 style="margin: 0 0 15px 0; color: #34495e;">INVOICE</h2>-->
+                                    <table style="width: 100%;margin: 0; border-collapse: collapse;" class="table-bordered">
+                                        <tr>
+                                            <td class="bordered-cell label-cell">[Date]</td>
+                                            <td class="bordered-cell info-cell">
+                                                <span t-field="o.invoice_date" t-options="{&quot;format&quot;: &quot;dd/MM/yyyy&quot;}"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="bordered-cell label-cell">[Invoice #]</td>
+                                            <td class="bordered-cell info-cell">
+                                                <span t-field="o.invoice_number"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Customer Info Section -->
+                        <table style="width: 100%; margin-top: 2px 0;" class="table-non-bordered">
+                            <thead>
+                                <tr style="background-color: #ecf0f1;">
+                                    <th class="align-center" style="width: 50%">BILL TO</th>
+                                    <th class="align-center" style="width: 50%">SHIP TO</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 <tr>
                                     <td class="non-bordered-cell info-cell">
-                                        <div style="margin-bottom: 12px; font-size: 1.4em;">
-                                            <span t-field="o.ar_company.name"/>
+                                        <div style="line-height: 1.5;font-size: 0.8em;">
+                                            <span t-field="o.customer.name"/>
                                         </div>
-                                        <div style="line-height: 1.5;">
-                                            [Address]<span t-esc="o.ar_company.street or 'N/A'"/>
+                                        <div style="line-height: 1.5;font-size: 0.8em;">
+                                            [Address]<span t-esc="o.customer.street or 'N/A'"/>
                                         </div>
-                                        <div style="line-height: 1.5;">
-                                            [City.Country]<span t-esc="o.ar_company.city or 'N/A'"/>,<span t-esc="o.ar_company.country_id.name or 'N/A'"/>
+                                        <div style="line-height: 1.5;font-size: 0.8em;">
+                                            [City.Country]<span t-esc="o.customer.city or 'N/A'"/>,<span t-esc="o.customer.country_id.name or 'N/A'"/>
                                         </div>
-                                        <div style="line-height: 1.5;">
-                                            [Phone]<span t-esc="o.ar_company.phone or 'N/A'"/>
+                                        <div style="line-height: 1.5;font-size: 0.8em;">
+                                            [Phone]<span t-esc="o.customer.phone or 'N/A'"/>
                                         </div>
-                                        <div style="line-height: 1.5;">
-                                            [Kvk]<span t-esc="o.ar_company.x_kvknr or 'N/A'"/>
+                                        <div style="line-height: 1.5;font-size: 0.8em;">
+                                            [Kvk]<span t-esc="o.customer.x_kvknr or 'N/A'"/>
                                         </div>
-                                        <div style="line-height: 1.5;">
-                                            [VAT]<span t-esc="o.ar_company.vat or 'N/A'"/>
+                                        <div style="line-height: 1.5;font-size: 0.8em;">
+                                            [VAT]<span t-esc="o.customer.vat or 'N/A'"/>
                                         </div>
-                                        <div style="line-height: 1.5;">
-                                            [IBAN]<span t-esc="o.ar_company_account.acc_number or 'N/A'"/>
-                                        </div>
-                                        <div style="line-height: 1.5;">
-                                            [BIC]<span t-esc="o.ar_company_account.bank_bic or 'N/A'"/>
-                                        </div>
-                                    </td>
-                                    <td style="width: 50%; text-align: center; vertical-align: middle;">
-                                        <h2 style="margin: 0 0 15px 0; color: #34495e;">INVOICE</h2>
-                                        <table style="width: 100%;">
-                                            <tr>
-                                                <td class="bordered-cell label-cell">[Date]</td>
-                                                <td class="bordered-cell info-cell">
-                                                    <span t-field="o.invoice_date" t-options='{"format": "dd/MM/yyyy"}'/>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="bordered-cell label-cell">[Invoice #]</td>
-                                                <td class="bordered-cell info-cell">
-                                                    <span t-field="o.invoice_number"/>
-                                                </td>
-                                            </tr>
-                                        </table>
                                     </td>
                                 </tr>
-                            </table>
-                            <!-- Customer Info Section -->
-                            <table style="width: 100%; margin-top: 20px;">
-                                <thead>
-                                    <tr style="background-color: #ecf0f1;">
-                                        <th class="align-center" style="width: 50%">BILL TO</th>
-                                        <th class="align-center" style="width: 50%">SHIP TO</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="non-bordered-cell info-cell">
-                                            <div style="line-height: 1.5;">
-                                                <span t-field="o.customer.name"/>
-                                            </div>
-                                            <div style="line-height: 1.5;">
-                                                [Address]<span t-esc="o.customer.street or 'N/A'"/>
-                                            </div>
-                                            <div style="line-height: 1.5;">
-                                                [City.Country]<span t-esc="o.customer.city or 'N/A'"/>,<span t-esc="o.customer.country_id.name or 'N/A'"/>
-                                            </div>
-                                            <div style="line-height: 1.5;">
-                                                [Phone]<span t-esc="o.customer.phone or 'N/A'"/>
-                                            </div>
-                                            <div style="line-height: 1.5;">
-                                                [Kvk]<span t-esc="o.customer.x_kvknr or 'N/A'"/>
-                                            </div>
-                                            <div style="line-height: 1.5;">
-                                                [VAT]<span t-esc="o.customer.vat or 'N/A'"/>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            </tbody>
+                        </table>
 
-                            <!-- Line Items Table -->
-                            <table class="table table-bordered" style="width: 100%; margin-top: 20px;">
-                                <thead>
-                                    <tr style="background-color: #ecf0f1;">
-                                        <th class="align-center">NO</th>
-                                        <th class="align-center">SERVICE</th>
-                                        <th class="align-center">DESCRIPTION</th>
-                                        <th class="align-center">TOTAL</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-if="o.invoice_line_ids">
-                                        <t t-foreach="o.invoice_line_ids" t-as="line" t-enumerate="line_index">
-                                            <tr>
-                                                <td class="align-center"><span t-esc="line_index + 1"/></td>
-                                                <td class="align-left"><span t-esc="line.fitem_name"/></td>
-                                                <td class="align-left"><span t-esc="line.remark"/></td>
-                                                <td class="align-right">
-                                                    <div class="total-amount" lang="nl-NL">
-                                                        <span t-esc="line.invoice_amount"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </t>
-                                    </t>
-                                    <t t-if="not o.invoice_line_ids">
+                        <!-- Line Items Table -->
+                        <table class="table table-bordered" style="width: 100%; margin: 0; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: #ecf0f1;">
+                                    <th class="align-center">
+                                        <div style="line-height: 1.5; font-size: 0.8em;">NO</div>
+                                    </th>
+                                    <th class="align-center">
+                                        <div style="line-height: 1.5; font-size: 0.8em;">SERVICE</div>
+                                    </th>
+                                    <th class="align-center">
+                                        <div style="line-height: 1.5; font-size: 0.8em;">DESCRIPTION</div>
+                                    </th>
+                                    <th class="align-center">
+                                        <div style="line-height: 1.5; font-size: 0.8em;">TOTAL</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-size: 1em;">
+                                <t t-if="o.invoice_line_ids">
+                                    <t t-foreach="o.invoice_line_ids" t-as="line" t-enumerate="line_index">
                                         <tr>
-                                            <td colspan="4" class="align-center">No line items found</td>
+                                            <td class="align-center"><span t-esc="line_index + 1"/></td>
+                                            <td class="align-left"><span t-esc="line.fitem_name"/></td>
+                                            <td class="align-left"><span t-esc="line.remark"/></td>
+                                            <td class="align-right">
+                                                <div t-if="o.currency_id.name == 'EUR'">
+                                                    <span t-esc="'{:,.2f}'.format(line.invoice_amount).replace('.', ',')"/>
+                                                </div>
+                                                <div t-else="">
+                                                    <span t-esc="'{:,.2f}'.format(line.invoice_amount)"/>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </t>
-                                </tbody>
-                            </table>
-                            <!-- Total Amount Section -->
-                            <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif;">
-                                <!-- First Row: Payment Method + Price Components -->
-                                <tr>
-                                    <td style="border: 1px solid black; padding: 8px; width: 50%; vertical-align: top;">
-                                        <strong>Pay by:</strong> bank transfer
-                                    </td>
-                                    <td style="border: 1px solid black; padding: 8px; width: 50%;">
-                                        <table style="width: 100%;">
-                                            <tr>
-                                                <td>SUBTOTAL</td>
-                                                <td style="text-align: right;">
-                                                    <div class="total-amount" lang="nl-NL">
-                                                    <span t-esc="o.invoice_amount"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>SHIPPING</td>
-                                                <td style="text-align: right;">0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>VAT</td>
-                                                <td style="text-align: right;">0</td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
+                                </t>
+                                <t t-if="not o.invoice_line_ids">
+                                    <tr>
+                                        <td colspan="4" class="align-center">No line items found</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
 
-                                <!-- Second Row: Remarks + Total Components -->
-                                <tr>
-                                    <td style="border: 1px solid black; padding: 8px; vertical-align: top;">
-                                        <strong>Remark:</strong><span t-esc="o.remark or 'N/A'"/>
-                                    </td>
-                                    <td style="border: 1px solid black; padding: 8px;">
-                                        <table style="width: 100%;">
-                                            <tr>
-                                                <td>VAT Charged</td>
-                                                <td style="text-align: right;">
-                                                    <div class="total-amount" lang="nl-NL">
-                                                        <span t-esc="o.invoice_vat"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr style="background-color: #f0f0f0;">
-                                                <td><strong>TOTAL</strong></td>
-                                                <td style="text-align: right;">
-                                                    <div class="total-amount" lang="nl-NL">
-                                                        <span t-esc="o.invoice_amount_with_vat"/>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Currency</td>
-                                                <td style="text-align: right;"><span t-esc="o.currency_id.name"/></td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
+                        <!-- Total Amount Section -->
+                        <table style="width: 100%; margin-top: 2px 0; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 1em;">
+                            <!-- First Row: Payment Method + Price Components -->
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px; width: 70%; vertical-align: top;border-bottom:none;">
+                                    <strong>Pay by:</strong> bank transfer
+                                </td>
+                                <td style="border: 1px solid black; padding: 8px; width: 70%;border-bottom:none;">
+                                    <table style="width: 100%; font-size: 1em;">
+                                        <tr>
+                                            <td>SUBTOTAL</td>
+                                            <td style="text-align: right;">
+                                                <div t-if="o.currency_id.name == 'EUR'">
+                                                    <span t-esc="'{:,.2f}'.format(o.invoice_amount).replace('.', ',')"/>
+                                                </div>
+                                                <div t-else="">
+                                                    <span t-esc="'{:,.2f}'.format(o.invoice_amount)"/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>SHIPPING</td>
+                                            <td style="text-align: right;">0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>VAT</td>
+                                            <td style="text-align: right;"><span t-esc="'{:,.0f}'.format(o.vat_rate)"/>%</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- Second Row: Remarks + Total Components -->
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px; vertical-align: top;border-top:none;">
+                                    <strong>Remark:</strong><span t-esc="o.remark or 'N/A'"/>
+                                </td>
+                                <td style="border: 1px solid black; padding: 8px;border-top:none;">
+                                    <table style="width: 100%; font-size: 1em;">
+                                        <tr>
+                                            <td>VAT Charged</td>
+                                            <td style="text-align: right;">
+                                                <div t-if="o.currency_id.name == 'EUR'">
+                                                    <span t-esc="'{:,.2f}'.format(o.invoice_vat).replace('.', ',')"/>
+                                                </div>
+                                                <div t-else="">
+                                                    <span t-esc="'{:,.2f}'.format(o.invoice_vat)"/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color: #f0f0f0;">
+                                            <td><strong>TOTAL</strong></td>
+                                            <td style="text-align: right;">
+                                                <div t-if="o.currency_id.name == 'EUR'">
+                                                    <span t-esc="'{:,.2f}'.format(o.invoice_amount_with_vat).replace('.', ',')"/>
+                                                </div>
+                                                <div t-else="">
+                                                    <span t-esc="'{:,.2f}'.format(o.invoice_amount_with_vat)"/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Currency</td>
+                                            <td style="text-align: right;"><span t-esc="o.currency_id.name"/></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- Invoice Instructions -->
+                            <tr>
+                                <td colspan="2" style="padding: 15px; border: 1px solid black; color: red; font-size: 0.8em;">
+                                    <p>1. Please add invoice number in your payment reference of the bank when you pay.</p>
+                                    <p>2. Please note we will not accept dispute over 7 working days since from invoice issue date.</p>
+                                    <p>3. All payment details / specifications must be sent to finance.nl@panexwd.com.</p>
+                                    <p>4. This invoice only can be paid in EUR</p>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Footer Section -->
+                        <div style="margin-top: 20px; text-align: center;">
+                            <!-- Payment Instructions -->
+                            <p style="margin: 0 auto; max-width: 80%; font-size: 0.8em;">
+                                Make all checks payable to [<span t-field="o.ar_company.name"/>]
+                            </p>
 
+                            <!-- Thank You Message -->
+                            <h2 style="margin: 10px 0 0 0; font-weight: bold; font-size: 1em; letter-spacing: 0.5px;">
+                                THANK YOU FOR YOUR BUSINESS!
+                            </h2>
                         </div>
-                    </t>
+                    </div>
+
                 </t>
             </t>
         </t>
+    </t>
     </template>
 </odoo>

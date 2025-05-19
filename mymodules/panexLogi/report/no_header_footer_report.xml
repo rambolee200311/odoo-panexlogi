@@ -14,7 +14,7 @@
         <style>
             @page {
                 size: A4;
-                margin: 20mm;
+                margin: 0mm 20mm 20mm 20mm; /* Reduced top margin to 10mm */
                 @bottom-right {
                     content: "Page " counter(page) " of " counter(pages);
                 }
