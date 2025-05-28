@@ -61,6 +61,7 @@
         <menuitem id="outlay_menu" name="Payments" parent="panex_logi_menu" sequence="300" />
         <menuitem id="import_payment_application_menu" name="Waybill Application" parent="outlay_menu" sequence="301" action="import_payapp_action"/>
         <menuitem id="cartage_payment_application_menu" name="Trucking Application" parent="outlay_menu" sequence="302" action="cartage_payapp_action"/>
+        <menuitem id="payment_application_line_menu" name="Payment Application Lines" parent="outlay_menu" sequence="303" action="payment_application_line_action"/>
         <menuitem id="finance_payment_menu" name="Payment" parent="outlay_menu" sequence="309" action="action_finance_payment" />
 
         <menuitem id="settle_menu" name="Settle" parent="panex_logi_menu" sequence="400" />
@@ -116,5 +117,8 @@
         <!--<menuitem id="report_demotodo_menu" name="DemoToDo Report" parent="report_menu" sequence="801" action="action_panexlogi_demotodo_report_all"/>-->
         <menuitem id="report_project_item_menu" name="Project Item Report" parent="report_menu" sequence="801" action="action_project_item_analysis_report"/>
 
+        <menuitem id="keji_menu" name="KEJI" parent="panex_logi_menu" sequence="820" />
+        <menuitem id="keji_in_realtime_menu" name="In Realtime" parent="keji_menu" sequence="821" action="action_keji_in_realtime"/>
+        <menuitem id="keji_in_realtime_wizard_menu" name="Excecute In Realtime" parent="keji_menu" sequence="822" action="action_keji_in_realtime_wizard"/>
     </data>
 </odoo>

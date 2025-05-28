@@ -108,6 +108,8 @@
         'views/delivery_cmr.xml',
         'views/delivery_order_new.xml',
         'views/project_item_report.xml',
+        'views/payment_application_line.xml',
+        'views/keji_in_realtime.xml',
         'views/menus.xml',
         #'views/tools_required.xml',
     ],
@@ -134,6 +136,7 @@
             #('scss', 'panexLogi/static/src/scss/tools_required.scss', None),
             #('scss', 'panexLogi/static/src/scss/address.scss', None),
             #'panexLogi/static/src/js/custom_pager.js'
+            #'panexLogi/static/src/js/update_record.js',
         ],
     },
 

@@ -43,6 +43,36 @@
                             Container Details
                         </h1>
                     </div>
+                    <!--<div class="oe_button_box" name="button_navigator_box" style="width: 300px !important">
+                        <button
+                            name="action_first"
+                            string="First"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-step-backward"/>
+
+                        <button
+                            name="action_previous"
+                            string="Previous"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-chevron-left"/>
+
+                        <button
+                            name="action_next"
+                            string="Next"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-chevron-right"/>
+
+                        <button
+                            name="action_last"
+                            string="Last"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-step-forward"/>
+                    </div>-->
+
                     <group>
                         <field name="waybill_billno" readonly="1"/>
                         <field name="cntrno"/>

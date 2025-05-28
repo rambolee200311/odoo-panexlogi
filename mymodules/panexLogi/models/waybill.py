@@ -166,7 +166,9 @@ class Waybill(models.Model):
             if not r.date:
                 r.week = 0
             else:
-                r.week = int(r.date.strftime("%W"))
+                #r.week = int(r.date.strftime("%W"))
+                iso_year, iso_week, iso_day = r.date.isocalendar()
+                r.week = iso_week
 
     def action_confirm_order(self):
         for rec in self:

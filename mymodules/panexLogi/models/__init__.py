@@ -69,3 +69,5 @@ from . import ar_receive
 from . import customer_temp
 from . import delivery_order_new
 from . import project_item_report
+from . import keji_token
+from . import keji_in_realtime

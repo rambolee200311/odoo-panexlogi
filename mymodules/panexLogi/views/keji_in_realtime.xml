@@ -1,0 +1,115 @@
+<odoo>
+    <!-- This XML file defines a wizard for executing Keji In Realtime jobs in Odoo. -->
+    <record id="view_keji_in_realtime_wizard" model="ir.ui.view">
+        <field name="name">keji.in.realtime.wizard.form</field>
+        <field name="model">keji.in.realtime.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Keji In Realtime">
+                <group>
+                    <field name="order_id" required="1"/>
+                    <field name="result"/>
+                    <field name="error_message"/>
+                    <field name="response_data"/>
+                </group>
+                <footer>
+                    <button string="Execute" type="object" name="execute_job" class="oe_highlight"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!-- Action to open the wizard -->
+    <record id="action_keji_in_realtime_wizard" model="ir.actions.act_window">
+        <field name="name">Execute In Realtime</field>
+        <field name="res_model">keji.in.realtime.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_keji_in_realtime_tree" model="ir.ui.view">
+        <field name="name">keji.in.realtime.tree</field>
+        <field name="model">keji.in.realtime</field>
+        <field name="arch" type="xml">
+            <tree string="Keji In Realtime">
+                <field name="order_id" optional="show"/>
+                <field name="owner_id" optional="show"/>
+                <field name="order_seqno" optional="show"/>
+                <field name="cop_g_no" optional="show"/>
+                <field name="g_name" optional="show"/>
+                <field name="qty" optional="show"/>
+                <field name="qty1" optional="show"/>
+                <field name="qty2" optional="show"/>
+                <field name="g_unit" optional="show"/>
+                <field name="wh_no" optional="show"/>
+                <field name="production_date" optional="show"/>
+                <field name="effective_date" optional="show"/>
+                <field name="batch_no" optional="show"/>
+                <field name="mid3" optional="show"/>
+                <field name="mid4" optional="show"/>
+                <field name="mid5" optional="show"/>
+                <field name="work_no" optional="show"/>
+                <field name="last_indate" optional="show"/>
+                <field name="response_status" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_keji_in_realtime_form" model="ir.ui.view">
+        <field name="name">keji.in.realtime.form</field>
+        <field name="model">keji.in.realtime</field>
+        <field name="arch" type="xml">
+            <form string="Keji In Realtime">
+                <sheet>
+                    <group>
+                        <field name="order_id"/>
+                        <field name="owner_id"/>
+                        <field name="order_seqno"/>
+                        <field name="cop_g_no"/>
+                        <field name="g_name"/>
+                        <field name="qty"/>
+                        <field name="qty1"/>
+                        <field name="qty2"/>
+                        <field name="g_unit"/>
+                        <field name="wh_no"/>
+                        <field name="production_date"/>
+                        <field name="effective_date"/>
+                        <field name="batch_no"/>
+                        <field name="mid3"/>
+                        <field name="mid4"/>
+                        <field name="mid5"/>
+                        <field name="work_no"/>
+                        <field name="last_indate"/>
+                        <field name="response_status"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_keji_in_realtime_search" model="ir.ui.view">
+        <field name="name">keji.in.realtime.search</field>
+        <field name="model">keji.in.realtime</field>
+        <field name="arch" type="xml">
+            <search string="Keji In Realtime">
+                <field name="order_id"/>
+                <field name="owner_id"/>
+                <field name="cop_g_no"/>
+                <field name="g_name"/>
+                <field name="response_status"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action to open the in realtime -->
+    <record id="action_keji_in_realtime" model="ir.actions.act_window">
+        <field name="name">In Realtime</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">keji.in.realtime</field>
+        <field name="view_mode">tree,form</field>
+        <!-- Remove or set target to 'current'
+        <field name="target">current</field>-->
+    </record>
+</odoo>

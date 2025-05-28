@@ -133,23 +133,31 @@ class WarehouseInvoice(models.Model):
                 'due_date': record.due_date,
             })
             # Unit price= OUD
+            project = False
             for records in self.warehouseinvoicedetailids:
+                if records.project:
+                    project = records.project.id
+                else:
+                    if record.project:
+                        project = record.project.id
                 self.env['panexlogi.finance.paymentapplicationline'].create({
                     'payapp_billno': payment_application.id,
                     'fitem': records.fitem.id,
                     'amount': records.amount,
                     'amount_usd': records.amount_usd,
                     'remark': records.cntrno,
-                    'project': records.project.id,
+                    'project': project,
                 })
-
-            self.env['panexlogi.finance.paymentapplicationline'].create({
-                'payapp_billno': payment_application.id,
-                'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'WAH')]).id,
-                'amount': record.vat,
-                'amount_usd': record.vat_usd,
-                'remark': 'VAT-' + str(record.tax_rate) + '%',
-            })
+            if record.vat or record.vat_usd:
+                if record.vat != 0 or record.vat_usd != 0:
+                    self.env['panexlogi.finance.paymentapplicationline'].create({
+                        'payapp_billno': payment_application.id,
+                        'fitem': self.env['panexlogi.fitems'].search([('code', '=', 'WAH')]).id,
+                        'amount': record.vat,
+                        'amount_usd': record.vat_usd,
+                        'remark': 'VAT-' + str(record.tax_rate) + '%',
+                        'project': project,
+                    })
             # 修改状态
             record.state = 'apply'
         return {
@@ -220,20 +228,20 @@ class WarehouseInvoice(models.Model):
                                 else:
                                     # create a new warehouse invoice detail
                                     self.env['panexlogi.warehouse.invoice.detail'].create({
-                                    'fitem': record.fitem.id,
-                                    'amount': amount,
-                                    'amount_usd': amount_usd,
-                                    'vat': vat,
-                                    'vat_usd': vat_usd,
-                                    'project': record.project.id,
-                                    'waybillno': record.waybillno,
-                                    'cntrno': waybill_detail.cntrno,
-                                    'cntrnum': 1,
-                                    'pallets': waybill_detail.pallets,
-                                    'pcs': waybill_detail.pcs,
-                                    'remark': record.remark,
-                                    'warehouseinvoiceid': rec.id,
-                                })
+                                        'fitem': record.fitem.id,
+                                        'amount': amount,
+                                        'amount_usd': amount_usd,
+                                        'vat': vat,
+                                        'vat_usd': vat_usd,
+                                        'project': record.project.id,
+                                        'waybillno': record.waybillno,
+                                        'cntrno': waybill_detail.cntrno,
+                                        'cntrnum': 1,
+                                        'pallets': waybill_detail.pallets,
+                                        'pcs': waybill_detail.pcs,
+                                        'remark': record.remark,
+                                        'warehouseinvoiceid': rec.id,
+                                    })
                                 # record.to_delete = True
                                 sequence += 1
             # Unlink all warehouseinvoicedetailids where to_delete is True
@@ -242,10 +250,6 @@ class WarehouseInvoice(models.Model):
             return True
         except Exception as e:
             raise UserError(_('An error occurred while splitting waybill: %s') % str(e))
-
-
-
-
 
 
 # 外包仓库发票明细
@@ -268,4 +272,4 @@ class WarehouseInvoiceDetail(models.Model):
     remark = fields.Text(string='Remark', tracking=True)
     warehouseinvoiceid = fields.Many2one('panexlogi.warehouse.invoice', string='Warehouse invoice')
     be_bonded = fields.Boolean(string='Be Bonded')
-    to_delete = fields.Boolean(string='To Delete',default=False)
+    to_delete = fields.Boolean(string='To Delete', default=False)

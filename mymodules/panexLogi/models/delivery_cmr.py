@@ -127,7 +127,8 @@ class DeliveryDetailCmrWizard(models.TransientModel):
         'panexlogi.delivery',
         string='Delivery',
         required=True,
-        default=lambda self: self.env.context.get('active_id')
+        default=lambda self: self.env.context.get('active_id'),
+        readonly=True,
     )
     detail_ids = fields.Many2many(
         'panexlogi.delivery.detail',
@@ -138,246 +139,249 @@ class DeliveryDetailCmrWizard(models.TransientModel):
     cmr_remark = fields.Text(string='CMR Remark')
 
     def action_create_cmr(self):
-        if not self.detail_ids:
-            raise UserError(_("Please select at least one delivery detail to create a CMR."))
-        try:
-            # generate CMR file and file_name
-            template_record = self.env['panexlogi.excel.template'].search([('type', '=', 'delivery')], limit=1)
-            if not template_record:
-                raise UserError(_('Template not found!'))
-            template_data = base64.b64decode(template_record.template_file)
-            template_buffer = BytesIO(template_data)
-            # Load the template workbook
-            workbook = openpyxl.load_workbook(template_buffer)
-            worksheet = workbook.active
+        for rec in self:
+            if not rec.detail_ids:
+                raise UserError(_("Please select at least one delivery detail to create a CMR."))
+            try:
+                # generate CMR file and file_name
+                template_record = self.env['panexlogi.excel.template'].search([('type', '=', 'delivery')], limit=1)
+                if not template_record:
+                    raise UserError(_('Template not found!'))
+                template_data = base64.b64decode(template_record.template_file)
+                template_buffer = BytesIO(template_data)
+                # Load the template workbook
+                workbook = openpyxl.load_workbook(template_buffer)
+                worksheet = workbook.active
 
-            # Write data to the specified cells
+                # Write data to the specified cells
 
-            # Alignment styles for Excel cells
-            ALIGN_TOP_RIGHT = Alignment(
-                vertical="top",  # Align text to the top vertically
-                horizontal="right",  # Align text to the right horizontally
-                wrap_text=True  # Enable text wrapping
-            )
+                # Alignment styles for Excel cells
+                ALIGN_TOP_RIGHT = Alignment(
+                    vertical="top",  # Align text to the top vertically
+                    horizontal="right",  # Align text to the right horizontally
+                    wrap_text=True  # Enable text wrapping
+                )
 
-            ALIGN_TOP_LEFT = Alignment(
-                vertical="top",  # Align text to the top vertically
-                horizontal="left",  # Align text to the left horizontally
-                wrap_text=True  # Enable text wrapping
-            )
+                ALIGN_TOP_LEFT = Alignment(
+                    vertical="top",  # Align text to the top vertically
+                    horizontal="left",  # Align text to the left horizontally
+                    wrap_text=True  # Enable text wrapping
+                )
 
-            # Black font
-            ARIAL_10 = Font(name='Arial', size=10, color='000000')
+                # Black font
+                ARIAL_10 = Font(name='Arial', size=10, color='000000')
 
-            # check detail_ids if combination of load_address and unload_address is same
-            load_address = self.detail_ids[0].load_address
-            unload_address = self.detail_ids[0].unload_address
-            for detail in self.detail_ids:
-                if detail.load_address != load_address or detail.unload_address != unload_address:
-                    raise UserError(_("Please select details with the same load and unload addresses."))
+                # check detail_ids if combination of load_address and unload_address is same
+                load_address = rec.detail_ids[0].load_address
+                unload_address = rec.detail_ids[0].unload_address
+                for detail in rec.detail_ids:
+                    if detail.load_address != load_address or detail.unload_address != unload_address:
+                        raise UserError(_("Please select details with the same load and unload addresses."))
 
-            load_address = []
-            if self.detail_ids[0].load_address.company_name:
-                load_address.append(self.detail_ids[0].load_address.company_name)
-            if self.detail_ids[0].load_address.street:
-                load_address.append(self.detail_ids[0].load_address.street)
-            if self.detail_ids[0].load_address.postcode:
-                load_address.append(self.detail_ids[0].load_address.postcode)
-            if self.detail_ids[0].load_address.city:
-                load_address.append(self.detail_ids[0].load_address.city)
-            if self.detail_ids[0].load_address.country:
-                load_address.append(self.detail_ids[0].load_address.country.name)
+                load_address = []
+                if rec.detail_ids[0].load_address.company_name:
+                    load_address.append(rec.detail_ids[0].load_address.company_name)
+                if rec.detail_ids[0].load_address.street:
+                    load_address.append(rec.detail_ids[0].load_address.street)
+                if rec.detail_ids[0].load_address.postcode:
+                    load_address.append(rec.detail_ids[0].load_address.postcode)
+                if rec.detail_ids[0].load_address.city:
+                    load_address.append(rec.detail_ids[0].load_address.city)
+                if rec.detail_ids[0].load_address.country:
+                    load_address.append(rec.detail_ids[0].load_address.country.name)
 
-            unload_address = []
-            if self.detail_ids[0].unload_address.company_name:
-                unload_address.append(self.detail_ids[0].unload_address.company_name)
-            if self.detail_ids[0].unload_address.street:
-                unload_address.append(self.detail_ids[0].unload_address.street)
-            if self.detail_ids[0].unload_address.postcode:
-                unload_address.append(self.detail_ids[0].unload_address.postcode)
-            if self.detail_ids[0].unload_address.city:
-                unload_address.append(self.detail_ids[0].unload_address.city)
-            if self.detail_ids[0].unload_address.country:
-                unload_address.append(self.detail_ids[0].unload_address.country.name)
+                unload_address = []
+                if rec.detail_ids[0].unload_address.company_name:
+                    unload_address.append(rec.detail_ids[0].unload_address.company_name)
+                if rec.detail_ids[0].unload_address.street:
+                    unload_address.append(rec.detail_ids[0].unload_address.street)
+                if rec.detail_ids[0].unload_address.postcode:
+                    unload_address.append(rec.detail_ids[0].unload_address.postcode)
+                if rec.detail_ids[0].unload_address.city:
+                    unload_address.append(rec.detail_ids[0].unload_address.city)
+                if rec.detail_ids[0].unload_address.country:
+                    unload_address.append(rec.detail_ids[0].unload_address.country.name)
 
-            worksheet['B6'] = ''
-            worksheet['B6'] = self.delivery_id.project.project_name
+                worksheet['B6'] = ''
+                worksheet['B6'] = rec.delivery_id.project.project_name
 
-            worksheet['B7'] = ''
-            worksheet['B7'] = ', '.join(load_address)
+                worksheet['B7'] = ''
+                worksheet['B7'] = ', '.join(load_address)
 
-            worksheet['B13'] = ''
-            worksheet['B13'] = ', '.join(unload_address)
-            worksheet['B20'] = ''
-            worksheet['B20'] = self.detail_ids[0].load_address.street
-            worksheet['B21'] = ''
-            worksheet['B21'] = self.detail_ids[0].load_address.country.name
+                worksheet['B13'] = ''
+                worksheet['B13'] = ', '.join(unload_address)
+                worksheet['B20'] = ''
+                worksheet['B20'] = rec.detail_ids[0].load_address.street
+                worksheet['B21'] = ''
+                worksheet['B21'] = rec.detail_ids[0].load_address.country.name
 
-            worksheet['D21'] = ''
-            worksheet['D21'] = fields.Date.today().strftime('  -   -%Y  (DD-MM-YYYY)')  # --2025
+                worksheet['D21'] = ''
+                worksheet['D21'] = fields.Date.today().strftime('  -   -%Y  (DD-MM-YYYY)')  # --2025
 
-            # Fix 1: Convert batch numbers
-            batch_nos = [
-                str(detail.batch_no) if detail.batch_no and str(detail.batch_no).lower() != 'false'
-                else ''
-                for detail in self.detail_ids
-            ]
-            worksheet['B29'] = ''
-            worksheet['B29'] = '\n'.join(batch_nos) if batch_nos else ''
-            cell = worksheet['B29']
-            cell.alignment = ALIGN_TOP_LEFT
-            cell.font = ARIAL_10
+                # Fix 1: Convert batch numbers
+                batch_nos = [
+                    str(detail.batch_no) if detail.batch_no and str(detail.batch_no).lower() != 'false'
+                    else ''
+                    for detail in rec.detail_ids
+                ]
+                worksheet['B29'] = ''
+                worksheet['B29'] = '\n'.join(batch_nos) if batch_nos else ''
+                cell = worksheet['B29']
+                cell.alignment = ALIGN_TOP_LEFT
+                cell.font = ARIAL_10
 
-            # Fix 2: Convert container numbers
-            # cntrnos = [
-            #    str(detail.cntrno) if detail.cntrno and str(detail.cntrno).lower() != 'false'
-            #    else ''
-            #    for detail in self.detail_ids
-            # ]
-            # load_refs = [
-            #        str(detail.loading_ref) if detail.loading_ref and str(detail.loading_ref).lower() != 'false'
-            #        else ''
-            #        for detail in self.detail_ids
-            # ]
-            cntrnos_load_refs = [
-                f"-{str(detail.loading_ref)}" if not detail.cntrno and detail.loading_ref and str(
-                    detail.loading_ref).lower() != 'false'
-                else f"{str(detail.cntrno)}-" if not detail.loading_ref and detail.cntrno and str(
-                    detail.cntrno).lower() != 'false'
-                else f"{str(detail.cntrno)}-{str(detail.loading_ref)}" if detail.cntrno and detail.loading_ref and str(
-                    detail.cntrno).lower() != 'false' and str(detail.loading_ref).lower() != 'false'
-                else ''
-                for detail in self.detail_ids
-            ]
-            worksheet['D29'] = ''
-            worksheet['D29'] = '\n'.join(cntrnos_load_refs)
-            cell = worksheet['D29']
-            cell.alignment = ALIGN_TOP_LEFT
-            cell.font = ARIAL_10
+                # Fix 2: Convert container numbers
+                # cntrnos = [
+                #    str(detail.cntrno) if detail.cntrno and str(detail.cntrno).lower() != 'false'
+                #    else ''
+                #    for detail in self.detail_ids
+                # ]
+                # load_refs = [
+                #        str(detail.loading_ref) if detail.loading_ref and str(detail.loading_ref).lower() != 'false'
+                #        else ''
+                #        for detail in self.detail_ids
+                # ]
+                cntrnos_load_refs = [
+                    f"-{str(detail.loading_ref)}" if not detail.cntrno and detail.loading_ref and str(
+                        detail.loading_ref).lower() != 'false'
+                    else f"{str(detail.cntrno)}-" if not detail.loading_ref and detail.cntrno and str(
+                        detail.cntrno).lower() != 'false'
+                    else f"{str(detail.cntrno)}-{str(detail.loading_ref)}" if detail.cntrno and detail.loading_ref and str(
+                        detail.cntrno).lower() != 'false' and str(detail.loading_ref).lower() != 'false'
+                    else ''
+                    for detail in rec.detail_ids
+                ]
+                worksheet['D29'] = ''
+                worksheet['D29'] = '\n'.join(cntrnos_load_refs)
+                cell = worksheet['D29']
+                cell.alignment = ALIGN_TOP_LEFT
+                cell.font = ARIAL_10
 
-            # Fix 3: Convert model types
-            # model_types = [
-            #    str(detail.model_type) if detail.model_type and str(detail.model_type).lower() != 'false'
-            #    else ''
-            #    for detail in self.detail_ids
-            # ]
-            model_types = [
-                str(detail.model_type) if not detail.product and detail.model_type and str(
-                    detail.model_type).lower() != 'false'
-                else detail.product.name if detail.product and (
-                        not detail.model_type or str(detail.model_type).lower() == 'false')
-                else ''
-                for detail in self.detail_ids
-            ]
-            worksheet['F29'] = ''
-            worksheet['F29'] = '\n'.join(model_types) if model_types else ''
-            cell = worksheet['F29']
-            cell.alignment = ALIGN_TOP_LEFT
-            cell.font = ARIAL_10
+                # Fix 3: Convert model types
+                # model_types = [
+                #    str(detail.model_type) if detail.model_type and str(detail.model_type).lower() != 'false'
+                #    else ''
+                #    for detail in self.detail_ids
+                # ]
+                model_types = [
+                    str(detail.model_type) if not detail.product and detail.model_type and str(
+                        detail.model_type).lower() != 'false'
+                    else detail.product.name if detail.product and (
+                            not detail.model_type or str(detail.model_type).lower() == 'false')
+                    else ''
+                    for detail in rec.detail_ids
+                ]
+                worksheet['F29'] = ''
+                worksheet['F29'] = '\n'.join(model_types) if model_types else ''
+                cell = worksheet['F29']
+                cell.alignment = ALIGN_TOP_LEFT
+                cell.font = ARIAL_10
 
-            pallets = []
-            pcs = []
-            weights = []
-            for detail in self.detail_ids:
-                # 直接记录原始值，不需要分割
-                if detail.pallets:
-                    pallets.append(str(detail.pallets))  # 转换为字符串
-                if detail.qty:
-                    pcs.append(str(detail.qty))
-                if detail.gross_weight:
-                    weights.append(str(detail.gross_weight))
+                pallets = []
+                pcs = []
+                weights = []
+                for detail in rec.detail_ids:
+                    # 直接记录原始值，不需要分割
+                    if detail.pallets:
+                        pallets.append(str(detail.pallets))  # 转换为字符串
+                    if detail.qty:
+                        pcs.append(str(detail.qty))
+                    if detail.gross_weight:
+                        weights.append(str(detail.gross_weight))
 
-            worksheet['H29'] = ''
-            worksheet['H29'] = DeliveryDetailCmrWizard.format_multi_line(pallets)
-            cell = worksheet['H29']
-            cell.alignment = ALIGN_TOP_RIGHT
-            cell.font = ARIAL_10
+                worksheet['H29'] = ''
+                worksheet['H29'] = DeliveryDetailCmrWizard.format_multi_line(pallets)
+                cell = worksheet['H29']
+                cell.alignment = ALIGN_TOP_RIGHT
+                cell.font = ARIAL_10
 
-            worksheet['I29'] = ''
-            worksheet['I29'] = DeliveryDetailCmrWizard.format_multi_line(pcs)
-            cell = worksheet['I29']
-            cell.alignment = ALIGN_TOP_RIGHT
-            cell.font = ARIAL_10
+                worksheet['I29'] = ''
+                worksheet['I29'] = DeliveryDetailCmrWizard.format_multi_line(pcs)
+                cell = worksheet['I29']
+                cell.alignment = ALIGN_TOP_RIGHT
+                cell.font = ARIAL_10
 
-            worksheet['J29'] = ''
-            worksheet['J29'] = DeliveryDetailCmrWizard.format_multi_line(weights)
-            cell = worksheet['J29']
-            cell.alignment = ALIGN_TOP_RIGHT
-            cell.font = ARIAL_10
+                worksheet['J29'] = ''
+                worksheet['J29'] = DeliveryDetailCmrWizard.format_multi_line(weights)
+                cell = worksheet['J29']
+                cell.alignment = ALIGN_TOP_RIGHT
+                cell.font = ARIAL_10
 
-            # Ensure all elements in pallets are converted to floats before summing
-            total_pallets = sum(float(p) for p in pallets if p) if pallets else 0
-            total_pcs = sum(float(p) for p in pcs if p) if pcs else 0
-            # total_weights = sum(float(w) for w in weights if w) if weights else 0
+                # Ensure all elements in pallets are converted to floats before summing
+                total_pallets = sum(float(p) for p in pallets if p) if pallets else 0
+                total_pcs = sum(float(p) for p in pcs if p) if pcs else 0
+                # total_weights = sum(float(w) for w in weights if w) if weights else 0
 
-            worksheet['G36'] = 'Total Pallets:'
-            worksheet['H36'] = ''
-            worksheet['H36'] = total_pallets
-            cell = worksheet['H36']
-            cell.alignment = ALIGN_TOP_RIGHT
-            cell.font = ARIAL_10
+                worksheet['G36'] = 'Total Pallets:'
+                worksheet['H36'] = ''
+                worksheet['H36'] = total_pallets
+                cell = worksheet['H36']
+                cell.alignment = ALIGN_TOP_RIGHT
+                cell.font = ARIAL_10
 
-            worksheet['G37'] = 'Total Pcs:'
-            worksheet['H37'] = ''
-            worksheet['H37'] = total_pcs
-            cell.alignment = ALIGN_TOP_RIGHT
-            cell.font = ARIAL_10
+                worksheet['G37'] = 'Total Pcs:'
+                worksheet['H37'] = ''
+                worksheet['H37'] = total_pcs
+                cell.alignment = ALIGN_TOP_RIGHT
+                cell.font = ARIAL_10
 
-            worksheet['B48'] = ''
-            worksheet['B48'] = 'Warehouse:' + fields.Date.today().strftime('      -   -%Y  (DD-MM-YYYY)')  # --2025
-            # Save the workbook to a BytesIO object
-            excel_buffer = BytesIO()
-            workbook.save(excel_buffer)
-            excel_buffer.seek(0)
+                worksheet['B48'] = ''
+                worksheet['B48'] = 'Warehouse:' + fields.Date.today().strftime('      -   -%Y  (DD-MM-YYYY)')  # --2025
+                # Save the workbook to a BytesIO object
+                excel_buffer = BytesIO()
+                workbook.save(excel_buffer)
+                excel_buffer.seek(0)
+                _logger.info("CMR excel file created successfully.")
 
-            # Create the CMR record
-            cmr_vals = {
-                'delivery_id': self.delivery_id.id,
-                'delivery_detail_ids': [(6, 0, self.detail_ids.ids)],
-                'loading_refs': ', '.join(str(ref) for ref in set(self.detail_ids.mapped('loading_ref')) if ref),
-                # ', '.join(set(ref for ref in self.detail_ids.mapped('loading_ref') if ref)),
-                # 'load_date': min(
-                #    date for date in self.detail_ids.mapped('load_date') if date) if self.detail_ids.mapped(
-                #    'load_date') else False,
-                'load_date': min(
-                    [date for date in self.detail_ids.mapped('load_date') if date]
-                ) if any(self.detail_ids.mapped('load_date')) else False,
-                'consignee_refs': ', '.join(str(ref) for ref in set(self.detail_ids.mapped('consignee_ref')) if ref),
-                # ', '.join(set(ref for ref in self.detail_ids.mapped('consignee_ref') if ref)),
-                # 'unload_date': min(
-                #    date for date in self.detail_ids.mapped('unload_date') if date) if self.detail_ids.mapped(
-                #    'unload_date') else False,
-                'unload_date': min(
-                    [date for date in self.detail_ids.mapped('unload_date') if date]
-                ) if any(self.detail_ids.mapped('unload_date')) else False,
-                'cntrnos': ', '.join(str(cntr) for cntr in set(self.detail_ids.mapped('cntrno')) if cntr),
-                # ', '.join(set(cntr for cntr in self.detail_ids.mapped('cntrno') if cntr)),
-                'cmr_file': base64.b64encode(excel_buffer.getvalue()),
-                # 'cmr_filename': f'CMR_{self.delivery_id.billno}.xlsx',
-                'cmr_remark': self.cmr_remark,
-                'load_address': self.detail_ids[0].load_address.id,
-                'unload_address': self.detail_ids[0].unload_address.id,
-            }
-            cmr = self.env['panexlogi.delivery.detail.cmr'].create(cmr_vals)
-            cmr.write({'cmr_filename': f'CMR_{cmr.billno}.xlsx'})
-            # Link the selected details to the created CMR
-            self.detail_ids.write({'delivery_detail_cmr_id': cmr.id})
+                # Create the CMR record
+                cmr_vals = {
+                    'delivery_id': rec.delivery_id.id,
+                    'delivery_detail_ids': [(6, 0, rec.detail_ids.ids)],
+                    'loading_refs': ', '.join(str(ref) for ref in set(rec.detail_ids.mapped('loading_ref')) if ref),
+                    # ', '.join(set(ref for ref in self.detail_ids.mapped('loading_ref') if ref)),
+                    # 'load_date': min(
+                    #    date for date in self.detail_ids.mapped('load_date') if date) if self.detail_ids.mapped(
+                    #    'load_date') else False,
+                    'load_date': min(
+                        [date for date in rec.detail_ids.mapped('load_date') if date]
+                    ) if any(rec.detail_ids.mapped('load_date')) else False,
+                    'consignee_refs': ', '.join(str(ref) for ref in set(rec.detail_ids.mapped('consignee_ref')) if ref),
+                    # ', '.join(set(ref for ref in self.detail_ids.mapped('consignee_ref') if ref)),
+                    # 'unload_date': min(
+                    #    date for date in self.detail_ids.mapped('unload_date') if date) if self.detail_ids.mapped(
+                    #    'unload_date') else False,
+                    'unload_date': min(
+                        [date for date in rec.detail_ids.mapped('unload_date') if date]
+                    ) if any(rec.detail_ids.mapped('unload_date')) else False,
+                    'cntrnos': ', '.join(str(cntr) for cntr in set(rec.detail_ids.mapped('cntrno')) if cntr),
+                    # ', '.join(set(cntr for cntr in self.detail_ids.mapped('cntrno') if cntr)),
+                    'cmr_file': base64.b64encode(excel_buffer.getvalue()),
+                    # 'cmr_filename': f'CMR_{self.delivery_id.billno}.xlsx',
+                    'cmr_remark': rec.cmr_remark,
+                    'load_address': rec.detail_ids[0].load_address.id,
+                    'unload_address': rec.detail_ids[0].unload_address.id,
+                }
+                cmr = rec.env['panexlogi.delivery.detail.cmr'].create(cmr_vals)
+                cmr.write({'cmr_filename': f'CMR_{cmr.billno}.xlsx'})
+                # Link the selected details to the created CMR
+                rec.detail_ids.write({'delivery_detail_cmr_id': cmr.id})
+                _logger.info("CMR record created successfully.")  # Update the state of the CMR
+            except Exception as e:
+                raise UserError(_("Error creating CMR: %s") % str(e))
 
-        except Exception as e:
-            raise UserError(_("Error creating CMR: %s") % str(e))
-
-        # return {'type': 'ir.actions.act_window_close'}
+        return {'type': 'ir.actions.act_window_close'}
         # return a success message
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': 'Success',
-                'message': 'CMR Created Successfully!',
-                'type': 'success',
-                'sticky': False,
-            }
-        }
+
+        # return {
+        #     'type': 'ir.actions.client',
+        #     'tag': 'display_notification',
+        #     'params': {
+        #         'title': 'Success',
+        #         'message': 'CMR Created Successfully!',
+        #         'type': 'success',
+        #         'sticky': False,
+        #     }
+        # }
 
     @staticmethod
     def format_multi_line(values):

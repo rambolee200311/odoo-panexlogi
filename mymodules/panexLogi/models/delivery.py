@@ -437,17 +437,18 @@ class Delivery(models.Model):
 
     # create delivery cmr
     def action_create_delivery_cmr(self):
-        return {
-            'name': _('Create Delivery Cmr'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'panexlogi.delivery.detail.cmr.wizard',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_delivery_id': self.id,
-                'form_view_ref': 'panexLogi.view_delivery_detail_cmr_wizard_form'
+        for rec in self:
+            return {
+                'name': _('Create Delivery Cmr'),
+                'type': 'ir.actions.act_window',
+                'res_model': 'panexlogi.delivery.detail.cmr.wizard',
+                'view_mode': 'form',
+                'target': 'new',
+                'context': {
+                    'default_delivery_id': rec.id,
+                    'form_view_ref': 'panexLogi.view_delivery_detail_cmr_wizard_form_new'
+                }
             }
-        }
 
     @api.model
     def _create_single_delivery_order(self, recs):

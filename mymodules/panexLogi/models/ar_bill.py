@@ -198,8 +198,8 @@ class ARBill(models.Model):
                 'invoiceno': record.inv_no,
                 'invoice_date': record.inv_date,
                 'due_date': record.inv_duedate,
-                'pay_pdffile': record.inv_file,
-                'pay_pdffilename': record.inv_file_name,
+                'pdffile': record.inv_file,
+                'pdffilename': record.inv_file_name,
                 'remark': record.remark,
             })
             for records in record.bill_line_ids:

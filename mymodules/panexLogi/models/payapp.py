@@ -43,17 +43,47 @@ class PaymentApplication(models.Model):
     invoice_date = fields.Date(string='Invoice Date(发票日期)', readonly=True)
     due_date = fields.Date(string='Due Date(到期日)', readonly=True)
 
-    pay_date = fields.Date(string='Pay Date(付款日期)', tracking=True)
-    pay_amount = fields.Float(string='Pay Amount（欧元金额）', tracking=True)
-    pay_amount_usd = fields.Float(string='Pay Amount（美元金额）', tracking=True)
-    pay_remark = fields.Text(string='Pay Remark', tracking=True)
+    pay_date = fields.Date(string='Pay Date(付款日期)',
+                           tracking=True,
+                           store=True,
+                           compute='computer_payment_id')
+    pay_amount = fields.Float(string='Pay Amount（欧元金额）',
+                              tracking=True,
+                              store=True,
+                              compute='computer_payment_id')
+    pay_amount_usd = fields.Float(string='Pay Amount（美元金额）',
+                                  tracking=True,
+                                  store=True,
+                                  compute='computer_payment_id')
+    pay_remark = fields.Text(string='Pay Remark',
+                             tracking=True,
+                             store=True,
+                             compute='computer_payment_id')
     pay_pdffile = fields.Binary(string='Pay File（原件）')
     pay_pdffilename = fields.Char(string='Pay File name')
     payment_id = fields.Many2one('panexlogi.finance.payment', string='Payment')
     shipinvoice_id = fields.Many2one('panexlogi.waybill.shipinvoice', 'Invoice ID')
     clearinvoice_id = fields.Many2one('panexlogi.waybill.clearinvoice', 'Invoice ID')
     trasportinvoice_id = fields.Many2one('panexlogi.transport.invoice', 'Invoice ID')
-
+    '''
+    @api.depends('payment_id')
+    def computer_payment_id(self):
+        for record in self:
+            if record.payment_id:
+                for line in record.payment_id.paymentline_ids:
+                    if line.source == record.type and line.source_code == record.billno and record.payment_id.state == 'paid':
+                        record.pay_date = line.pay_date
+                        record.pay_amount = line.pay_amount
+                        record.pay_amount_usd = line.pay_amount_usd
+                        record.pay_remark = line.pay_remark
+                        break  # Exit the loop once a match is found
+            else:
+                # Reset fields if no payment_id is found
+                record.pay_date = False
+                record.pay_amount = 0.0
+                record.pay_amount_usd = 0.0
+                record.pay_remark = False
+    '''
     @api.model
     def create(self, values):
         """
@@ -222,43 +252,51 @@ class PaymentApplication(models.Model):
     """
 
     def cron_update_state_paid(self):
-        try:
-            for rec in self.search([('state', '=', 'confirm')]):
-                source = rec.type,
-                souce_code = rec.billno
+        for rec in self.search([('state', 'in', ['confirm', 'paid'])]):
+            try:
+                source = rec.type
+                source_code = rec.billno
 
-                domain = [('source', '=', source), ('source_code', '=', souce_code), ('payment_id.state', '=', 'paid')]
+                domain = [('source', '=', source), ('source_code', '=', source_code), ('payment_id.state', '=', 'paid')]
                 payment = self.env['panexlogi.finance.payment.line'].search(domain)
-                if payment:
+
+                if rec.state == 'confirm' and payment:
                     state_time = fields.Datetime.now()
                     payapp_billno = rec.billno
                     _logger.info("%s : cron_update_state_paid started at: %s", payapp_billno, state_time)
+
                     rec.state = 'paid'
+
+                    # Update related invoices based on the source and type
                     if rec.source == 'Shipping Invoice' and rec.type == 'import':
                         shipinvoice = self.env['panexlogi.waybill.shipinvoice'].search(
-                            [('billno', '=', rec.source_Code),
-                             ('state', '=', 'apply')])
+                            [('billno', '=', rec.source_Code), ('state', '=', 'apply')]
+                        )
                         if shipinvoice:
                             shipinvoice.state = 'paid'
-                    if rec.source == 'Clearance Invoice' and rec.type == 'import':
+
+                    elif rec.source == 'Clearance Invoice' and rec.type == 'import':
                         clearanceinvoice = self.env['panexlogi.waybill.clearinvoice'].search(
-                            [('billno', '=', rec.source_Code)
-                                , ('state', '=', 'apply')])
+                            [('billno', '=', rec.source_Code), ('state', '=', 'apply')]
+                        )
                         if clearanceinvoice:
                             clearanceinvoice.state = 'paid'
-                    if rec.source == 'Transport Invoice' and rec.type == 'trucking':
+
+                    elif rec.source == 'Transport Invoice' and rec.type == 'trucking':
                         transportinvoice = self.env['panexlogi.transport.invoice'].search(
-                            [('billno', '=', rec.source_Code),
-                             ('state', '=', 'apply')])
+                            [('billno', '=', rec.source_Code), ('state', '=', 'apply')]
+                        )
                         if transportinvoice:
                             transportinvoice.state = 'paid'
-                    if rec.source == 'Delivery Invoice' and rec.type == 'trucking':
+
+                    elif rec.source == 'Delivery Invoice' and rec.type == 'trucking':
                         deliveryinvoice = self.env['panexlogi.delivery.invoice'].search(
-                            [('billno', '=', rec.source_Code),
-                             ('state', '=', 'apply')])
+                            [('billno', '=', rec.source_Code), ('state', '=', 'apply')]
+                        )
                         if deliveryinvoice:
                             deliveryinvoice.state = 'paid'
-                    # send message to administrator
+
+                    # Log and notify administrators
                     end_time = fields.Datetime.now()
                     _logger.info("%s : cron_update_state_paid ended at: %s", payapp_billno, end_time)
                     rec.message_post(
@@ -268,11 +306,22 @@ class PaymentApplication(models.Model):
                             "partner_id").ids,
                         subject='Update state to paid',
                         message_type='notification',
-                        subtype_xmlid="mail.mt_comment",  # Correct subtype for emails
-                        body_is_html=True,  # Render HTML in email
-                        force_send=True, )
-        except Exception as e:
-            _logger.error(f"Error in cron_update_state_paid: {str(e)}")
+                        subtype_xmlid="mail.mt_comment",
+                        body_is_html=True,
+                        force_send=True,
+                    )
+
+                elif rec.state == 'paid' and payment:
+                    # Update payment details for already paid records
+                    rec.pay_date = payment.payment_id.pay_date
+                    rec.pay_amount = payment.pay_amount
+                    rec.pay_amount_usd = payment.pay_amount_usd
+                    rec.pay_remark = payment.pay_remark
+
+            except Exception as e:
+                _logger.error(f"Error in updating payment details for {rec.billno}: {str(e)}")
+                continue
+
         return  # Explicitly return None
 
     # select multi rows create a paymentcd
@@ -364,6 +413,34 @@ class PaymentApplicationLine(models.Model):
     remark = fields.Text(string='Remark', tracking=True)
     pdffile = fields.Binary(string='File（原件）')
     pdffilename = fields.Char(string='File name')
+
+    # link to parent payment application
+    parent_billno = fields.Char(related="payapp_billno.billno", string="Bill No", readonly=True)
+    parent_type = fields.Char(related="payapp_billno.type", string="Type", readonly=True)
+    parent_date = fields.Date(related="payapp_billno.date", string="Date", readonly=True)
+    parent_payee = fields.Many2one(related="payapp_billno.payee", string="Payee", readonly=True)
+    parent_state = fields.Selection(related="payapp_billno.state", string="State", readonly=True)
+    parent_source = fields.Char(related="payapp_billno.source", string="Source", readonly=True)
+    parent_source_code = fields.Char(
+        related="payapp_billno.source_Code",
+        string="Source Code",
+        readonly=True
+    )
+    parent_pay_date = fields.Date(related="payapp_billno.pay_date", string="Pay Date", readonly=True)
+    parent_pay_amount = fields.Float(related="payapp_billno.pay_amount", string="Pay Amount", readonly=True)
+    parent_remark = fields.Text(
+        related="payapp_billno.remark",
+        string="Parent Remark",
+        readonly=False,
+    )
+    created_by = fields.Many2one(
+        related="payapp_billno.create_uid",
+        string="Created By",
+        readonly=True
+    )
+    parent_invoiceno = fields.Char(string='Invoice No', related="payapp_billno.invoiceno", readonly=True)
+    parent_invoice_date = fields.Date(string='Invoice Date', related="payapp_billno.invoice_date", readonly=True)
+    parent_due_date = fields.Date(string='Due Date', related="payapp_billno.due_date", readonly=True)
 
     @api.model
     def create(self, values):

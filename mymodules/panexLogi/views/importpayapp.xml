@@ -161,7 +161,7 @@
             <field name="res_model">panexlogi.finance.paymentapplication</field>
             <field name="context">{'default_type':'import'}</field>
             <field name="search_view_id" ref="view_waybill_payment_application_search"/> <!-- Set default search view -->
-            <field name="domain">[('type','in',['import','export','other'])]</field>
+            <field name="domain">[('type','in',['import','export','other',False])]</field>
             <field name="view_mode">tree,form</field>
             <field name="view_ids" eval="[(5,0,0),
                                       (0,0,{'view_mode': 'tree','view_id': ref('import_payment_application_tree_view')}),

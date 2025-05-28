@@ -1,0 +1,70 @@
+<odoo>
+    <data>
+        <!-- Pay Application Line Tree -->
+        <record id="view_payment_application_line_tree_extend" model="ir.ui.view">
+            <field name="name">Payment Application Line Tree</field>
+            <field name="model">panexlogi.finance.paymentapplicationline</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="parent_state=='confirm'" decoration-info="parent_state=='paid'"  decoration-danger="parent_state=='cancel'" limit="50">
+                    <field name="parent_billno" optional="show"/>
+                    <field name="parent_type" optional="show"/>
+                    <field name="parent_date" optional="show"/>
+                    <field name="parent_payee" optional="show"/>
+                    <field name="parent_state" optional="show"/>
+                    <field name="parent_source" optional="show"/>
+                    <field name="parent_source_code" optional="show"/>
+                    <field name="parent_pay_date" optional="show"/>
+                    <field name="parent_pay_amount" optional="show"/>
+                    <field name="project" optional="show"/>
+                    <field name="parent_invoiceno" optional="show"/>
+                    <field name="parent_invoice_date" optional="show"/>
+                    <field name="parent_due_date" optional="show"/>
+                    <field name="fitem" optional="show"/>
+                    <field name="fitem_name" optional="show"/>
+                    <field name="amount" optional="show"/>
+                    <field name="amount_usd" optional="show"/>
+                    <field name="remark" optional="show"/>
+                    <field name="created_by" string="Create User" optional="show"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Pay Application Line Search -->
+        <record id="view_payment_application_line_Search_extend" model="ir.ui.view">
+            <field name="name">Payment Application Line Search</field>
+            <field name="model">panexlogi.finance.paymentapplicationline</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="parent_billno"/>
+                    <field name="parent_type"/>
+                    <field name="parent_date"/>
+                    <field name="parent_payee"/>
+                    <field name="parent_state"/>
+                    <field name="parent_source"/>
+                    <field name="parent_source_code"/>
+                    <field name="parent_pay_date"/>
+                    <field name="parent_pay_amount"/>
+                    <field name="project"/>
+                    <field name="parent_invoiceno"/>
+                    <field name="parent_invoice_date"/>
+                    <field name="parent_due_date"/>
+                    <field name="fitem"/>
+                    <field name="fitem_name"/>
+                    <field name="amount"/>
+                    <field name="amount_usd"/>
+                    <field name="remark"/>
+                    <field name="created_by" string="Create User"/>
+                </search>
+            </field>
+        </record>
+        <!-- Pay Application Line Action -->
+        <record id="payment_application_line_action" model="ir.actions.act_window">
+            <field name="name">Payment Lines</field>
+            <field name="res_model">panexlogi.finance.paymentapplicationline</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{"search_default_new":1, "show_all_fields": False}</field>
+            <field name="views">[
+                (view_mode='tree', view_id='view_payment_application_line_tree_extend')
+            ]</field>
+        </record>
+    </data>
+</odoo>

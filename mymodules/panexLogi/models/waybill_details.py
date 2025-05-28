@@ -110,6 +110,80 @@ class WaybillDetails(models.Model):
             if rec.waybill_billno.adr and not rec.uncode:
                 raise UserError(_("UN Code is required!"))
 
+    def action_first(self):
+        self.ensure_one()
+        domain = [
+            ('waybill_billno', '=', self.waybill_billno.id),
+            ('truck_type', '=', self.truck_type),
+        ]
+        first_record = self.search(domain, order='id asc', limit=1)
+        if not first_record:
+            raise UserError(_("No first record found."))
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'update_record',
+            'params': {
+                'active_id': first_record.id,
+            },
+        }
+
+    def action_previous(self):
+        self.ensure_one()
+        domain = [
+            ('waybill_billno', '=', self.waybill_billno.id),
+            ('truck_type', '=', self.truck_type),
+            ('id', '<', self.id),
+        ]
+        previous_record = self.search(domain, order='id desc', limit=1)
+        if not previous_record:
+            raise UserError(_("No previous record found."))
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'update_record',
+            'params': {
+                'active_id': previous_record.id,
+            },
+        }
+
+    def action_next(self):
+        self.ensure_one()
+        domain = [
+            ('waybill_billno', '=', self.waybill_billno.id),
+            ('truck_type', '=', self.truck_type),
+            ('id', '>', self.id),
+        ]
+        next_record = self.search(domain, order='id asc', limit=1)
+        if not next_record:
+            raise UserError(_("No next record found."))
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'update_record',
+            'params': {
+                'active_id': next_record.id,
+            },
+        }
+
+    def action_last(self):
+        self.ensure_one()
+        domain = [
+            ('waybill_billno', '=', self.waybill_billno.id),
+            ('truck_type', '=', self.truck_type),
+        ]
+        last_record = self.search(domain, order='id desc', limit=1)
+        if not last_record:
+            raise UserError(_("No last record found."))
+
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'update_record',
+            'params': {
+                'active_id': last_record.id,
+            },
+        }
+
 
 """
     # check if truck_type=inbound then warehouse is required

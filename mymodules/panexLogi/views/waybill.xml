@@ -233,7 +233,10 @@
                     </group>
                     <notebook>
                         <page string="Container Details">
-                            <field name="details_ids"/>
+                            <field name="details_ids"
+                                   context="{'default_waybill_billno': active_id}"
+                                   mode="tree,form"
+                            />
                         </page>
                         <page  string="Packing List">
                             <field name="packlist_ids"/>

@@ -1,159 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <!-- Delivery detail cmr-->
-        <record id="view_delivery_detail_cmr_wizard_form" model="ir.ui.view">
-            <field name="name">delivery.detail.cmr.wizard.form</field>
-            <field name="model">panexlogi.delivery.detail.cmr.wizard</field>
-            <field name="arch" type="xml">
-                <form string="Create Delivery Detail CMR">
-                    <group>
-                        <field name="delivery_id" readonly="1"/>
-                        <field name="detail_ids" context="{'tree_view_ref': 'panexLogi.view_delivery_detail_tree_wizard'}"
-                          options="{'no_create': True}"/>
-                        <field name="cmr_remark" widget="textarea"/>
-                    </group>
-                    <footer>
-                        <button string="Create CMR" type="object" name="action_create_cmr" class="btn-primary"/>
-                        <button string="Cancel" class="btn-secondary" special="cancel"/>
-                    </footer>
-                </form>
-            </field>
-        </record>
-        <!-- Delivery detail cmr action-->
-        <record id="action_delivery_detail_cmr_wizard" model="ir.actions.act_window">
-            <field name="name">Create Delivery Detail CMR</field>
-            <field name="res_model">panexlogi.delivery.detail.cmr.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-            <field name="context">{'default_delivery_id': active_id}</field>
-        </record>
+    <!-- Delivery detail cmr-->
+    <record id="view_delivery_detail_cmr_wizard_form" model="ir.ui.view">
+        <field name="name">delivery.detail.cmr.wizard.form</field>
+        <field name="model">panexlogi.delivery.detail.cmr.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create CMR">
+                <header>
+                    <button string="Create CMR" type="object" name="action_create_cmr" class="btn-primary oe_highlight"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </header>
+                <group>
+                    <field name="delivery_id" readonly="1"/>
+                    <field name="detail_ids" context="{'tree_view_ref': 'panexLogi.view_delivery_detail_tree_wizard'}"
+                      options="{'no_create': True}"/>
+                    <field name="cmr_remark" widget="textarea"/>
+                </group>
+            </form>
+        </field>
+    </record>
 
-        <!-- CMR Form View -->
-        <record id="delivery_detail_cmr_view_form" model="ir.ui.view">
-            <field name="name">panexlogi.delivery.detail.cmr.form</field>
-            <field name="model">panexlogi.delivery.detail.cmr</field>
-            <field name="arch" type="xml">
-                <form>
-                    <header>
-                        <button name="action_confirm"
-                                type="object"
-                                string="Confirm"
-                                invisible="state != 'new'"
-                                class="oe_highlight"/>
-                        <button name="action_cancel"
-                                type="object"
-                                string="Cancel"
-                                invisible="state != 'new'"
-                                class="btn-danger"/>
-                        <button name="action_unconfirm"
-                                type="object"
-                                string="Unconfirm"
-                                invisible="state != 'confirm'"
-                                class="btn-secondary"/>
-                        <field name="state" widget="statusbar"
-                               statusbar_visible="new,confirm,order"
-                               statusbar_colors='{"confirm":"green", "order":"red"}'
-                               optional="hide"/>
-                        <widget name="web_ribbon" title="CANCEL"
-                                bg_color="bg-danger" invisible="state!='cancel'"/>
-                    </header>
-                    <sheet>
-                        <div class="oe_title">
-                            <h1><field name="billno" readonly="1"/></h1>
-                        </div>
-                        <group col="2">
-                            <group string="Loading">
-                                <field name="loading_refs" />
-                                <field name="load_address" />
-                                <field name="load_date" />
-                                <field name="load_timeslot"/>
-                                <field name="load_company"/>
-                            </group>
-                            <group string="Unloading">
-                               <field name="consignee_refs" readonly="1" string="Unloading Refs"/>
-                                <field name="unload_address" />
-                                <field name="unload_date"/>
-                                <field name="unload_timeslot"/>
-                                <field name="unload_company"/>
-                            </group>
-                        </group>
-                        <group col="2">
-                            <!-- Left Column -->
-                            <group string="Information">
-                                <field name="delivery_id" options="{'no_open': True}" readonly="1"/>
-                                <field name="trailer_type"/>
-                                <field name="cntrnos" readonly="1"/>
-                                <field name="cmr_file" filename="cmr_filename"/>
-                                <field name="cmr_filename" invisible="1"/>
-                                <field name="cmr_remark"/>
-                            </group>
-                            <!-- Right Column -->
-                            <group string="Documents">
-                                <field name="outside_eu"/>
-                                <field name="import_file" filename="import_filename"  widget="binary"/>
-                                <field name="import_filename" string="Import Document Filename"/>
-                                <field name="export_file" sfilename="export_filename" widget="binary"/>
-                                <field name="export_filename" string="Order Filename"/>
-                            </group>
-                        </group>
 
-                        <notebook>
-                            <page string="Related Details">
-                                <field name="delivery_detail_ids" readonly="state!= 'new'">
-                                    <tree create="false" delete="false">
-                                        <field name="loading_ref"/>
-                                        <field name="consignee_ref"/>
-                                        <field name="cntrno"/>
-                                        <field name="load_address"/>
-                                        <field name="load_date"/>
-                                        <field name="load_timeslot"/>
-                                        <field name="unload_address"/>
-                                        <field name="unload_date"/>
-                                        <field name="unload_timeslot"/>
-                                        <field name="product_name"/>
-                                        <field name="model_type"/>
-                                        <field name="pallets"/>
-                                        <field name="qty"/>
-                                        <field name="gross_weight"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+    <!-- Delivery detail cmr action
+    <record id="action_delivery_detail_cmr_wizard" model="ir.actions.act_window">
+        <field name="name">Create Delivery Detail CMR</field>
+        <field name="res_model">panexlogi.delivery.detail.cmr.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_delivery_id': active_id}</field>
+    </record>
+    -->
+    <!-- CMR Form View -->
 
-        <!-- CMR Tree View -->
-        <record id="delivery_detail_cmr_view_tree" model="ir.ui.view">
-            <field name="name">panexlogi.delivery.detail.cmr.tree</field>
-            <field name="model">panexlogi.delivery.detail.cmr</field>
-            <field name="arch" type="xml">
-                <tree decoration-success="state=='confirm'"
-                      decoration-danger="state=='cancel'"
-                      create="true" delete="false">
-                    <field name="billno" optional="show"/>
-                    <field name="delivery_id" optional="show"/>
-                    <field name="trailer_type" optional="show"/>
-                    <field name="load_address" optional="show"/>
-                    <field name="loading_refs" optional="show"/>
-                    <field name="load_date" optional="show"/>
-                    <field name="load_timeslot" optional="show"/>
-                    <field name="unload_address" optional="show"/>
-                    <field name="consignee_refs" optional="show"/>
-                    <field name="unload_date" optional="show"/>
-                    <field name="unload_timeslot" optional="show"/>
-                    <field name="cntrnos" optional="show"/>
-                    <field name="state" optional="show"/>
-                    <field name="cmr_file" filename="cmr_filename" widget="binary_filename" optional="show"/>
-                    <field name="cmr_filename" optional="show"/>
-                    <field name="outside_eu" optional="show"/>
-                    <field name="import_file" filename="import_filename" widget="binary_filename" optional="show"/>
-                    <field name="import_filename" string="Import Document Filename" optional="show"/>
-                    <field name="export_file" filename="export_filename" widget="binary_filename" optional="show"/>
-                    <field name="export_filename" string="Order Filename" optional="show"/>
-                </tree>
-            </field>
-        </record>
-    </data>
+
+    <!-- CMR Tree View -->
+    <record id="delivery_detail_cmr_view_tree" model="ir.ui.view">
+        <field name="name">panexlogi.delivery.detail.cmr.tree</field>
+        <field name="model">panexlogi.delivery.detail.cmr</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state=='confirm'"
+                  decoration-danger="state=='cancel'"
+                  create="true" delete="false">
+                <field name="billno" optional="show"/>
+                <field name="delivery_id" optional="show"/>
+                <field name="trailer_type" optional="show"/>
+                <field name="load_address" optional="show"/>
+                <field name="loading_refs" optional="show"/>
+                <field name="load_date" optional="show"/>
+                <field name="load_timeslot" optional="show"/>
+                <field name="unload_address" optional="show"/>
+                <field name="consignee_refs" optional="show"/>
+                <field name="unload_date" optional="show"/>
+                <field name="unload_timeslot" optional="show"/>
+                <field name="cntrnos" optional="show"/>
+                <field name="state" optional="show"/>
+                <field name="cmr_file" filename="cmr_filename" widget="binary_filename" optional="show"/>
+                <field name="cmr_filename" optional="show"/>
+                <field name="outside_eu" optional="show"/>
+                <field name="import_file" filename="import_filename" widget="binary_filename" optional="show"/>
+                <field name="import_filename" string="Import Document Filename" optional="show"/>
+                <field name="export_file" filename="export_filename" widget="binary_filename" optional="show"/>
+                <field name="export_filename" string="Order Filename" optional="show"/>
+            </tree>
+        </field>
+    </record>
 </odoo>

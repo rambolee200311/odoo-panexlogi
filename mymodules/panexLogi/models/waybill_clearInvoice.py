@@ -19,10 +19,20 @@ class WaybillClearInvoice(models.Model):
     due_date = fields.Date(string='Due Date（到期日）', required=True,
                            tracking=True)
     desc = fields.Char(string='Description(费用名称)', tracking=True)
-    usdtotal = fields.Float(string='Total_of_USD', store=True,
-                            tracking=True, compute='_compute_total')
-    eurtotal = fields.Float(string='Total_of_EUR', store=True,
-                            tracking=True, compute='_compute_total')
+    usdtotal = fields.Float(
+        string='Total_of_USD',
+        store=True,
+        tracking=True,
+        compute='_compute_currency_totals',
+        compute_sudo=True  # 关键修复
+    )
+    eurtotal = fields.Float(
+        string='Total_of_EUR',
+        store=True,
+        tracking=True,
+        compute='_compute_currency_totals',
+        compute_sudo=True
+    )
     pdffile = fields.Binary(string='File（原件）')
     pdffilename = fields.Char(string='File name')
     waybill_billno = fields.Many2one('panexlogi.waybill')
@@ -44,13 +54,55 @@ class WaybillClearInvoice(models.Model):
     waybill_application = fields.Many2one('panexlogi.finance.paymentapplication', 'Waybill Application')
     waybillclearinvoicedetail_ids = fields.One2many('panexlogi.waybill.clearinvoice.detail', 'clearinvoiceinvoiceid')
 
-    poa = fields.Float(string='POA', readonly=True, tracking=True, compute='_compute_total')
-    t1 = fields.Float(string='T1', readonly=True, tracking=True, compute='_compute_total')
-    vdn = fields.Float(string='VAT defer notification', readonly=True, tracking=True, compute='_compute_total')
-    imd = fields.Float(string='Import declaration', readonly=True, tracking=True, compute='_compute_total')
-    exa = fields.Float(string='Extra article', readonly=True, tracking=True, compute='_compute_total')
-    lfr = fields.Float(string='LFR', readonly=True, tracking=True, compute='_compute_total')
-    expa = fields.Float(string='Export', readonly=True, tracking=True, compute='_compute_total')
+    poa = fields.Float(
+        string='POA',
+        readonly=True,
+        tracking=True,
+        compute='_compute_fee_components',
+        compute_sudo=True
+    )
+    t1 = fields.Float(
+        string='T1',
+        readonly=True,
+        tracking=True,
+        compute='_compute_fee_components',
+        compute_sudo=True
+    )
+    vdn = fields.Float(
+        string='VAT defer notification',
+        readonly=True,
+        tracking=True,
+        compute='_compute_fee_components',
+        compute_sudo=True
+    )
+    imd = fields.Float(
+        string='Import declaration',
+        readonly=True,
+        tracking=True,
+        compute='_compute_fee_components',
+        compute_sudo=True
+    )
+    exa = fields.Float(
+        string='Extra article',
+        readonly=True,
+        tracking=True,
+        compute='_compute_fee_components',
+        compute_sudo=True
+    )
+    lfr = fields.Float(
+        string='LFR',
+        readonly=True,
+        tracking=True,
+        compute='_compute_fee_components',
+        compute_sudo=True
+    )
+    expa = fields.Float(
+        string='Export',
+        readonly=True,
+        tracking=True,
+        compute='_compute_fee_components',
+        compute_sudo=True
+    )
     cntrnos = fields.Char(string='Container No(集装箱号)', compute='_get_cntrno_refno')
     refnos = fields.Char(string='Reference No(参考号)', compute='_get_cntrno_refno')
 
@@ -92,21 +144,28 @@ class WaybillClearInvoice(models.Model):
                 rec.state = 'cancel'
                 return True
 
-    @api.depends('waybillclearinvoicedetail_ids')
-    def _compute_total(self):
+    @api.depends('waybillclearinvoicedetail_ids.amount', 'waybillclearinvoicedetail_ids.amount_usd')
+    def _compute_currency_totals(self):
+        """计算货币总计（USD/EUR）"""
         for rec in self:
-            rec.eurtotal = 0
-            rec.usdtotal = 0
-            rec.poa = 0
-            rec.t1 = 0
-            rec.vdn = 0
-            rec.imd = 0
-            rec.exa = 0
-            rec.lfr = 0
-            rec.expa = 0
+            rec.eurtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount'))
+            rec.usdtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount_usd'))
+
+    @api.depends('waybillclearinvoicedetail_ids.poa',
+                 'waybillclearinvoicedetail_ids.t1',
+                 'waybillclearinvoicedetail_ids.vdn',
+                 'waybillclearinvoicedetail_ids.imd',
+                 'waybillclearinvoicedetail_ids.exa',
+                 'waybillclearinvoicedetail_ids.lfr',
+                 'waybillclearinvoicedetail_ids.expa')
+    def _compute_fee_components(self):
+        """计算费用组件"""
+        for rec in self:
+            # 初始化为0
+            rec.poa = rec.t1 = rec.vdn = rec.imd = rec.exa = rec.lfr = rec.expa = 0.0
+
+            # 汇总明细中的值
             if rec.waybillclearinvoicedetail_ids:
-                rec.eurtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount'))
-                rec.usdtotal = sum(rec.waybillclearinvoicedetail_ids.mapped('amount_usd'))
                 rec.poa = sum(rec.waybillclearinvoicedetail_ids.mapped('poa'))
                 rec.t1 = sum(rec.waybillclearinvoicedetail_ids.mapped('t1'))
                 rec.vdn = sum(rec.waybillclearinvoicedetail_ids.mapped('vdn'))
@@ -122,14 +181,17 @@ class WaybillClearInvoice(models.Model):
             # check if state is confirm
             if record.state != 'confirm':
                 raise UserError(_("You can only create Payment Application for a confirmed Clearance Invoice"))
+
+            if not record.waybill_billno.direction:
+                raise UserError(_("Please select a Waybill Direction"))
             # Check if PaymentApplication already exists
             direction = record.waybill_billno.direction
             domain1 = [
                 ('source', '=', 'Clearance Invoice')
                 , ('source_Code', '=', record.billno)
                 , ('state', '!=', 'cancel')
-                , ('type', '=', direction)
             ]
+            # , ('type', '=', direction)
             existing_records = self.env['panexlogi.finance.paymentapplication'].search(domain1)
             if existing_records:
                 existing_billnos = ", ".join(existing_records.mapped('billno'))
