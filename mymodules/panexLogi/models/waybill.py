@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 import requests
 import logging
@@ -166,7 +167,7 @@ class Waybill(models.Model):
             if not r.date:
                 r.week = 0
             else:
-                #r.week = int(r.date.strftime("%W"))
+                # r.week = int(r.date.strftime("%W"))
                 iso_year, iso_week, iso_day = r.date.isocalendar()
                 r.week = iso_week
 
@@ -431,7 +432,8 @@ class Waybill(models.Model):
                 if existing_delivery:
                     raise UserError(_("Delivery request already exists"))
 
-                for detail in rec.details_ids.search([('truck_type', '=', 'delivery'), ('waybill_billno', '=', rec.id)]):
+                for detail in rec.details_ids.search(
+                        [('truck_type', '=', 'delivery'), ('waybill_billno', '=', rec.id)]):
 
                     """动态合并地址字段，自动跳过空值
                     address_parts = []
@@ -712,174 +714,177 @@ class Waybill(models.Model):
         except Exception as e:
             _logger.error(f"Error in cron_link_transportoder_detail: {str(e)}")
 
+    # Fetch Portbase data and update Waybill details
     def fetch_portbase_data(self):
         self.ensure_one()
         try:
-            # API configuration
+            # API Configuration
             portbase_access_key_id = self.env['ir.config_parameter'].sudo().get_param('portbase-access-key-id')
             portbase_secret_access_key = self.env['ir.config_parameter'].sudo().get_param('portbase-secret-access-key')
-            portbase_tracked_bls = self.env['ir.config_parameter'].sudo().get_param('portbase-tracked-bls')
             portbase_track_requests = self.env['ir.config_parameter'].sudo().get_param('portbase-track-requests')
+            portbase_tracked_bls = self.env['ir.config_parameter'].sudo().get_param('portbase-tracked-bls')
 
+            # Secondary API Key
+            portbase_access_key_id_wde = self.env['ir.config_parameter'].sudo().get_param('portbase-access-key-id_wde')
+            portbase_secret_access_key_wde = self.env['ir.config_parameter'].sudo().get_param(
+                'portbase-secret-access-key_wde')
+
+            # Retry Configuration
+            max_retries = 3
+            retry_delay = 1  # Initial delay in seconds
+            # Helper function to make API requests with retry logic
+            def make_request(url, method='post', headers=None, json=None):
+                """Helper function to make API requests with retry logic."""
+                for attempt in range(max_retries):
+                    try:
+                        response = requests.post(url, headers=headers, json=json) if method == 'post' else requests.get(
+                            url, headers=headers)
+                        if response.status_code == 200:
+                            return response
+                        _logger.warning(f"API returned status {response.status_code} (attempt {attempt + 1})")
+                    except Exception as e:
+                        _logger.error(f"Request error (attempt {attempt + 1}): {str(e)}")
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay * (2 ** attempt))  # Exponential backoff
+                return None
+            # Fetch Portbase data in two steps
+            def fetch_tracking_id(headers):
+                """Fetch tracking ID (Step 1)."""
+                payload = {"trackRequests": [{"transportEquipmentNumber": self.cntrno, "blNumber": self.waybillno}]}
+                track_response = make_request(portbase_track_requests, 'post', headers, payload)
+                if not track_response:
+                    return None
+                track_data = track_response.json()
+                tracked_bls = track_data.get('trackedBLs', [])
+                if not tracked_bls:
+                    return None
+                return tracked_bls[0]['id']
+
+            def fetch_detailed_data(headers, tracking_id):
+                """Fetch detailed data (Step 2)."""
+                detail_url = f"{portbase_tracked_bls}?id={tracking_id}"
+                detail_response = make_request(detail_url, 'get', headers)
+                if not detail_response:
+                    return None
+                bl_data = detail_response.json()
+                if not isinstance(bl_data, list) or not bl_data:
+                    return None
+                return bl_data
+
+            # Prepare API headers
             headers = {
                 'portbase-access-key-id': portbase_access_key_id,
                 'portbase-secret-access-key': portbase_secret_access_key,
                 'Content-Type': 'application/json'
             }
-            # Step 1: Create track request
 
-            payload = {
-                "trackRequests": [{
-                    "transportEquipmentNumber": self.cntrno,
-                    "blNumber": self.waybillno
-                }]
-            }
-            try:
-                response = requests.post(portbase_track_requests, headers=headers, json=payload)
-                response.raise_for_status()
-                track_data = response.json()
-            except Exception as e:
-                raise UserError(_('API Error: %s') % str(e))
+            # Step 1: Fetch Tracking ID
+            tracking_id = fetch_tracking_id(headers)
+            if not tracking_id:
+                raise UserError(_('Failed to fetch tracking ID after multiple attempts.'))
 
-            # Get tracking ID
-            tracked_bls = track_data.get('trackedBLs', [])
-            if not tracked_bls:
-                raise UserError(_('No tracked BLS found in the response.'))
-            tracking_id = tracked_bls[0]['id']
-
-            # Step 2: Get detailed tracking data
-            detail_url = f'{portbase_tracked_bls}?id={tracking_id}'
-            try:
-                response = requests.get(detail_url, headers=headers)
-                response.raise_for_status()
-                bl_data = response.json()
-            except Exception as e:
-                raise UserError(_('API Error: %s') % str(e))
-
+            # Step 2: Fetch Detailed Data
+            bl_data = fetch_detailed_data(headers, tracking_id)
             if not bl_data:
-                raise UserError(_(f'No data found for the given tracking ID: {tracking_id}.'))
+                # Switch to secondary API key and retry Step 1 and Step 2
+                _logger.info("Switching to secondary API key...")
+                headers = {
+                    'portbase-access-key-id': portbase_access_key_id_wde,
+                    'portbase-secret-access-key': portbase_secret_access_key_wde,
+                    'Content-Type': 'application/json'
+                }
+                tracking_id = fetch_tracking_id(headers)
+                if not tracking_id:
+                    raise UserError(_('Failed to fetch tracking ID with secondary API key.'))
+
+                bl_data = fetch_detailed_data(headers, tracking_id)
+                if not bl_data:
+                    raise UserError(_('Failed to fetch detailed data with secondary API key.'))
+
+            # Step 3: Process Data
             bill_of_lading = bl_data[0].get('billOfLading', {})
-            vessel_visit = bill_of_lading.get('vesselVisit', {})
-            visit_declaration = vessel_visit.get('visitDeclaration', {})
-            port_visit = visit_declaration.get('portVisit', {})
-
-            # Update ETA and terminal information
             update_vals = {}
+            vessel_visit = bill_of_lading.get('vesselVisit', {}).get('visitDeclaration', {}).get('portVisit', {})
+            for field, source in [('eta', 'etaPort'), ('ata', 'ataPort')]:
+                value = vessel_visit.get(source)
+                if value:
+                    try:
+                        update_vals[field] = datetime.strptime(value.split('T')[0], '%Y-%m-%d').date()
+                    except ValueError:
+                        _logger.warning(f"Failed to parse date for {field}: {value}")
 
-            # Parse ETA date
-            if port_visit.get('etaPort'):
-                try:
-                    eta_date_str = port_visit['etaPort'].split('T')[0]  # Get date part only
-                    ata_date_str = port_visit['ataPort'].split('T')[0]  # Get date part only
-                    update_vals['eta'] = datetime.strptime(eta_date_str, '%Y-%m-%d').date()
-                    update_vals['ata'] = datetime.strptime(ata_date_str, '%Y-%m-%d').date()
-                except Exception as e:
-                    _logger.error("Error parsing ETA date: %s", str(e))
-
-            # Handle terminal information
-            discharge_terminal = bill_of_lading.get('dischargeTerminal', {})
-            if discharge_terminal:
-                update_vals['portbase_discharge_terminal'] = discharge_terminal.get('ownerFullName', '')
-
-            # Write the update values to the waybill
+            update_vals['portbase_discharge_terminal'] = bill_of_lading.get('dischargeTerminal', {}).get(
+                'ownerFullName', '')
             if update_vals:
                 self.write(update_vals)
 
-            # Filter only the container we requested
-            transport_equipments = [
-                eq for eq in bill_of_lading.get('transportEquipments', [])
-                if eq.get('equipmentNumber') == self.cntrno
-            ]
-            goods_items = bill_of_lading.get('goodsItems', [])
-            # Group goods items by container
-            equipment_goods = defaultdict(list)
-            for gi in goods_items:
-                for ge in gi.get('goodsItemTransportEquipments', []):
-                    if ge.get('equipmentNumber') == self.cntrno:
-                        equipment_goods[self.cntrno].append(gi)
+            # Step 4: Process Containers
+            containers_processed = 0
+            for equipment in bill_of_lading.get('transportEquipments', []):
+                cntr_num = equipment.get('equipmentNumber')
+                if not cntr_num:
+                    continue
 
-            # Process container details
-            for equipment in transport_equipments:
-                # Create/update detail line
-                detail = self.details_ids.filtered(
-                    lambda d: d.cntrno == equipment['equipmentNumber']
-                )
+                container_goods = [
+                    (gi, ge) for gi in bill_of_lading.get('goodsItems', [])
+                    for ge in gi.get('goodsItemTransportEquipments', [])
+                    if ge.get('equipmentNumber') == cntr_num
+                ]
+
+                detail = self.details_ids.filtered(lambda d: d.cntrno == cntr_num)
                 detail_vals = {
-                    'cntrno': equipment['equipmentNumber'],
+                    'cntrno': cntr_num,
                     'cntrnum': 1,
-                    'pallets': sum(
-                        gi['numberOfOuterPackages']
-                        for gi in goods_items
-                        if any(ge['equipmentNumber'] == equipment['equipmentNumber']
-                               for ge in gi['goodsItemTransportEquipments'])
-                    ),
+                    'pallets': sum(ge.get('numberOfPackages', 0) for _, ge in container_goods),
                     'note': equipment.get('oversizeRemarks', ''),
                     'waybill_billno': self.id,
                 }
-                # Check if detail already exists
+
                 if not detail:
-                    new_detail = self.details_ids.create(detail_vals)
-                    id_int_new = new_detail.id
-                    # Get goods items SPECIFIC to this container
-                    container_goods = [
-                        gi for gi in goods_items
-                        if any(ge['equipmentNumber'] == equipment['equipmentNumber']
-                               for ge in gi['goodsItemTransportEquipments'])
-                    ]
-
-                    # Process packing list items
-                    packlist_lines = []
-                    for gi in container_goods:
-                        commodity_data = gi.get('commodity', {})
-
-                        packlist_vals = {
-                            'portbase_product_code': commodity_data.get('code', ''),
-                            'portbase_product': commodity_data.get('description', ''),
-                            'pcs': gi.get('numberOfOuterPackages', 0),
-                            'pallets': gi.get('numberOfOuterPackages', 0),
-                            'gw': gi.get('grossWeight', 0),
-                            'cntrno': equipment['equipmentNumber'],
-                            'sealno': equipment.get('carrierSealNumber', ''),
-                            'waybill_billno': self.id,
-                            'waybll_detail_id': id_int_new,
-                        }
-                        packlist_lines.append((0, 0, packlist_vals))
-                    new_detail.write({'waybill_packlist_id': packlist_lines})
-
-                # Update records
-                """
-                if detail:
-                    # detail.write(detail_vals)
-                    # detail.waybill_packlist_id = [(5, 0, 0)] + packlist_lines
-                    pass
+                    detail = self.env['panexlogi.waybill.details'].create(detail_vals)
                 else:
-                    detail_vals['waybill_billno'] = self.id
-                    detail_vals['waybill_packlist_id'] = packlist_lines
-                    new_detail = self.env['panexlogi.waybill.details'].create(detail_vals)
-                    #new_detail.waybill_packlist_id = packlist_lines
-                """
-                # return success message
+                    detail.write(detail_vals)
+
+                detail.waybill_packlist_id.unlink()
+                pack_lines = [
+                    (0, 0, {
+                        'portbase_product_code': gi.get('commodity', {}).get('code', ''),
+                        'portbase_product': gi.get('commodity', {}).get('description', ''),
+                        'pcs': ge.get('numberOfPackages', 0),
+                        'pallets': ge.get('numberOfPackages', 0),
+                        'gw': ge.get('grossWeight', 0.0),
+                        'cntrno': cntr_num,
+                        'sealno': equipment.get('carrierSealNumber', ''),
+                        'waybill_billno': self.id,
+                        'waybll_detail_id': detail.id,
+                    }) for gi, ge in container_goods
+                ]
+                if pack_lines:
+                    detail.write({'waybill_packlist_id': pack_lines})
+
+                containers_processed += 1
+
+            # Success Notification
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': 'Success',
-                    'message': 'Portbase data fetched successfully!',
+                    'title': 'Sync Complete',
+                    'message': f'{containers_processed} containers updated successfully.',
                     'type': 'success',
                     'sticky': False,
-                    'next': {
-                        'type': 'ir.actions.client',
-                        'tag': 'reload',
-                    }
                 }
             }
+
         except Exception as e:
+            _logger.error(f"Error in fetch_portbase_data: {str(e)}")
             raise UserError(f"Failed to fetch Portbase data: {e}")
 
     @api.depends('packlist_ids')
     def _autolink_detail_auto_link(self):
         for record in self:
             record.cron_link_packlist_details()
+
 
 # 其他附件
 class WaybillOtherDocs(models.Model):

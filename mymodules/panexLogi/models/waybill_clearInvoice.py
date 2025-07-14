@@ -203,7 +203,7 @@ class WaybillClearInvoice(models.Model):
             # check if invoiceno is duplicate
             domain2 = [
                 ('source', '=', 'Clearance Invoice')
-                , ('waybill_billno', '=', record.waybill_billno.id)
+                , ('payee', '=', record.payee.id)
                 , ('invoiceno', '=', record.invno)
                 , ('state', '!=', 'cancel')
                 , ('type', '=', direction)]

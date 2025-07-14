@@ -7,6 +7,8 @@
             <field name="arch" type="xml">
                 <tree decoration-success="parent_state=='confirm'" decoration-info="parent_state=='paid'"  decoration-danger="parent_state=='cancel'" limit="50">
                     <field name="parent_billno" optional="show"/>
+                    <field name="parent_waybillno" optional="show"/>
+                    <field name="parent_eta" optional="show"/>
                     <field name="parent_type" optional="show"/>
                     <field name="parent_date" optional="show"/>
                     <field name="parent_payee" optional="show"/>
@@ -35,6 +37,8 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="parent_billno"/>
+                    <field name="parent_waybillno"/>
+                    <field name="parent_eta"/>
                     <field name="parent_type"/>
                     <field name="parent_date"/>
                     <field name="parent_payee"/>

@@ -6,5 +6,5 @@ class PackageType(models.Model):
     _description = 'PackageType'
     _rec_name = "packagetype_name"
 
-    packagetype_name = fields.Char(string='Package Type', required=True)
-    remark = fields.Text(string='Remark')
+    packagetype_name = fields.Char(string='Package Type', required=True, translate=True)
+    remark = fields.Text(string='Remark', translate=True)

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Form View -->
+    <record id="view_panex_dashboard_form" model="ir.ui.view">
+        <field name="name">panex.dashboard.form</field>
+        <field name="model">panex.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Panex Dashboard" create="false" edit="false">
+                <sheet>
+                    <div class="dashboard" style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                        <!-- Waybill Shortcut -->
+                        <div class="card o_kanban_record" style="padding: 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; background: #f8f9fa;">
+                            <h3>Waybill</h3>
+                            <p>Total: <field name="waybill_count" readonly="true"/></p>
+                            <button name="action_open_waybill" type="object" string="Open" class="btn btn-primary"/>
+                        </div>
+
+                        <!-- Transport Shortcut -->
+                        <div class="card o_kanban_record" style="padding: 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; background: #f8f9fa;">
+                            <h3>Transport</h3>
+                            <p>Total: <field name="transport_count" readonly="true"/></p>
+                            <button name="action_open_transport" type="object" string="Open" class="btn btn-primary"/>
+                        </div>
+
+                        <!-- Delivery Shortcut -->
+                        <div class="card o_kanban_record" style="padding: 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; background: #f8f9fa;">
+                            <h3>Delivery</h3>
+                            <p>Total: <field name="delivery_count" readonly="true"/></p>
+                            <button name="action_open_delivery" type="object" string="Open" class="btn btn-primary"/>
+                        </div>
+
+                        <!-- AR Bill Shortcut -->
+                        <div class="card o_kanban_record" style="padding: 16px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; background: #f8f9fa;">
+                            <h3>A/R Bill</h3>
+                            <p>Total: <field name="ar_bill_count" readonly="true"/></p>
+                            <button name="action_open_ar_bill" type="object" string="Open" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="action_panex_dashboard" model="ir.actions.act_window">
+        <field name="name">Panex Dashboard</field>
+        <field name="res_model">panex.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="view_id" ref="view_panex_dashboard_form"/>
+    </record>
+</odoo>

@@ -30,6 +30,18 @@ class OutboundOrder(models.Model):
 
     outbound_order_product_ids = fields.One2many('panexlogi.outbound.order.products', 'outboundorderid')
 
+    unload_street = fields.Char(string='Unload Street')
+    unload_city = fields.Char(string='Unload City')
+    unload_state = fields.Char(string='Unload State')
+    unload_zip = fields.Char(string='Unload Zip')
+    unload_country = fields.Many2one('res.country', string='Unload Country')
+    unload_company = fields.Char(string='Unload Company')
+    unload_contact = fields.Char(string='Unload Contact')
+    unload_phone = fields.Char(string='Unload Phone')
+    unload_timeslot = fields.Char(string='Unload Timeslot')
+    unload_date = fields.Datetime(string='Unload Date')
+    unload_remark = fields.Text(string='Unload Remark')
+
     @api.model
     def create(self, values):
         """

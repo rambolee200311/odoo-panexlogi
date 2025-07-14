@@ -241,26 +241,33 @@
                         <page  string="Packing List">
                             <field name="packlist_ids"/>
                         </page>
-                        <!--<page  string="Arrival Notice">
-                            <field name="arrivnotice_ids"/>
-                        </page>-->
-                         <page  string="Commercial Invoice">
-                            <field name="commeinvoice_ids"/>
-                        </page>
                          <page  string="Shipping Invoice">
                             <field name="shipinvoice_ids" delete="0"/>
                         </page>
                         <page  string="Clearance Invoice">
                             <field name="clearinvoice_ids" delete="0"/>
                         </page>
-                        <!--
-                        <page  string="Warehousing Invoice">
-                            <field name="customsduties_ids"/>
-                        </page>
-                        -->
                         <page  string="Cargo Release">
                             <field name="cargorelease_ids"/>
                         </page>
+                        <page  string="Other Docs">
+                            <field name="otherdocs_ids"/>
+                        </page>
+                        <!--
+                        <page  string="Arrival Notice">
+                            <field name="arrivnotice_ids"/>
+                        </page>
+                        <page  string="Commercial Invoice">
+                            <field name="commeinvoice_ids"/>
+                        </page>
+                        <page  string="Warehousing Invoice">
+                            <field name="customsduties_ids"/>
+                        </page>
+
+                        <page  string="Cargo Release">
+                            <field name="cargorelease_ids"/>
+                        </page>
+
                         <page string="Income">
                             <group string="Main" col="3">
                                 <group col="2">
@@ -346,10 +353,8 @@
                                 <field name="cntr_note"/>
                             </group>
                         </page>
+                        -->
 
-                        <page  string="Other Docs">
-                            <field name="otherdocs_ids"/>
-                        </page>
 
                     </notebook>
                 </sheet>

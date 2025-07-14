@@ -15,7 +15,7 @@ class WaybillPackList(models.Model):
     interpono = fields.Char(string='Inter-Company PO Number')
     product_id = fields.Many2one('product.product', string='Product')
     portbase_product_code = fields.Char(string='Portbase Product Code')
-    portbase_product = fields.Char(string='Portbase Product')
+    portbase_product = fields.Text(string='Portbase Product')
     sn = fields.Char(string='Serial Number')
     powerperpc = fields.Integer(string='Power Per Piece')
     pcs = fields.Float(string='Pcs', required=True)

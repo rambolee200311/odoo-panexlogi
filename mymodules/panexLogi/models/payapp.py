@@ -84,6 +84,7 @@ class PaymentApplication(models.Model):
                 record.pay_amount_usd = 0.0
                 record.pay_remark = False
     '''
+
     @api.model
     def create(self, values):
         """
@@ -441,6 +442,8 @@ class PaymentApplicationLine(models.Model):
     parent_invoiceno = fields.Char(string='Invoice No', related="payapp_billno.invoiceno", readonly=True)
     parent_invoice_date = fields.Date(string='Invoice Date', related="payapp_billno.invoice_date", readonly=True)
     parent_due_date = fields.Date(string='Due Date', related="payapp_billno.due_date", readonly=True)
+    parent_waybillno = fields.Char(string='Bill of Lading',  related="payapp_billno.waybill_billno.waybillno", readonly=True)
+    parent_eta = fields.Date(string='ETA', related="payapp_billno.waybill_billno.eta", readonly=True)
 
     @api.model
     def create(self, values):

@@ -1,0 +1,106 @@
+erDiagram
+    res_state ||--o{ bxmp_area : "locate"
+    res_state {
+        bigint id PK
+        string code
+        string name
+    }
+    bxmp_area {
+        bigint id PK
+        string code
+        string name
+        bigint state_id FK
+    }
+    bxmp_area||--o{ bxmp_hospital : "has"
+    bxmp_hospital {
+        bigint id PK
+        string code
+        string name
+        bigint area_id FK
+    }
+    res_user ||--o{ bxmp_patient_main : "register"
+    res_user {
+        bigint id PK
+        string username
+        string password
+        string email
+    }
+    bxmp_patient_main {
+        bigint id PK
+        string name
+        string phone
+        string gender
+        date birth_date
+        string id_card
+        string address
+        string remark
+        bigint user_id FK
+    }
+    bxmp_patient_main ||--o{  bxmp_patient_medical_record: "belongs to"
+    bxmp_hospital ||--o{ bxmp_patient_medical_record: "has"
+    bxmp_patient_medical_record {
+        bigint id PK
+        date visit_date
+        string symptoms
+        string diagnosis
+        string treatment
+        string doctor_name
+        string remark
+        bigint patient_id FK
+        bigint hospital_id FK
+    }
+    bxmp_patient_main ||--o{  bxmp_patient_medical_history: "belongs to"
+    bxmp_patient_medical_history {
+        bigint id PK
+        string disease_name
+        date diagnosis_date
+        string treatment
+        string remark
+        bigint patient_id FK
+    }
+    bxmp_patient_medical_history ||--o{ bxmp_patient_family_history: "has"
+    bxmp_patient_family_history {
+        bigint id PK
+        string relationship
+        string disease_name
+        date diagnosis_date
+        string remark
+        bigint medical_history_id FK
+    }
+
+    bxmp_patient_main ||--o{  bxmp_patient_follow_up_record: "belongs to"
+    bxmp_patient_follow_up_record {
+        bigint id PK
+        date follow_up_date
+        string notes
+        string physical_status_id FK
+        string appetite_status_id FK
+        string remark
+        bigint patient_id FK
+    }
+    bxmp_physical_status ||--o{ bxmp_patient_follow_up_record: "has"
+    bxmp_physical_status {
+        bigint id PK
+        string status
+    }
+    bxmp_appetite_status ||--o{ bxmp_patient_follow_up_record: "has"
+    bxmp_appetite_status {
+        bigint id PK
+        string status
+    }
+    bxmp_patient_follow_up_record ||--o{ bxmp_patient_evaluation_record: "has"
+    bxmp_patient_evaluation_record {
+        bigint id PK
+        date evaluation_date
+        string notes
+        string indicator
+        string remark
+        bigint follow_up_record_id FK
+    }
+    bxmp_patient_evaluation_record ||--o{ bxmp_patient_conclusion: "has"
+    bxmp_patient_conclusion {
+        bigint id PK
+        string conclusion
+        string remark
+        bigint evaluation_record_id FK
+    }

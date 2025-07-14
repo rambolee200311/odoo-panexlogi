@@ -110,6 +110,7 @@
         'views/project_item_report.xml',
         'views/payment_application_line.xml',
         'views/keji_in_realtime.xml',
+        'views/panex_dashboard_views.xml',
         'views/menus.xml',
         #'views/tools_required.xml',
     ],

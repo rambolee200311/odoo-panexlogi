@@ -2,7 +2,7 @@
 <odoo>
     <!-- window_action -->
     <record id="panexlogi_packagetype_action" model="ir.actions.act_window">
-        <field name="name">packagetype.management</field>
+        <field name="name">Package Type</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">panexlogi.packagetype</field>
         <field name="view_mode">tree,form</field>
@@ -20,29 +20,32 @@
             <form>
                 <sheet>
                     <group string="Main">
-                        <field name="packagetype_name"/>
+                        <field name="packagetype_name" string='Package Type'/>
+                        <field name="remark" string='Remark'/>
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
     <!--Search View-->
-        <record id="settle_bill_search_view" model="ir.ui.view">
-            <field name="name">panexlogi.packagetype.search</field>
-            <field name="model">panexlogi.packagetype</field>
-            <field name="arch" type="xml">
-                <search>
-                    <field name="packagetype_name"/>
-                </search>
-            </field>
-        </record>
+    <record id="packagetype_search_view" model="ir.ui.view">
+        <field name="name">panexlogi.packagetype.search</field>
+        <field name="model">panexlogi.packagetype</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="packagetype_name" string='Package Type'/>
+                <field name="remark" string='Remark'/>
+            </search>
+        </field>
+    </record>
     <!--Tree(List) View-->
     <record id="packagetype_view_tree" model="ir.ui.view">
         <field name="name">packagetype.tree</field>
         <field name="model">panexlogi.packagetype</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="packagetype_name"/>
+               <field name="packagetype_name" string='Package Type'/>
+                <field name="remark" string='Remark'/>
             </tree>
         </field>
     </record>

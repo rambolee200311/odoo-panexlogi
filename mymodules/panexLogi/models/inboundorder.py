@@ -1,6 +1,7 @@
+import logging
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-
+_logger = logging.getLogger(__name__)
 
 # 入库指令
 class InboundOrder(models.Model):
@@ -11,7 +12,8 @@ class InboundOrder(models.Model):
 
     billno = fields.Char(string='BillNo', readonly=True)
     date = fields.Date(string='Date（单据日期）', required=True, tracking=True, default=fields.Date.today)
-    project = fields.Many2one('panexlogi.project', string='Project（项目）', required=True)
+    owner = fields.Many2one('res.partner', string='Owner', required=True, tracking=True)
+    project = fields.Many2one('panexlogi.project', string='Project', required=True)
     project_code = fields.Char(string='Project Code', related='project.project_code', readonly=True)
     waybill_billno = fields.Many2one(comodel_name='panexlogi.waybill', string='Waybill NO')
     waybillno = fields.Char(string='B/L NUMBER', related='waybill_billno.waybillno', readonly=True, store=True)
@@ -32,6 +34,8 @@ class InboundOrder(models.Model):
         tracking=True
     )
     inbound_order_product_ids = fields.One2many('panexlogi.inbound.order.products', 'inboundorderid')
+
+
 
     @api.model
     def create(self, values):
