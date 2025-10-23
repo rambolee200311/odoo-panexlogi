@@ -132,6 +132,10 @@ class Waybill(models.Model):
     eta_remark = fields.Text(string='ETA Remark')
     transport_order = fields.One2many('panexlogi.transport.order', 'waybill_billno', string='Transport Order')
 
+    # 20250716 add
+    release_received = fields.Boolean(string='Release Received', default=False, tracking=True)
+    custom_clearance = fields.Boolean(string='Custom Clearance', default=False, tracking=True)
+
     # Autofill project_type when project is selected
     @api.onchange('project')
     def _onchange_project(self):
@@ -732,6 +736,7 @@ class Waybill(models.Model):
             # Retry Configuration
             max_retries = 3
             retry_delay = 1  # Initial delay in seconds
+
             # Helper function to make API requests with retry logic
             def make_request(url, method='post', headers=None, json=None):
                 """Helper function to make API requests with retry logic."""
@@ -747,6 +752,7 @@ class Waybill(models.Model):
                     if attempt < max_retries - 1:
                         time.sleep(retry_delay * (2 ** attempt))  # Exponential backoff
                 return None
+
             # Fetch Portbase data in two steps
             def fetch_tracking_id(headers):
                 """Fetch tracking ID (Step 1)."""

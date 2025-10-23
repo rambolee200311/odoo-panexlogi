@@ -146,7 +146,7 @@
                             string="Cancel"
                             invisible="state == 'confirm' or state == 'cancel'"
                             class="btn-warning"/>
-                    <button name="action_renew_order"
+                     <button name="action_renew_order"
                             type="object"
                             string="Renew"
                             invisible="state != 'cancel'"
@@ -213,6 +213,8 @@
                             <field name="date" readonly="state!='new'"/>
                             <field name="week" readonly="state!='new'"/>
                             <field name="adr" readonly="state!='new'"/>
+                            <field name="release_received"/>
+                            <field name="custom_clearance"/>
                             <field name="cntrno_list" readonly="1"/>
                             <field name="remark"/>
                         </group>
@@ -247,13 +249,14 @@
                         <page  string="Clearance Invoice">
                             <field name="clearinvoice_ids" delete="0"/>
                         </page>
-                        <page  string="Cargo Release">
-                            <field name="cargorelease_ids"/>
-                        </page>
+
                         <page  string="Other Docs">
                             <field name="otherdocs_ids"/>
                         </page>
                         <!--
+                        <page  string="Cargo Release">
+                            <field name="cargorelease_ids"/>
+                        </page>
                         <page  string="Arrival Notice">
                             <field name="arrivnotice_ids"/>
                         </page>

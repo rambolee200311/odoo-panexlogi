@@ -93,6 +93,10 @@
         <menuitem id="panexlogi_warehouse_invoice_menu" name="Warehouse Invoices"  parent="warehouse_invoice_menu"  action="action_warehouse_invoice" sequence="522"/>
         <menuitem id="panexlogi_warehouse_invoice_detail_menu" name="Warehouse Invoice Details"  parent="warehouse_invoice_menu"  action="action_warehouse_invoice_detail" sequence="523"/>
 
+        <menuitem id="lunch_menu" name="Lunch" parent="panex_logi_menu" sequence="600" />
+        <menuitem id="lunch_week_plan_menu" name="Week Plan" parent="lunch_menu" sequence="601" action="action_lunch_week_plan"/>
+        <menuitem id="lunch_week_plan_summary_menu" name="Week Plan Summary" parent="lunch_menu" sequence="602" action="action_lunch_week_plan_summary"/>
+
         <menuitem id="configuration_menu" name="Configuration" parent="panex_logi_menu" sequence="900" />
         <menuitem id="partner_menu" name="Partners" parent="configuration_menu" sequence="901" action="action_partner"/>
 <!--    <menuitem id="sender_menu" name="Spot files" parent="configuration_menu" sequence="902" action="sender_action"/>
@@ -105,16 +109,16 @@
         <menuitem id="panex_loadingcondition_menu" name="Loading Conditions" parent="configuration_menu" sequence="909" action="panexlogi_loadingcondition_action"/>
         <menuitem id="panex_packagetype_menu" name="packagetypes" parent="configuration_menu" sequence="907" action="panexlogi_packagetype_action"/>
         <menuitem id="panex_terminal_menu" name="Terminals" parent="configuration_menu" sequence="908" action="panexlogi_terminal_action"/>
-	<menuitem id="panex_paymentmethod_menu" name="Payment Methods" parent="configuration_menu" sequence="909" action="action_payment_method"/>
-	<menuitem id="panex_project_type_menu" name="Project Types" parent="configuration_menu" sequence="910" action="action_project_type"/>
+        <menuitem id="panex_paymentmethod_menu" name="Payment Methods" parent="configuration_menu" sequence="909" action="action_payment_method"/>
+        <menuitem id="panex_project_type_menu" name="Project Types" parent="configuration_menu" sequence="910" action="action_project_type"/>
         <menuitem id="menu_partner_bankinfo"  name="Partner BankInfos"   parent="configuration_menu" sequence="911" action="action_partner_bankinfo"/>
 
-	<menuitem id="menu_clearance_type" name="Clearance Types" sequence="913" parent="configuration_menu" action="action_clearance_type"/>
-	<menuitem id="menu_trailertype_type" name="Trailer Types" sequence="914" parent="configuration_menu" action="panexlogi_trailertype_action"/>
-	<menuitem id="menu_excel_template_type" name="Excel Templates" sequence="915" parent="configuration_menu" action="action_excel_template"/>
-	<menuitem id="menu_address" name="Addresses" sequence="916" parent="configuration_menu" action="action_address_tree"/>
-	<menuitem id="menu_fiscal_year" name="Fiscal Years" parent="configuration_menu" action="action_fiscal_year" sequence="917"/>
-	<menuitem id="menu_customer_temp" name="Customer Temp" parent="configuration_menu" action="action_customer_temp" sequence="918"/>
+        <menuitem id="menu_clearance_type" name="Clearance Types" sequence="913" parent="configuration_menu" action="action_clearance_type"/>
+        <menuitem id="menu_trailertype_type" name="Trailer Types" sequence="914" parent="configuration_menu" action="panexlogi_trailertype_action"/>
+        <menuitem id="menu_excel_template_type" name="Excel Templates" sequence="915" parent="configuration_menu" action="action_excel_template"/>
+        <menuitem id="menu_address" name="Addresses" sequence="916" parent="configuration_menu" action="action_address_tree"/>
+        <menuitem id="menu_fiscal_year" name="Fiscal Years" parent="configuration_menu" action="action_fiscal_year" sequence="917"/>
+        <menuitem id="menu_customer_temp" name="Customer Temp" parent="configuration_menu" action="action_customer_temp" sequence="918"/>
 
 	<!-- <menuitem id="menu_demo_todo" name="Demo To-Do" parent="configuration_menu" sequence="999" action="action_demo_todo_menu"/>
         <menuitem id="menu_demo_stock_picking" name="Demo Stock Picking" parent="configuration_menu" sequence="999" action="action_demo_stock_picking_menu"/>-->

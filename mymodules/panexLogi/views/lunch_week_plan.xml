@@ -1,0 +1,148 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_lunch_week_plan_tree" model="ir.ui.view">
+        <field name="name">lunch.week.plan.tree</field>
+        <field name="model">panexlogi.lunch.week.plan</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="plan_week_begin"/>
+                <field name="plan_week_end"/>
+                <field name="reserved_day"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_lunch_week_plan_form" model="ir.ui.view">
+        <field name="name">lunch.week.plan.form</field>
+        <field name="model">panexlogi.lunch.week.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                        invisible="state != 'draft'"
+                        class="btn-primary"/>
+                    <button name="action_unsubmit" string="Unsubmit" type="object"
+                        invisible="state != 'submitted'"
+                        class="btn-danger"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                        invisible="state != 'draft'"
+                        class="btn-primary"/>
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,submitted"/>
+                    <widget name="web_ribbon" title="CANCEL" bg_color="bg-danger" invisible="state!='cancel'"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            Week Plan
+                        </h1>
+                        <h2>
+                            <field name="name" readonly="1"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <field name="employee_id" readonly="1"/>
+                        <field name="week_date" readonly="state!='draft'"/>
+                        <field name="plan_week_begin" readonly="1"/>
+                        <field name="plan_week_end" readonly="1"/>
+                        <field name="reserved_day" readonly="1"/>
+                        <!--<field name="state" readonly="1"/>-->
+                    </group>
+                    <group string="Meal Days" col="2">
+                        <group >
+                            <field name="monday_meals" readonly="state!='draft'"/>
+                            <field name="tuesday_meals" readonly="state!='draft'"/>
+                            <field name="wednesday_meals" readonly="state!='draft'"/>
+                            <field name="thursday_meals" readonly="state!='draft'"/>
+                            <field name="friday_meals" readonly="state!='draft'"/>
+                        </group>
+                        <group >
+                            <field name="monday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
+                            <field name="tuesday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
+                            <field name="wednesday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
+                            <field name="thursday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
+                            <field name="friday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Summary Tree View -->
+    <record id="view_lunch_week_plan_summary_tree" model="ir.ui.view">
+        <field name="name">lunch.week.plan.summary.tree</field>
+        <field name="model">panexlogi.lunch.week.plan.summary</field>
+        <field name="arch" type="xml">
+            <tree string="Lunch Week Plan Summary">
+                <field name="plan_week" optional="hide"/>
+                <field name="plan_week_begin" optional="show"/>
+                <field name="plan_week_end" optional="show"/>
+                <field name="total_monday" optional="show"/>
+                <field name="total_monday_guests" optional="show"/>
+                <field name="monday_employees" widget="many2many_tags" optional="show"/>
+                <field name="total_tuesday" optional="show"/>
+                <field name="total_tuesday_guests" optional="show"/>
+                <field name="tuesday_employees" widget="many2many_tags" optional="show"/>
+                <field name="total_wednesday" optional="show"/>
+                <field name="total_wednesday_guests" optional="show"/>
+                <field name="wednesday_employees" widget="many2many_tags" optional="show"/>
+                <field name="total_thursday" optional="show"/>
+                <field name="total_thursday_guests" optional="show"/>
+                <field name="thursday_employees" widget="many2many_tags" optional="show"/>
+                <field name="total_friday" optional="show"/>
+                <field name="total_friday_guests" optional="show"/>
+                <field name="friday_employees" widget="many2many_tags" optional="show"/>
+                <field name="total_week" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <!-- Summary search view -->
+    <record id="view_lunch_week_plan_summary_search" model="ir.ui.view">
+        <field name="name">lunch.week.plan.summary.search</field>
+        <field name="model">panexlogi.lunch.week.plan.summary</field>
+        <field name="arch" type="xml">
+            <search string="Lunch Week Plan Summary">
+                 <field name="plan_week_begin"/>
+                 <field name="plan_week_end"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Calendar View -->
+    <record id="view_lunch_week_plan_calendar" model="ir.ui.view">
+        <field name="name">lunch.week.plan.calendar</field>
+        <field name="model">panexlogi.lunch.week.plan</field>
+        <field name="arch" type="xml">
+            <calendar string="Lunch Week Plan"
+                      date_start="plan_week_begin"
+                      date_stop="plan_week_end"
+                      color="state"
+                      mode="week">
+                <field name="employee_id"/>
+                <field name="reserved_day"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_lunch_week_plan" model="ir.actions.act_window">
+        <field name="name">Lunch Week Plan</field>
+        <field name="res_model">panexlogi.lunch.week.plan</field>
+        <field name="view_mode">tree,form,calendar</field>
+    </record>
+    <record id="action_lunch_week_plan_summary" model="ir.actions.act_window">
+        <field name="name">Lunch Week Plan Summary</field>
+        <field name="res_model">panexlogi.lunch.week.plan.summary</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+
+</odoo>

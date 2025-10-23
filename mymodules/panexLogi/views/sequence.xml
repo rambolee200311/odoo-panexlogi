@@ -351,5 +351,14 @@
             <field name="number_increment">1</field>
             <field name="use_date_range" eval="True"/>
         </record>
+         <record id="seq_lunch_week_plan" model="ir.sequence">
+            <field name="name">Lunch Week Plan</field>
+            <field name="code">lunch.week.plan</field>
+            <field name="prefix">lWP%(year)s%(month)s%(day)s</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="use_date_range" eval="True"/>
+        </record>
     </data>
 </odoo>

@@ -111,6 +111,7 @@
         'views/payment_application_line.xml',
         'views/keji_in_realtime.xml',
         'views/panex_dashboard_views.xml',
+        'views/lunch_week_plan.xml',
         'views/menus.xml',
         #'views/tools_required.xml',
     ],
