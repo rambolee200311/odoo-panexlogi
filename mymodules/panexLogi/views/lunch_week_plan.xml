@@ -81,6 +81,9 @@
         <field name="model">panexlogi.lunch.week.plan.summary</field>
         <field name="arch" type="xml">
             <tree string="Lunch Week Plan Summary">
+                <header>
+                    <button name="action_refresh_summary" type="object" string="Refresh Summary" class="oe_highlight"/>
+                </header>
                 <field name="plan_week" optional="hide"/>
                 <field name="plan_week_begin" optional="show"/>
                 <field name="plan_week_end" optional="show"/>

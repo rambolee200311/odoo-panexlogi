@@ -388,3 +388,29 @@ class LunchWeekPlanSummary(models.Model):
                 record.total_thursday +
                 record.total_friday
             )
+
+    def action_refresh_summary(self):
+        """Action to manually refresh summary data for all weeks."""
+        try:
+            # Get all unique week numbers from submitted plans
+            week_numbers = self.env['panexlogi.lunch.week.plan'].search([
+                ('state', '=', 'submitted')
+            ]).mapped('plan_week')
+    
+            # Update summary for each week
+            for week_number in set(week_numbers):
+                self.update_summary_for_week(week_number)
+    
+            # Return success notification
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Summary Refreshed',
+                    'message': f'Successfully refreshed summary data for {len(set(week_numbers))} weeks',
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+        except Exception as e:
+            raise UserError(f"Error refreshing summary data: {str(e)}")
