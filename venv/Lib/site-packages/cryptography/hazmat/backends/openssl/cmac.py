@@ -2,8 +2,10 @@
 # 2.0, and the BSD License. See the LICENSE file in the root of this repository
 # for complete details.
 
+from __future__ import annotations
 
-from cryptography import utils
+import typing
+
 from cryptography.exceptions import (
     InvalidSignature,
     UnsupportedAlgorithm,
@@ -12,9 +14,18 @@ from cryptography.exceptions import (
 from cryptography.hazmat.primitives import constant_time
 from cryptography.hazmat.primitives.ciphers.modes import CBC
 
+if typing.TYPE_CHECKING:
+    from cryptography.hazmat.backends.openssl.backend import Backend
+    from cryptography.hazmat.primitives import ciphers
 
-class _CMACContext(object):
-    def __init__(self, backend, algorithm, ctx=None):
+
+class _CMACContext:
+    def __init__(
+        self,
+        backend: Backend,
+        algorithm: ciphers.BlockCipherAlgorithm,
+        ctx=None,
+    ) -> None:
         if not backend.cmac_algorithm_supported(algorithm):
             raise UnsupportedAlgorithm(
                 "This backend does not support CMAC.",
@@ -49,8 +60,6 @@ class _CMACContext(object):
 
         self._ctx = ctx
 
-    algorithm = utils.read_only_property("_algorithm")
-
     def update(self, data: bytes) -> None:
         res = self._backend._lib.CMAC_Update(self._ctx, data, len(data))
         self._backend.openssl_assert(res == 1)
@@ -65,7 +74,7 @@ class _CMACContext(object):
 
         return self._backend._ffi.buffer(buf)[:]
 
-    def copy(self) -> "_CMACContext":
+    def copy(self) -> _CMACContext:
         copied_ctx = self._backend._lib.CMAC_CTX_new()
         copied_ctx = self._backend._ffi.gc(
             copied_ctx, self._backend._lib.CMAC_CTX_free

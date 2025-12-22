@@ -1,0 +1,163 @@
+<odoo>
+    <record id="action_lunch_week_plan_summary_report" model="ir.actions.report">
+        <field name="name">Lunch Week Plan Summary Report</field>
+        <field name="model">panexlogi.lunch.week.plan.summary</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">panexLogi.lunch_week_plan_summary_report</field>
+        <field name="print_report_name">'Lunch Week Plan Summary - %s' % (object.plan_week_begin)</field>
+    </record>
+
+    <template id="lunch_week_plan_summary_report">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="doc">
+                    <div class="container" style="font-family: Arial, sans-serif; color: #333;">
+
+                        <!-- Title Section -->
+                        <div class="title-section" style="text-align: center; margin-bottom: 10px; padding: 10px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 8px;">
+                            <!-- h1 style="margin: 0; font-size: 28px; font-weight: bold;">PANEX - 泛鼎国际</h1 -->
+                            <h2 style="margin: 10px 0 0 0; font-size: 20px; font-weight: normal;">Lunch Week Plan Summary</h2>
+                        </div>
+
+                        <!-- Week Information -->
+                        <div class="week-info" style="text-align: center; margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+                            <div style="display: flex; justify-content: center; gap: 30px; margin-top: 5px;">
+                                <p style="margin: 0; font-size: 14px;">
+                                    <strong style="color: #7f8c8d;">Week Start:</strong>
+                                    <span style="color: #2c3e50; font-weight: bold;" t-esc="doc.plan_week_begin"/>
+                                </p>
+                                <p style="margin: 0; font-size: 14px;">
+                                    <strong style="color: #7f8c8d;">Week End:</strong>
+                                    <span style="color: #2c3e50; font-weight: bold;" t-esc="doc.plan_week_end"/>
+                                </p>
+                                <p style="margin: 0; font-size: 14px;">
+                                    <strong style="color: #7f8c8d;">Week Number:</strong>
+                                    <span style="color: #2c3e50; font-weight: bold;" t-esc="doc.plan_week"/>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Summary Table -->
+                        <table class="summary-table" style="width: 100%; border-collapse: collapse; margin: 10px 0; box-shadow: 0 2px 2px rgba(0,0,0,0.1);">
+                            <thead>
+                                <tr style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: blue;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd; font-weight: bold; font-size: 16px;">Day</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd; font-weight: bold; font-size: 16px;">Total</th>
+                                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd; font-weight: bold; font-size: 16px;">Guests</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd; font-weight: bold; font-size: 16px;">Employees</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Monday -->
+                                <tr style="background-color: #f8f9fa;">
+                                    <td style="padding: 12px 10px; border: 1px solid #ddd; font-weight: bold; color: #2c3e50;">Monday</td>
+                                    <td style="padding: 12px 10px; border: 1px solid #ddd; text-align: center; font-size: 16px; font-weight: bold; color: #27ae60;">
+                                        <t t-esc="doc.total_monday"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; color: #e74c3c; font-weight: bold;">
+                                        <t t-esc="doc.total_monday_guests"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd;">
+                                        <t t-foreach="doc.monday_employees" t-as="employee">
+                                            <div style="padding: 3px 0; font-size: 13px;">
+                                                <span t-esc="employee.name"/>
+                                                <t>____________________</t>
+                                            </div>
+                                        </t>
+                                        <t t-if="not doc.monday_employees">-</t>
+                                    </td>
+                                </tr>
+
+                                <!-- Tuesday -->
+                                <tr style="background-color: #ffffff;">
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; font-weight: bold; color: #2c3e50;">Tuesday</td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; font-size: 16px; font-weight: bold; color: #27ae60;">
+                                        <t t-esc="doc.total_tuesday"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; color: #e74c3c; font-weight: bold;">
+                                        <t t-esc="doc.total_tuesday_guests"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd;">
+                                        <t t-foreach="doc.tuesday_employees" t-as="employee">
+                                            <div style="padding: 3px 0; font-size: 13px;">
+                                                <span t-esc="employee.name"/>
+                                                <t>____________________</t>
+                                            </div>
+                                        </t>
+                                        <t t-if="not doc.tuesday_employees">-</t>
+                                    </td>
+                                </tr>
+
+                                <!-- Wednesday -->
+                                <tr style="background-color: #f8f9fa;">
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; font-weight: bold; color: #2c3e50;">Wednesday</td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; font-size: 16px; font-weight: bold; color: #27ae60;">
+                                        <t t-esc="doc.total_wednesday"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; color: #e74c3c; font-weight: bold;">
+                                        <t t-esc="doc.total_wednesday_guests"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd;">
+                                        <t t-foreach="doc.wednesday_employees" t-as="employee">
+                                            <div style="padding: 3px 0; font-size: 13px;">
+                                                <span t-esc="employee.name"/>
+                                                <t>____________________</t>
+                                            </div>
+                                        </t>
+                                        <t t-if="not doc.wednesday_employees">-</t>
+                                    </td>
+                                </tr>
+
+                                <!-- Thursday -->
+                                <tr style="background-color: #ffffff;">
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; font-weight: bold; color: #2c3e50;">Thursday</td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; font-size: 16px; font-weight: bold; color: #27ae60;">
+                                        <t t-esc="doc.total_thursday"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; color: #e74c3c; font-weight: bold;">
+                                        <t t-esc="doc.total_thursday_guests"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd;">
+                                        <t t-foreach="doc.thursday_employees" t-as="employee">
+                                            <div style="padding: 3px 0; font-size: 13px;">
+                                                <span t-esc="employee.name"/>
+                                                <t>____________________</t>
+                                            </div>
+                                        </t>
+                                        <t t-if="not doc.thursday_employees">-</t>
+                                    </td>
+                                </tr>
+
+                                <!-- Friday -->
+                                <tr style="background-color: #f8f9fa;">
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; font-weight: bold; color: #2c3e50;">Friday</td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; font-size: 16px; font-weight: bold; color: #27ae60;">
+                                        <t t-esc="doc.total_friday"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd; text-align: center; color: #e74c3c; font-weight: bold;">
+                                        <t t-esc="doc.total_friday_guests"/>
+                                    </td>
+                                    <td style="padding: 12px 15px; border: 1px solid #ddd;">
+                                        <t t-foreach="doc.friday_employees" t-as="employee">
+                                            <div style="padding: 3px 0; font-size: 13px;">
+                                                <span t-esc="employee.name"/>
+                                                <t>____________________</t>
+                                            </div>
+                                        </t>
+                                        <t t-if="not doc.friday_employees">-</t>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Footer Section -->
+                        <div class="footer" style="margin-top: 40px; padding-top: 15px; border-top: 2px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 12px;">
+                            <p style="margin: 5px 0;">Panex WD - Netherlands</p>
+                            <p style="margin: 5px 0;">Generated on <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M')"/></p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

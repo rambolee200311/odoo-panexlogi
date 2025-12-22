@@ -36,6 +36,14 @@ class Project(models.Model):
     outbound_operating_fix = fields.Boolean(string='Fix Outbound Operating Fee')
     outbound_operating_fixfee_per_pallet = fields.Float(string='Per Pallte')
 
+    # wecom parameters
+    wecom_corp_id = fields.Char(string='WeCom Corp ID')
+    wecom_agent_id = fields.Char(string='WeCom Agent ID')
+    wecom_token = fields.Char(string='WeCom Token')
+    wecom_encoding_aes_key = fields.Char(string='WeCom EncodingAESKey')
+    wecom_template_id = fields.Char(string='WeCom Template ID')
+
+
     # 生成明细
     """
     @api.model
@@ -81,4 +89,4 @@ class ProjectType(models.Model):
 
     name = fields.Char('Name')
     remark = fields.Text('Remark')
-    projectid = fields.Many2one('panexlogi.project')
+    projectid = fields.Many2one('panexlogi.project', string='Project')

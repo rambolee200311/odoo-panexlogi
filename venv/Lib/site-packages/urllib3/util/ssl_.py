@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 
+import hashlib
 import hmac
 import os
 import sys
 import warnings
 from binascii import hexlify, unhexlify
-from hashlib import md5, sha1, sha256
 
 from ..exceptions import (
     InsecurePlatformWarning,
@@ -24,7 +24,10 @@ IS_SECURETRANSPORT = False
 ALPN_PROTOCOLS = ["http/1.1"]
 
 # Maps the length of a digest to a possible hash function producing this digest
-HASHFUNC_MAP = {32: md5, 40: sha1, 64: sha256}
+HASHFUNC_MAP = {
+    length: getattr(hashlib, algorithm, None)
+    for length, algorithm in ((32, "md5"), (40, "sha1"), (64, "sha256"))
+}
 
 
 def _const_compare_digest_backport(a, b):
@@ -164,7 +167,7 @@ except ImportError:
                 "urllib3 from configuring SSL appropriately and may cause "
                 "certain SSL connections to fail. You can upgrade to a newer "
                 "version of Python to solve this. For more information, see "
-                "https://urllib3.readthedocs.io/en/latest/advanced-usage.html"
+                "https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html"
                 "#ssl-warnings",
                 InsecurePlatformWarning,
             )
@@ -191,9 +194,15 @@ def assert_fingerprint(cert, fingerprint):
 
     fingerprint = fingerprint.replace(":", "").lower()
     digest_length = len(fingerprint)
-    hashfunc = HASHFUNC_MAP.get(digest_length)
-    if not hashfunc:
+    if digest_length not in HASHFUNC_MAP:
         raise SSLError("Fingerprint of invalid length: {0}".format(fingerprint))
+    hashfunc = HASHFUNC_MAP.get(digest_length)
+    if hashfunc is None:
+        raise SSLError(
+            "Hash function implementation unavailable for fingerprint length: {0}".format(
+                digest_length
+            )
+        )
 
     # We need encode() here for py32; works on py2 and p33.
     fingerprint_bytes = unhexlify(fingerprint.encode())
@@ -422,7 +431,7 @@ def ssl_wrap_socket(
     try:
         if hasattr(context, "set_alpn_protocols"):
             context.set_alpn_protocols(ALPN_PROTOCOLS)
-    except NotImplementedError:
+    except NotImplementedError:  # Defensive: in CI, we always have set_alpn_protocols
         pass
 
     # If we detect server_hostname is an IP address then the SNI
@@ -440,7 +449,7 @@ def ssl_wrap_socket(
             "This may cause the server to present an incorrect TLS "
             "certificate, which can cause validation failures. You can upgrade to "
             "a newer version of Python to solve this. For more information, see "
-            "https://urllib3.readthedocs.io/en/latest/advanced-usage.html"
+            "https://urllib3.readthedocs.io/en/1.26.x/advanced-usage.html"
             "#ssl-warnings",
             SNIMissingWarning,
         )

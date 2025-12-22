@@ -142,7 +142,25 @@
                                     </tree>
                                 </field>
                             </page>
+                            <page string="DeepSeek Check">
+                                <header>
+                                    <button name="action_deepseek_check"
+                                                type="object"
+                                                string="Run DeepSeek Check"
+                                                class="btn-primary"
+                                                />
+                                </header>
+                                <group col="2">
+                                    <field name="check_status" readonly="1"/>
+                                    <field name="risk_level" readonly="1"/>
+                                    <field name="check_time_begin" readonly="1"/>
+                                    <field name="check_duration" readonly="1"/>
+                                    <field name="check_result" readonly="1" colspan="2" nolabel="1" style="width:100%; height:200px;"/>
+                                </group>
+                            </page>
+                                
                         </notebook>
+
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" />

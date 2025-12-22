@@ -63,11 +63,16 @@
                             <field name="friday_meals" readonly="state!='draft'"/>
                         </group>
                         <group >
-                            <field name="monday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
+                            <field name="monday_guest_count" readonly="state!='draft'"/>
+                            <field name="tuesday_guest_count" readonly="state!='draft'"/>
+                            <field name="wednesday_guest_count" readonly="state!='draft'"/>
+                            <field name="thursday_guest_count" readonly="state!='draft'"/>
+                            <field name="friday_guest_count" readonly="state!='draft'"/>
+                            <!--<field name="monday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
                             <field name="tuesday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
                             <field name="wednesday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
                             <field name="thursday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
-                            <field name="friday_guest_count" groups="base.group_system" readonly="state!='draft'"/>
+                            <field name="friday_guest_count" groups="base.group_system" readonly="state!='draft'"/>-->
                         </group>
                     </group>
                 </sheet>
@@ -83,26 +88,33 @@
             <tree string="Lunch Week Plan Summary">
                 <header>
                     <button name="action_refresh_summary" type="object" string="Refresh Summary" class="oe_highlight"/>
+                    <button name="action_print_summary_report" type="object" string="Print Report" class="btn-primary"/>
                 </header>
                 <field name="plan_week" optional="hide"/>
-                <field name="plan_week_begin" optional="show"/>
-                <field name="plan_week_end" optional="show"/>
-                <field name="total_monday" optional="show"/>
-                <field name="total_monday_guests" optional="show"/>
-                <field name="monday_employees" widget="many2many_tags" optional="show"/>
-                <field name="total_tuesday" optional="show"/>
-                <field name="total_tuesday_guests" optional="show"/>
-                <field name="tuesday_employees" widget="many2many_tags" optional="show"/>
-                <field name="total_wednesday" optional="show"/>
-                <field name="total_wednesday_guests" optional="show"/>
-                <field name="wednesday_employees" widget="many2many_tags" optional="show"/>
-                <field name="total_thursday" optional="show"/>
-                <field name="total_thursday_guests" optional="show"/>
-                <field name="thursday_employees" widget="many2many_tags" optional="show"/>
-                <field name="total_friday" optional="show"/>
-                <field name="total_friday_guests" optional="show"/>
-                <field name="friday_employees" widget="many2many_tags" optional="show"/>
-                <field name="total_week" optional="show"/>
+                <field name="plan_week_begin" optional="show" string="Start"/>
+                <field name="plan_week_end" optional="show" string="End"/>
+
+                <field name="total_monday" optional="show" string="MON"/>
+                <field name="total_monday_guests" optional="show" string="GSTs"/>
+                <field name="monday_employees" widget="many2many_tags" optional="show" string="EMPs"/>
+
+                <field name="total_tuesday" optional="show" string="TUE"/>
+                <field name="total_tuesday_guests" optional="show" string="GSTs"/>
+                <field name="tuesday_employees" widget="many2many_tags" optional="show" string="EMPs"/>
+
+                <field name="total_wednesday" optional="show" string="WED"/>
+                <field name="total_wednesday_guests" optional="show" string="GSTs"/>
+                <field name="wednesday_employees" widget="many2many_tags" optional="show" string="EMPs"/>
+
+                <field name="total_thursday" optional="show" string="THU"/>
+                <field name="total_thursday_guests" optional="show" string="GSTs"/>
+                <field name="thursday_employees" widget="many2many_tags" optional="show" string="EMPs"/>
+
+                <field name="total_friday" optional="show" string="FRI"/>
+                <field name="total_friday_guests" optional="show" string="GSTs"/>
+                <field name="friday_employees" widget="many2many_tags" optional="show" string="EMPs"/>
+
+                <field name="total_week" optional="show" string="TOTAL"/>
             </tree>
         </field>
     </record>

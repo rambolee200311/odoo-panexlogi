@@ -73,3 +73,6 @@ from . import keji_token
 from . import keji_in_realtime
 from . import panex_dashboard
 from . import lunch_week_plan
+from . import deepseek_checker
+from . import deepseek_utils
+from . import payapp_deepseek_check

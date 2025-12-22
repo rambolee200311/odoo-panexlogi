@@ -112,6 +112,7 @@
         'views/keji_in_realtime.xml',
         'views/panex_dashboard_views.xml',
         'views/lunch_week_plan.xml',
+        'report/lunch_week_plan_rpt.xml',
         'views/menus.xml',
         #'views/tools_required.xml',
     ],

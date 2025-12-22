@@ -8,3 +8,4 @@ from . import getOutbound
 from . import getWarehouse
 from . import getProject
 from . import getProduct
+from . import wecom
