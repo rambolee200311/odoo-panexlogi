@@ -110,6 +110,9 @@
                             <field name="payee_bank_bic"  readonly="state!='new'"/>
                         </group>
                         <group col="2" string="Payer">
+                            <field name="payer_contact"  readonly="state!='new'"/>
+                            <field name="payer_contact_account"  readonly="state!='new'"/>
+                            <!-- <field name="payer_contact_bic"  readonly="state!='new'"/> -->
                             <field name="payer"  readonly="state!='new'"/>
                             <field name="payer_account"  readonly="state!='new'"/>
                             <field name="payer_bank"  readonly="state!='new'"/>

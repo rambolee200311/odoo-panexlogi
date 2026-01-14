@@ -74,10 +74,22 @@ class Payment(models.Model):
                                        readonly=True)
     payee_bank_bic = fields.Char(string='Bank BIC（收款方银行BIC）', related='payee_account_partner.bank_bic',
                                  readonly=True)
-
-    payer = fields.Char(string='Payer（付款方）', tracking=True)
-    payer_bank = fields.Char(string='Bank（付款方银行）', tracking=True)
-    payer_account = fields.Char(string='Account（付款方账号）', tracking=True)
+    
+   
+    payer_contact = fields.Many2one(
+            'res.partner',
+            string='Payer',
+            tracking=True,
+            domain="[('id', 'in', [1269, 508])]"
+    )
+    
+    payer_contact_account = fields.Many2one('res.partner.bank', string='Payer Account', tracking=True,
+                                            domain="[('partner_id', '=', payer_contact)]")
+    payer_contact_bic = fields.Char(string='Payer Bank BIC（付款方银行BIC）', related='payer_contact_account.bank_bic',
+                                   readonly=True)
+    payer = fields.Char(string='Payer（付款方）', related='payer_contact.name',store=True)
+    payer_bank = fields.Char(string='Bank（付款方银行）', related='payer_contact_account.bank_name',store=True)
+    payer_account = fields.Char(string='Account（付款方账号）', related='payer_contact_account.acc_number', store=True)
     payment_method = fields.Many2one('panexlogi.finance.payment.method',
                                      string='Payment Method（付款方式）',
                                      domain=[('state', '=', 'active')], tracking=True)
